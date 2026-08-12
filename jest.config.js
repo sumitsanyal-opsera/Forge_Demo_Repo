@@ -13,6 +13,7 @@ module.exports = {
         '^lightning/platformShowToastEvent$':
             '<rootDir>/force-app/test/jest-mocks/lightningPlatformShowToastEvent.js',
         '^lightning/uiRecordApi$': '<rootDir>/force-app/test/jest-mocks/lightningUiRecordApi.js',
+        '^lightning/empApi$': '<rootDir>/force-app/test/jest-mocks/lightningEmpApi.js',
         '^c/(.+)$': '<rootDir>/force-app/main/default/lwc/$1/$1',
         ...jestConfig.moduleNameMapper
     },

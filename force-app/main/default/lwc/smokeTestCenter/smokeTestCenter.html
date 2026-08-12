@@ -202,6 +202,45 @@
                  role="region"
                  aria-label="Main content">
 
+                <!-- Content header: real-time progress indicator + manual refresh button -->
+                <div class="content-header slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                    <div class="slds-col">
+                        <template if:true={progressData}>
+                            <span class="progress-indicator slds-badge slds-badge_lightest">
+                                {progressLabel}
+                            </span>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-no-flex">
+                        <button
+                            class="slds-button slds-button_neutral"
+                            data-id="manual-refresh"
+                            onclick={handleManualRefresh}
+                            title="Refresh dashboard">
+                            <lightning-icon
+                                icon-name="utility:refresh"
+                                size="x-small"
+                                class="slds-m-right_xx-small">
+                            </lightning-icon>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fallback warning: shown when empApi subscriptions fail after max retries -->
+                <template if:true={showFallbackWarning}>
+                    <div class="fallback-warning slds-notify slds-notify_alert slds-theme_info slds-m-bottom_small"
+                         role="status">
+                        <lightning-icon
+                            icon-name="utility:info"
+                            alternative-text="Information"
+                            size="x-small"
+                            class="slds-m-right_x-small">
+                        </lightning-icon>
+                        Real-time updates unavailable — using periodic refresh.
+                    </div>
+                </template>
+
                 <!-- First-time user onboarding — shown when no execution records exist -->
                 <template if:true={showOnboarding}>
                     <c-onboarding-card is-admin={isAdmin}></c-onboarding-card>

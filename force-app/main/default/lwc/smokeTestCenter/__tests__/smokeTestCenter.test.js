@@ -1,6 +1,7 @@
 import { createElement } from 'lwc';
 import { registerApexTestWireAdapter } from '@salesforce/sfdx-lwc-jest';
 import { NavigationMixin } from 'lightning/navigation';
+import { subscribe, unsubscribe, onError } from 'lightning/empApi';
 import SmokeTestCenter from 'c/smokeTestCenter';
 import checkUserPermissions from '@salesforce/apex/SmokeTestDashboardController.checkUserPermissions';
 import getLatestExecution from '@salesforce/apex/SmokeTestDashboardController.getLatestExecution';
@@ -8,9 +9,14 @@ import getLatestExecution from '@salesforce/apex/SmokeTestDashboardController.ge
 import mockAdminPermissions  from './data/adminPermissions.json';
 import mockViewerPermissions from './data/viewerPermissions.json';
 import mockNoPermissions     from './data/noPermissions.json';
+import mockProgressEvent     from './data/progressEvent.json';
+import mockCompleteEvent     from './data/completeEvent.json';
 
 const checkUserPermissionsAdapter = registerApexTestWireAdapter(checkUserPermissions);
 const getLatestExecutionAdapter   = registerApexTestWireAdapter(getLatestExecution);
+
+const PROGRESS_CHANNEL = '/event/SmokeTestProgress__e';
+const COMPLETE_CHANNEL = '/event/SmokeTestComplete__e';
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -36,7 +42,6 @@ afterEach(() => {
 describe('loading state', () => {
     it('shows spinner before wire data resolves', () => {
         const element = createComponent();
-        // Wire adapter not yet emitted — component should be in loading state
         const spinner = element.shadowRoot.querySelector('.slds-spinner');
         expect(spinner).not.toBeNull();
     });
@@ -338,7 +343,6 @@ describe('onboarding card visibility', () => {
     it('does not render c-onboarding-card before execution wire resolves', async () => {
         const element = createComponent();
         checkUserPermissionsAdapter.emit(mockAdminPermissions);
-        // getLatestExecutionAdapter never emits — wire stays undefined
         await flushPromises();
 
         const onboardingCard = element.shadowRoot.querySelector('c-onboarding-card');
@@ -373,7 +377,6 @@ describe('onboarding card visibility', () => {
         getLatestExecutionAdapter.emit({ Id: 'a001', Status__c: 'Completed', OverallResult__c: 'Pass' });
         await flushPromises();
 
-        // Dashboard slot should be accessible
         const slot = element.shadowRoot.querySelector('slot');
         expect(slot).not.toBeNull();
     });
@@ -381,14 +384,349 @@ describe('onboarding card visibility', () => {
     it('hides onboarding and shows dashboard after execution wire returns data', async () => {
         const element = createComponent();
         checkUserPermissionsAdapter.emit(mockAdminPermissions);
-        // First emit null (onboarding shows)
         getLatestExecutionAdapter.emit(null);
         await flushPromises();
         expect(element.shadowRoot.querySelector('c-onboarding-card')).not.toBeNull();
 
-        // Then emit an execution record (onboarding hides)
         getLatestExecutionAdapter.emit({ Id: 'a001', Status__c: 'Completed', OverallResult__c: 'Pass' });
         await flushPromises();
         expect(element.shadowRoot.querySelector('c-onboarding-card')).toBeNull();
+    });
+});
+
+// =============================================================================
+// Platform Event subscription (AC-1, AC-5)
+// =============================================================================
+
+describe('Platform Event subscription', () => {
+    it('subscribes to SmokeTestProgress__e on connectedCallback', async () => {
+        createComponent();
+        await flushPromises();
+
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        expect(progressCall).toBeDefined();
+        expect(progressCall[1]).toBe(-1);
+        expect(typeof progressCall[2]).toBe('function');
+    });
+
+    it('subscribes to SmokeTestComplete__e on connectedCallback', async () => {
+        createComponent();
+        await flushPromises();
+
+        const completeCall = subscribe.mock.calls.find(c => c[0] === COMPLETE_CHANNEL);
+        expect(completeCall).toBeDefined();
+        expect(completeCall[1]).toBe(-1);
+        expect(typeof completeCall[2]).toBe('function');
+    });
+
+    it('registers onError handler on connectedCallback', async () => {
+        createComponent();
+        await flushPromises();
+
+        expect(onError).toHaveBeenCalledWith(expect.any(Function));
+    });
+
+    it('unsubscribes from both channels on disconnectedCallback', async () => {
+        const element = createComponent();
+        await flushPromises();
+
+        document.body.removeChild(element);
+        await flushPromises();
+
+        expect(unsubscribe).toHaveBeenCalledTimes(2);
+    });
+});
+
+// =============================================================================
+// Progress event handling (AC-2)
+// =============================================================================
+
+describe('progress event handling', () => {
+    it('updates progressData when a progress event is received', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent);
+        await flushPromises();
+
+        const indicator = element.shadowRoot.querySelector('.progress-indicator');
+        expect(indicator).not.toBeNull();
+        expect(indicator.textContent).toContain('3');
+        expect(indicator.textContent).toContain('10');
+    });
+
+    it('shows progress label with correct text format', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent);
+        await flushPromises();
+
+        const indicator = element.shadowRoot.querySelector('.progress-indicator');
+        expect(indicator.textContent.trim()).toContain('In Progress:');
+        expect(indicator.textContent.trim()).toContain('scenarios complete');
+    });
+
+    it('ignores duplicate progress events (idempotent — same completedScenarios)', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent); // completedScenarios = 3
+        await flushPromises();
+
+        // Send a lower count — should be ignored
+        progressCall[2]({
+            data: { payload: { ...mockProgressEvent.data.payload, CompletedScenarios__c: 2 } }
+        });
+        await flushPromises();
+
+        // Should still show 3 (the higher count)
+        const indicator = element.shadowRoot.querySelector('.progress-indicator');
+        expect(indicator.textContent).toContain('3');
+    });
+
+    it('hides progress indicator before any progress events', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const indicator = element.shadowRoot.querySelector('.progress-indicator');
+        expect(indicator).toBeNull();
+    });
+});
+
+// =============================================================================
+// Complete event handling (AC-3)
+// =============================================================================
+
+describe('complete event handling', () => {
+    it('dispatches refreshdashboard event on complete event', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const refreshHandler = jest.fn();
+        element.addEventListener('refreshdashboard', refreshHandler);
+
+        const completeCall = subscribe.mock.calls.find(c => c[0] === COMPLETE_CHANNEL);
+        completeCall[2](mockCompleteEvent);
+        await flushPromises();
+
+        expect(refreshHandler).toHaveBeenCalledTimes(1);
+    });
+
+    it('refreshdashboard event detail contains executionId and overallResult', async () => {
+        const element = createComponent();
+        await flushPromises();
+
+        let capturedDetail;
+        element.addEventListener('refreshdashboard', e => { capturedDetail = e.detail; });
+
+        const completeCall = subscribe.mock.calls.find(c => c[0] === COMPLETE_CHANNEL);
+        completeCall[2](mockCompleteEvent);
+        await flushPromises();
+
+        expect(capturedDetail.executionId).toBe('a00000000000001AAA');
+        expect(capturedDetail.overallResult).toBe('Pass');
+        expect(capturedDetail.totalDurationMs).toBe(45000);
+    });
+
+    it('clears progressData after complete event', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        // First set progressData via progress event
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent);
+        await flushPromises();
+
+        const indicatorBefore = element.shadowRoot.querySelector('.progress-indicator');
+        expect(indicatorBefore).not.toBeNull();
+
+        // Now send complete event
+        const completeCall = subscribe.mock.calls.find(c => c[0] === COMPLETE_CHANNEL);
+        completeCall[2](mockCompleteEvent);
+        await flushPromises();
+
+        const indicatorAfter = element.shadowRoot.querySelector('.progress-indicator');
+        expect(indicatorAfter).toBeNull();
+    });
+});
+
+// =============================================================================
+// Auto-refresh timer (AC-4)
+// =============================================================================
+
+describe('auto-refresh timer', () => {
+    it('starts a 30-second setInterval after first progress event', async () => {
+        const setIntervalSpy = jest.spyOn(global, 'setInterval');
+
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent);
+
+        expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 30000);
+        setIntervalSpy.mockRestore();
+    });
+
+    it('does not start duplicate timers on repeated progress events', async () => {
+        const setIntervalSpy = jest.spyOn(global, 'setInterval');
+
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent);
+        progressCall[2]({
+            data: { payload: { ...mockProgressEvent.data.payload, CompletedScenarios__c: 5 } }
+        });
+
+        // setInterval should only be called once (timer guard _refreshTimerId check)
+        expect(setIntervalSpy).toHaveBeenCalledTimes(1);
+        setIntervalSpy.mockRestore();
+    });
+
+    it('clears timer on complete event', async () => {
+        const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        // Start timer via progress event
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent);
+
+        // Send complete event — should clear timer
+        const completeCall = subscribe.mock.calls.find(c => c[0] === COMPLETE_CHANNEL);
+        completeCall[2](mockCompleteEvent);
+
+        expect(clearIntervalSpy).toHaveBeenCalled();
+        clearIntervalSpy.mockRestore();
+    });
+
+    it('clears timer on disconnectedCallback', async () => {
+        const clearIntervalSpy = jest.spyOn(global, 'clearInterval');
+
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        // Start timer
+        const progressCall = subscribe.mock.calls.find(c => c[0] === PROGRESS_CHANNEL);
+        progressCall[2](mockProgressEvent);
+
+        document.body.removeChild(element);
+
+        expect(clearIntervalSpy).toHaveBeenCalled();
+        clearIntervalSpy.mockRestore();
+    });
+});
+
+// =============================================================================
+// empApi error fallback (error handling, reconnection, AC-7)
+// =============================================================================
+
+describe('empApi error fallback', () => {
+    it('retries subscription on empApi error (up to 3 times)', async () => {
+        createComponent();
+        await flushPromises();
+
+        // Initial 2 subscribe calls (progress + complete)
+        const initialSubscribeCount = subscribe.mock.calls.length;
+
+        const errorCallback = onError.mock.calls[0][0];
+
+        // First error → retry (setTimeout scheduled, not executed without fake timers)
+        errorCallback({ code: 'STREAMING_LIMIT_EXCEEDED' });
+
+        // subscribe should NOT be called again synchronously (it's inside setTimeout)
+        expect(subscribe.mock.calls.length).toBe(initialSubscribeCount);
+    });
+
+    it('shows fallback warning banner after exceeding max retry attempts', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const errorCallback = onError.mock.calls[0][0];
+
+        // Exceed MAX_RETRY_ATTEMPTS (3): on the 4th call, fallback activates
+        errorCallback({}); // retryCount → 1
+        errorCallback({}); // retryCount → 2
+        errorCallback({}); // retryCount → 3
+        errorCallback({}); // 3 is NOT < 3 → fallback
+        await flushPromises();
+
+        const warning = element.shadowRoot.querySelector('.fallback-warning');
+        expect(warning).not.toBeNull();
+    });
+
+    it('starts auto-refresh timer when entering fallback mode', async () => {
+        const setIntervalSpy = jest.spyOn(global, 'setInterval');
+
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const errorCallback = onError.mock.calls[0][0];
+        errorCallback({});
+        errorCallback({});
+        errorCallback({});
+        errorCallback({}); // triggers fallback
+
+        expect(setIntervalSpy).toHaveBeenCalledWith(expect.any(Function), 30000);
+        setIntervalSpy.mockRestore();
+    });
+});
+
+// =============================================================================
+// Manual refresh button (AC-6)
+// =============================================================================
+
+describe('manual refresh button', () => {
+    it('renders manual refresh button in the content header', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const refreshBtn = element.shadowRoot.querySelector('[data-id="manual-refresh"]');
+        expect(refreshBtn).not.toBeNull();
+    });
+
+    it('dispatches refreshdashboard event when refresh button is clicked', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        await flushPromises();
+
+        const refreshHandler = jest.fn();
+        element.addEventListener('refreshdashboard', refreshHandler);
+
+        const refreshBtn = element.shadowRoot.querySelector('[data-id="manual-refresh"]');
+        refreshBtn.click();
+        await flushPromises();
+
+        expect(refreshHandler).toHaveBeenCalledTimes(1);
+    });
+
+    it('manual refresh button is always visible regardless of execution state', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        getLatestExecutionAdapter.emit({ Id: 'a001', Status__c: 'Completed', OverallResult__c: 'Pass' });
+        await flushPromises();
+
+        const refreshBtn = element.shadowRoot.querySelector('[data-id="manual-refresh"]');
+        expect(refreshBtn).not.toBeNull();
     });
 });

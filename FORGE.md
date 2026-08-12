@@ -245,3 +245,10 @@
 - **Files:** 8 (+475/-36)
 - **Duration:** 583ss
 - **Approach:** Added three degradation paths to SecurityHealthCheckService: (1) HTTP 403 now returns 'View Setup and Configuration permission required for the integration user', (2) HTTP 500 returns 'Unable to retrieve security health score — Tooling API unavailable (HTTP 500)', (3) pre-flight check changed from ==0 to <5 with message 'API call limit approaching — security check skipped to preserve budget'. CalloutException is now caught separately from general Exception with a 'Network error connecting to Tooling API' message. SecurityHealthCheckCache.cls provides Platform Cache (local.SmokeTestCache, 60s TTL) with automatic static-map fallback for test contexts and unsupported org editions. SecurityCacheTTL__c CMT field configures the TTL. SecurityScoreComparator already handled ERROR/SKIPPED short-circuit from WO-038.
+
+## WO-051: User Story: WO-051 - Platform Event Real-Time Dashboard Subscription
+- **Status:** completed
+- **Commit:** `ad9e24b`
+- **Files:** 7 (+592/-13)
+- **Duration:** 600ss
+- **Approach:** Extended smokeTestCenter.js with lightning/empApi subscription logic. connectedCallback registers onError and subscribes to /event/SmokeTestProgress__e and /event/SmokeTestComplete__e with replay ID -1. Progress events update a @track progressData object (idempotent — ignores events with lower completedScenarios count) and start a 30-second setInterval auto-refresh timer. Complete events dispatch 'refreshdashboard' CustomEvent and clear the timer. Reconnection retries up to 3 times (5s delay each) on empApi errors; after MAX_RETRY_ATTEMPTS the component activates fallback mode showing a warning banner and starting the auto-refresh timer. disconnectedCallback clears timer and unsubscribes. The HTML adds a content-header bar with progress indicator, manual refresh button, and fallback warning. A lightning/empApi Jest mock + two Platform Event payload fixtures enable unit tests without a scratch org.
