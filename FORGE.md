@@ -98,3 +98,10 @@
 - **Files:** 1 (+16/-0)
 - **Duration:** 157ss
 - **Approach:** WO-073 is a scaffold story for a greenfield project, but the project was already built in prior WOs. Performed a gap analysis against the 8 acceptance criteria: AC1 (package.json with libxmljs2/typescript/vitest), AC3 (src/, tests/, fixtures/ dirs), and AC5 (src/validate.ts importing libxmljs2 and exporting validateXml) were all already satisfied. AC4 (tsc compiles without errors) is satisfied by the existing tsconfig. AC2 requires module:NodeNext — the existing tsconfig uses module:commonjs; changing to NodeNext would break ts-node compatibility and all existing CommonJS-style imports across the entire project, so this was left as-is (the WO was written for a greenfield project, and the existing setup fully compiles and runs). The only missing piece was AC6: tests/validate.test.ts. Created it as a single Vitest smoke test that imports validateXml from src/validate.ts and asserts it returns isValid:true for the fixtures/valid-custom-object.xml against fixtures/custom-object.xsd.
+
+## WO-093: User Story: WO-093 - Load XSD and Validate XML Files
+- **Status:** completed
+- **Commit:** `11c974c`
+- **Files:** 5 (+152/-0)
+- **Duration:** 546ss
+- **Approach:** Extended the existing src/validate.ts (from WO-066) by adding three exports at the top of the file: a DEFAULT_SCHEMA_PATH constant pointing to schemas/CustomObject.xsd, a FileValidationResult interface ({filePath, valid, errors: {line, message}[]}), a loadSchema(xsdPath) function wrapping readFileSync+parseXml with descriptive error messages, and a validateFiles(schema, xmlPaths[]) function that reads/parses each file and maps libxmljs2 validationErrors. The original ValidationResult, ValidationError interfaces and validateXml function were left intact. Created a minimal CustomObject XSD with required fullName and optional label/description using the Salesforce metadata namespace. Created matching valid and invalid XML test fixtures. Tests cover all 6 acceptance criteria scenarios.
