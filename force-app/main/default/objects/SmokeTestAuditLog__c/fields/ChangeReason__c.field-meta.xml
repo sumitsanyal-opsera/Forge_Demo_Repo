@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ChangeReason__c</fullName>
+    <description>Human-readable justification for the change. Required (validated by AuditLogWriter) when ActionType__c is CONFIGURATION_CHANGE. Provides the "why" for compliance reviewers. Max 255 characters to encourage concise documentation.</description>
+    <externalId>false</externalId>
+    <label>Change Reason</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

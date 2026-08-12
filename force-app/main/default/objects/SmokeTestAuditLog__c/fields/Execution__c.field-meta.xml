@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Execution__c</fullName>
+    <description>Optional Lookup to the SmokeTestExecution__c record that triggered this audit event. Enables cross-object queries linking execution history to audit trail. Null for DASHBOARD_ACCESS and CONFIGURATION_CHANGE events not associated with a specific execution.</description>
+    <externalId>false</externalId>
+    <label>Execution</label>
+    <referenceTo>SmokeTestExecution__c</referenceTo>
+    <relationshipLabel>Audit Logs</relationshipLabel>
+    <relationshipName>ExecutionAuditLogs</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

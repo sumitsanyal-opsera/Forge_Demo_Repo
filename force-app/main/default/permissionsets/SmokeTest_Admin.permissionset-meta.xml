@@ -309,6 +309,7 @@
     <!-- ================================================================
          Field Permissions — SmokeTestAuditLog__c (readable only — immutability enforced)
          No fields are editable. System code creates entries via without-sharing context.
+         New fields added by WO-010 (AuditLogWriter service) are also included below.
          ================================================================ -->
     <fieldPermissions>
         <editable>false</editable>
@@ -353,6 +354,42 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>SmokeTestAuditLog__c.Timestamp__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- WO-010 new fields -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ActorUserId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ActionType__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.OldValue__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.NewValue__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ChangeReason__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.Outcome__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.Execution__c</field>
         <readable>true</readable>
     </fieldPermissions>
 

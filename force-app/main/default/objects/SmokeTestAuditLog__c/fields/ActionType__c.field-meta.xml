@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ActionType__c</fullName>
+    <description>Free-text action type validated against the AuditLogEntry allow-list at write time. Valid values: TEST_EXECUTION, CONFIGURATION_CHANGE, ROLLBACK_ACTION, ALERT_SENT, DASHBOARD_ACCESS. Complements the restricted Action__c picklist (WO-003) with an extensible string field for AuditLogWriter service integration.</description>
+    <externalId>false</externalId>
+    <label>Action Type</label>
+    <length>50</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
