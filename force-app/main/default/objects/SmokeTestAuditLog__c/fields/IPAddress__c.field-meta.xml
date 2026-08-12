@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IPAddress__c</fullName>
+    <description>IP address of the client that initiated the action. Supports both IPv4 (max 15 chars) and IPv6 (max 45 chars) addresses.</description>
+    <externalId>false</externalId>
+    <label>IP Address</label>
+    <length>45</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

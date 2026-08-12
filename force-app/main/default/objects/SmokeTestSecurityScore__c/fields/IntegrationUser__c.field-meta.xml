@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>IntegrationUser__c</fullName>
+    <description>Confidential: FLS restricted to SmokeTest_Admin. The dedicated read-only integration user under whose context the Tooling API SecurityHealthCheck query was executed.</description>
+    <externalId>false</externalId>
+    <label>Integration User</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Security Health Scores</relationshipLabel>
+    <relationshipName>SecurityHealthScores</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

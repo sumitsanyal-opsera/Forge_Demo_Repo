@@ -21,3 +21,10 @@
 - **Files:** 31 (+715/-0)
 - **Duration:** 413ss
 - **Approach:** Created two Custom Object metadata definitions in Salesforce DX source format. SmokeTestExecution__c is the master record (sharingModel Private, AutoNumber EXEC-{0000}) with 15 custom fields covering the full execution lifecycle. SmokeTestResult__c is the detail record (sharingModel ControlledByParent, AutoNumber RES-{00000}) with 13 custom fields including a Master-Detail relationship to SmokeTestExecution__c. All picklists are restricted. DeploymentId__c is marked as externalId for indexed lookups. Both object XMLs include custom index definitions on high-cardinality query fields. ErrorMessage__c and ErrorStackTrace__c descriptions explicitly require PII masking. Both objects have inline XML comments noting Internal data classification and 90-day retention.
+
+## WO-003: User Story: WO-003 - Create SecurityScore and AuditLog Objects with Immutability
+- **Status:** completed
+- **Commit:** `1409c04`
+- **Files:** 28 (+625/-0)
+- **Duration:** 402ss
+- **Approach:** Created two Confidential-tier Custom Objects with full field definitions, then implemented the AuditLog immutability enforcement layer using a trigger-handler pattern. SmokeTestSecurityScore__c uses a Lookup (not MasterDetail) to SmokeTestExecution__c to avoid cascading deletes across data classification tiers. ScoreDelta__c is a Formula field using IF(OR(ISBLANK)) to handle null scores gracefully. SmokeTestAuditLog__c has custom indexes on Timestamp__c, Action__c, and Actor__c for the three primary query patterns. The trigger delegates to a handler class with static methods, enabling testability and single-responsibility. The test class uses Database.update(list, false) with allOrNone=false for the bulk test to collect per-record errors rather than catching a single exception, verifying all 200 records individually receive the error.

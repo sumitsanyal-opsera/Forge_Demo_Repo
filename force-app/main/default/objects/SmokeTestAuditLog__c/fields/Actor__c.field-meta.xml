@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Actor__c</fullName>
+    <description>The Salesforce User who performed the audited action. Required for compliance — every audit record must be attributable to a specific user. Indexed for actor-based queries.</description>
+    <externalId>false</externalId>
+    <label>Actor</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Audit Logs</relationshipLabel>
+    <relationshipName>AuditLogs</relationshipName>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

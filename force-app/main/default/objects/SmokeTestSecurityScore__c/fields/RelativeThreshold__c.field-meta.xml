@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RelativeThreshold__c</fullName>
+    <description>Confidential: FLS restricted to SmokeTest_Admin. Maximum acceptable score drop (in points) from PreDeploymentScore__c to PostDeploymentScore__c. Sourced from SmokeTestConfig__mdt. Default: 5.</description>
+    <externalId>false</externalId>
+    <label>Relative Threshold (points)</label>
+    <precision>3</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RawResponse__c</fullName>
+    <description>Confidential: FLS restricted to SmokeTest_Admin. Full JSON response from the Tooling API SecurityHealthCheck query, stored for audit and debugging. Contains individual risk category scores. 131072 characters to accommodate complete API response payloads.</description>
+    <externalId>false</externalId>
+    <label>Raw API Response</label>
+    <length>131072</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>
