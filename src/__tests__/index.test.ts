@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
-import { formatResults } from '../index';
+import * as path from 'path';
+import { formatResults, validate } from '../index';
 import type { FileValidationResult } from '../validate';
+
+const FIXTURES = path.resolve(__dirname, '../../test-data');
+const SCHEMA = path.resolve(__dirname, '../../schemas/CustomObject.xsd');
 
 describe('formatResults', () => {
   it('shows correct passed count and no FAIL lines when all files pass', () => {
@@ -47,5 +51,19 @@ describe('formatResults', () => {
     expect(output).toContain('out of 2 files');
     expect(output).toContain('PASS');
     expect(output).toContain('FAIL');
+  });
+});
+
+describe('validate', () => {
+  it('returns isValid:true and empty errors for valid XML against matching XSD', () => {
+    const result = validate(path.join(FIXTURES, 'valid.object-meta.xml'), SCHEMA);
+    expect(result.isValid).toBe(true);
+    expect(result.errors).toHaveLength(0);
+  });
+
+  it('returns isValid:false with errors for invalid XML', () => {
+    const result = validate(path.join(FIXTURES, 'invalid.object-meta.xml'), SCHEMA);
+    expect(result.isValid).toBe(false);
+    expect(result.errors.length).toBeGreaterThan(0);
   });
 });
