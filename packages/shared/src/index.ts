@@ -111,3 +111,18 @@ export type { DnsResolver, ValidationResult, UrlAllowListConfig } from './common
 export { DEFAULT_ALLOWED_DOMAINS, UrlAllowList, isPrivateIp, sanitiseUrlForLog } from './common/security/UrlAllowList.js';
 export type { SsrfMiddlewareOptions } from './integration/salesforce/SsrfProtectionMiddleware.js';
 export { createSsrfMiddleware } from './integration/salesforce/SsrfProtectionMiddleware.js';
+
+// ── Salesforce authentication ─────────────────────────────────────────────────
+export type { JwtClaims, JwtBuilderConfig } from './integration/salesforce/auth/JwtBuilder.js';
+export { JwtBuilder } from './integration/salesforce/auth/JwtBuilder.js';
+export type { SalesforceToken } from './integration/salesforce/auth/SalesforceTokenCache.js';
+export { SalesforceTokenCache } from './integration/salesforce/auth/SalesforceTokenCache.js';
+export {
+  SalesforceAuthError,
+  SF_AUTH_ERROR_CODES,
+  isSalesforceAuthError,
+  mapSalesforceOAuthError,
+} from './integration/salesforce/auth/SalesforceAuthError.js';
+export type { SfAuthErrorCode } from './integration/salesforce/auth/SalesforceAuthError.js';
+export type { SalesforceAuthConfig, SalesforceHttpClient } from './integration/salesforce/auth/SalesforceAuthService.js';
+export { SalesforceAuthService } from './integration/salesforce/auth/SalesforceAuthService.js';
