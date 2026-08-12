@@ -231,4 +231,106 @@ private class SmokeTestDashboardControllerTest {
         // Both records have same CreatedDate in test; verify the query executes without error
         System.assert(result.Id != null, 'Returned record must have an Id');
     }
+
+    // =========================================================================
+    // getExecutionHistory tests
+    // =========================================================================
+
+    @isTest
+    static void testGetExecutionHistory_NoRecords_ReturnsEmptyList() {
+        Test.startTest();
+        List<SmokeTestExecution__c> result = SmokeTestDashboardController.getExecutionHistory();
+        Test.stopTest();
+
+        System.assertNotEquals(null, result,  'Should return empty list, not null');
+        System.assertEquals(0, result.size(), 'Should return 0 records when none exist');
+    }
+
+    @isTest
+    static void testGetExecutionHistory_OneRecord_ReturnsSingleRecord() {
+        insert new SmokeTestExecution__c(
+            Status__c          = 'Completed',
+            TotalScenarios__c  = 10,
+            PassedScenarios__c = 8,
+            FailedScenarios__c = 2
+        );
+
+        Test.startTest();
+        List<SmokeTestExecution__c> result = SmokeTestDashboardController.getExecutionHistory();
+        Test.stopTest();
+
+        System.assertEquals(1, result.size(), 'Should return exactly 1 record');
+        System.assertEquals(10, (Integer) result[0].TotalScenarios__c);
+        System.assertEquals(8,  (Integer) result[0].PassedScenarios__c);
+        System.assertEquals(2,  (Integer) result[0].FailedScenarios__c);
+    }
+
+    @isTest
+    static void testGetExecutionHistory_InProgressRecordsExcluded() {
+        insert new List<SmokeTestExecution__c>{
+            new SmokeTestExecution__c(Status__c = 'Completed', TotalScenarios__c = 10, PassedScenarios__c = 10, FailedScenarios__c = 0),
+            new SmokeTestExecution__c(Status__c = 'In Progress', TotalScenarios__c = 10, PassedScenarios__c = 5, FailedScenarios__c = 0),
+            new SmokeTestExecution__c(Status__c = 'Queued')
+        };
+
+        Test.startTest();
+        List<SmokeTestExecution__c> result = SmokeTestDashboardController.getExecutionHistory();
+        Test.stopTest();
+
+        System.assertEquals(1, result.size(),
+            'Only Completed/Failed records should be returned, not In Progress or Queued');
+    }
+
+    @isTest
+    static void testGetExecutionHistory_FailedStatusIncluded() {
+        insert new List<SmokeTestExecution__c>{
+            new SmokeTestExecution__c(Status__c = 'Completed', TotalScenarios__c = 10, PassedScenarios__c = 10, FailedScenarios__c = 0),
+            new SmokeTestExecution__c(Status__c = 'Failed',    TotalScenarios__c = 5,  PassedScenarios__c = 2,  FailedScenarios__c = 3)
+        };
+
+        Test.startTest();
+        List<SmokeTestExecution__c> result = SmokeTestDashboardController.getExecutionHistory();
+        Test.stopTest();
+
+        System.assertEquals(2, result.size(), 'Both Completed and Failed records should be returned');
+    }
+
+    @isTest
+    static void testGetExecutionHistory_LimitOf30() {
+        List<SmokeTestExecution__c> toInsert = new List<SmokeTestExecution__c>();
+        for (Integer i = 0; i < 35; i++) {
+            toInsert.add(new SmokeTestExecution__c(
+                Status__c          = 'Completed',
+                TotalScenarios__c  = 10,
+                PassedScenarios__c = 8,
+                FailedScenarios__c = 2
+            ));
+        }
+        insert toInsert;
+
+        Test.startTest();
+        List<SmokeTestExecution__c> result = SmokeTestDashboardController.getExecutionHistory();
+        Test.stopTest();
+
+        System.assertEquals(30, result.size(), 'Should return at most 30 records regardless of total count');
+    }
+
+    @isTest
+    static void testGetExecutionHistory_ReturnedFieldsPopulated() {
+        insert new SmokeTestExecution__c(
+            Status__c          = 'Completed',
+            TotalScenarios__c  = 10,
+            PassedScenarios__c = 7,
+            FailedScenarios__c = 3
+        );
+
+        Test.startTest();
+        List<SmokeTestExecution__c> result = SmokeTestDashboardController.getExecutionHistory();
+        Test.stopTest();
+
+        SmokeTestExecution__c rec = result[0];
+        System.assert(rec.Id != null,          'Id must be populated');
+        System.assert(rec.CreatedDate != null,  'CreatedDate must be populated');
+        System.assert(rec.TotalScenarios__c != null, 'TotalScenarios__c must be populated');
+    }
 }

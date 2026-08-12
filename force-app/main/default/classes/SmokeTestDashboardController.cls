@@ -65,4 +65,25 @@ public with sharing class SmokeTestDashboardController {
         ];
         return execs.isEmpty() ? null : execs[0];
     }
+
+    /**
+     * Returns the last 30 completed SmokeTestExecution__c records ordered by
+     * CreatedDate DESC for the historical trend chart.
+     *
+     * Uses the indexed CreatedDate and Status__c fields for query performance.
+     * TimedOutScenarios__c is not a deployed field; callers derive it as
+     * TotalScenarios__c - PassedScenarios__c - FailedScenarios__c.
+     */
+    @AuraEnabled(cacheable=true)
+    public static List<SmokeTestExecution__c> getExecutionHistory() {
+        return [
+            SELECT Id, CreatedDate,
+                   PassedScenarios__c, FailedScenarios__c, TotalScenarios__c
+            FROM SmokeTestExecution__c
+            WHERE Status__c IN ('Completed', 'Failed')
+            WITH SECURITY_ENFORCED
+            ORDER BY CreatedDate DESC
+            LIMIT 30
+        ];
+    }
 }
