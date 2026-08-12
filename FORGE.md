@@ -294,3 +294,10 @@
 - **Files:** 8 (+1005/-0)
 - **Duration:** 767ss
 - **Approach:** Implemented the decorator pattern for role-based scenario execution. RoleBasedScenarioExecutor wraps any ISmokeTestScenario in System.runAs() blocks using a temporary test user created via SmokeTestDataFactory.createUserWithProfile(). Permission failures (NoAccessException, InsufficientAccessException, access-related DmlException) are caught, parsed with regex and string matching to extract object/field name and permission type, and wrapped in PermissionFailureDetail. Results include the profile name and are persisted to SmokeTestResult__c with RoleProfile__c set. Used the existing RoleProfile__c field (Text 255) rather than creating a duplicate ExecutionProfile__c field since RoleProfile__c already exists on both SmokeTestResult__c and SmokeTestScenario__mdt.
+
+## WO-056: User Story: WO-056 - Alert Dispatch Service with In-App and Email
+- **Status:** completed
+- **Commit:** `8ffc68f`
+- **Files:** 25 (+1600/-0)
+- **Duration:** 783ss
+- **Approach:** Built the pluggable alerting engine with interface-first design. IAlertChannelAdapter defines the contract; AlertDispatchService is the orchestrator that reads SmokeTestAlertRoute__mdt.getAll(), filters by new Enabled__c field, applies AlertOnFail/Pass and ScenarioFilter__c tag matching (against failedScenarioNames and SmokeTestScenario__mdt.BusinessProcess__c CMT lookup), resolves recipients via PermissionSetAssignment queries, and dispatches independently per route with full error isolation. InAppNotificationAdapter uses Messaging.CustomNotification with graceful handling for missing CustomNotificationType. EmailAlertAdapter batches in groups of 10 to respect governor limits and escapes HTML in the body. Added Enabled__c Checkbox field to SmokeTestAlertRoute__mdt (required by AC2) and updated all 5 existing CMT records. Used ROLE_TO_PERM_SET static map to translate RecipientRole__c values (Team Lead, Business Owner, etc.) to permission set names for PermissionSetAssignment queries. AlertPayload carries only securityThresholdBreached boolean — no numeric score values, per Confidential data classification.

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Enabled__c</fullName>
+    <description>When true, this alert route is active and will be evaluated during alert dispatch. Disabled routes are silently skipped.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Enabled</label>
+    <type>Checkbox</type>
+    <defaultValue>true</defaultValue>
+</CustomField>

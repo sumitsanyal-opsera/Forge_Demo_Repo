@@ -34,4 +34,8 @@
         <field>IncludeDetails__c</field>
         <value xsi:type="xsd:boolean">false</value>
     </values>
+    <values>
+        <field>Enabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
 </CustomMetadata>

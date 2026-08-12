@@ -38,4 +38,8 @@
         <field>CallbackUrlPattern__c</field>
         <value xsi:type="xsd:string">hooks.slack.com</value>
     </values>
+    <values>
+        <field>Enabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
 </CustomMetadata>
