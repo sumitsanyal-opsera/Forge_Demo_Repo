@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="urn:metadata.tooling.soap.sforce.com">
+    <!-- VIOLATION 1: 'fullNam' is misspelled — XSD requires 'fullName' -->
+    <fullNam>MyCustomObject__c</fullNam>
+    <!-- VIOLATION 2: 'label' element is intentionally omitted — required by XSD -->
+    <!-- VIOLATION 3: 'Active' is not a valid DeploymentStatus value —
+         XSD restricts this to 'Deployed' or 'InDevelopment' -->
+    <deploymentStatus>Active</deploymentStatus>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

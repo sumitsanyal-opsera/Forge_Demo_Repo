@@ -28,3 +28,10 @@
 - **Files:** 9 (+253/-1)
 - **Duration:** 384ss
 - **Approach:** Built the CLI runner on top of the existing validateXml from WO-083. Created src/validator.ts with validateMetadataXml that wraps validateXml and adds filePath to the result, defining the ValidationResult interface needed by the CLI. Created the hardcoded XSD path at test/fixtures/schemas/metadata-61.0.xsd (Salesforce-namespace XSD matching the existing fixture structure). Created fixture directories test/fixtures/valid/ and test/fixtures/invalid/ with representative XML files. Implemented src/cli.ts under 80 lines with discoverXmlFiles (manual recursion for broad Node.js compatibility) and formatResults as named exports for unit testability; main() handles all edge cases (missing arg, missing dir, missing XSD). Unit tests use tmp directories created in beforeEach for isolation. E2E test uses child_process.execSync with try/catch to capture both exit codes and stdout for both success and failure paths. Added tsx devDependency for zero-build-step CLI execution and excluded *.test.ts from production tsconfig compile.
+
+## WO-065: User Story: WO-065 - Add Sample Salesforce XML and XSD Fixture Files
+- **Status:** completed
+- **Commit:** `77b7ea6`
+- **Files:** 3 (+62/-0)
+- **Duration:** 144ss
+- **Approach:** Created three static fixture files in a new fixtures/ directory at the project root. Wrote the XSD first to define the contract, then the valid XML conforming to it, then the invalid XML with deliberate violations. The XSD uses targetNamespace urn:metadata.tooling.soap.sforce.com (Salesforce tooling API namespace), xs:sequence for element ordering, and xs:restriction/xs:enumeration for the DeploymentStatus and SharingModel enum types. The valid XML includes all required and optional elements with valid values. The invalid XML has three commented violations: a misspelled element name (fullNam), a missing required element (label), and an invalid enum value (Active for deploymentStatus).
