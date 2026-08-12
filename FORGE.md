@@ -77,3 +77,10 @@
 - **Files:** 3 (+109/-8)
 - **Duration:** 190ss
 - **Approach:** Created src/formatResult.ts with a pure formatResult(result: ValidationResult, filePath: string): string function that produces '<filePath>:<line>:<column> [<phase>] <message>' and conditionally appends ' (rule: <xsdRule>)' when xsdRule is non-null. Extended src/cli.ts with a validateWithExplicitXsd(xmlPath, xsdPath) function and two-argument routing in main(): when both argv[2] and argv[3] are present, reads both files with try-catch error handling ('Error: Cannot read file <path>: <message>'), calls validateXmlAgainstXsd, prints 'Validation passed: no errors found' + exit(0) for empty results, or iterates errors via formatResult + exit(1) for non-empty results. Single-arg (bundled schema) and directory batch modes from prior WOs are preserved unchanged. Created tests/formatResult.test.ts with 3 Vitest tests.
+
+## WO-096: User Story: WO-096 - CLI Runner and Console Validation Report Output
+- **Status:** completed
+- **Commit:** `faf34ff`
+- **Files:** 2 (+90/-28)
+- **Duration:** 271ss
+- **Approach:** Updated validateWithExplicitXsd in src/cli.ts to output PASS/FAIL report format: on empty results prints 'PASS: <xmlPath> conforms to <xsdPath>' and exits 0; on errors prints 'FAIL: <xmlPath> does not conform to <xsdPath>' followed by numbered error lines '  N. Line L, Col C [phase]: message' and exits 1. Changed the no-arg exit code from 1 to 2 (usage error per WO-096 and the existing e2e test expectation). Wrapped the main dispatch in try/catch for unexpected errors, printing 'Unexpected error: <msg>' to stderr and exiting 1. Created src/__tests__/cli.test.ts with 4 integration tests using execSync/npx tsx to spawn the CLI: (1) valid.xml + test-metadata.xsd expects exit 0 and PASS in stdout, (2) unexpected-element.xml + test-metadata.xsd expects exit 1 and FAIL in stdout, (3) no args expects exit 2 and Usage in stderr, (4) nonexistent path expects exit 1 and Error in stderr.

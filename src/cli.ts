@@ -129,13 +129,14 @@ function validateWithExplicitXsd(xmlPath: string, xsdPath: string): void {
 
   const errors = validateXmlAgainstXsd(xmlContent, xsdContent);
   if (errors.length === 0) {
-    console.log('Validation passed: no errors found');
+    console.log(`PASS: ${xmlPath} conforms to ${xsdPath}`);
     process.exit(0);
   }
 
-  for (const err of errors) {
-    console.log(formatResult(err, xmlPath));
-  }
+  console.log(`FAIL: ${xmlPath} does not conform to ${xsdPath}`);
+  errors.forEach((err, i) => {
+    console.log(`  ${i + 1}. Line ${err.line}, Col ${err.column} [${err.phase}]: ${err.message}`);
+  });
   process.exit(1);
 }
 
@@ -145,34 +146,38 @@ function main(): void {
 
   if (!xmlPath) {
     process.stderr.write('Usage: ts-node src/cli.ts <xml-file> <xsd-file>\n');
-    process.exit(1);
+    process.exit(2);
   }
 
-  if (xsdPath) {
-    // Two-arg mode: explicit XML + XSD paths
-    if (!fs.existsSync(xmlPath)) {
-      process.stderr.write(`Error: File not found: ${xmlPath}\n`);
-      process.exit(1);
+  try {
+    if (xsdPath) {
+      // Two-arg mode: explicit XML + XSD paths
+      if (!fs.existsSync(xmlPath)) {
+        process.stderr.write(`Error: File not found: ${xmlPath}\n`);
+        process.exit(1);
+      }
+      if (!fs.existsSync(xsdPath)) {
+        process.stderr.write(`Error: File not found: ${xsdPath}\n`);
+        process.exit(1);
+      }
+      validateWithExplicitXsd(xmlPath, xsdPath);
+    } else {
+      // Single-arg mode: file with bundled schema, or directory batch scan
+      if (!fs.existsSync(xmlPath)) {
+        process.stderr.write(`Error: File not found: ${xmlPath}\n`);
+        process.exit(1);
+      }
+      const stat = fs.statSync(xmlPath);
+      if (stat.isDirectory()) {
+        validateDirectory(xmlPath);
+      } else {
+        validateFile(xmlPath);
+      }
     }
-    if (!fs.existsSync(xsdPath)) {
-      process.stderr.write(`Error: File not found: ${xsdPath}\n`);
-      process.exit(1);
-    }
-    validateWithExplicitXsd(xmlPath, xsdPath);
-    return;
-  }
-
-  // Single-arg mode: file with bundled schema, or directory batch scan
-  if (!fs.existsSync(xmlPath)) {
-    process.stderr.write(`Error: File not found: ${xmlPath}\n`);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Unexpected error: ${msg}\n`);
     process.exit(1);
-  }
-
-  const stat = fs.statSync(xmlPath);
-  if (stat.isDirectory()) {
-    validateDirectory(xmlPath);
-  } else {
-    validateFile(xmlPath);
   }
 }
 
