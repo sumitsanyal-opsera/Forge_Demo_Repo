@@ -287,3 +287,10 @@
 - **Files:** 12 (+840/-29)
 - **Duration:** 996ss
 - **Approach:** Pre/post security capture injected into the Queueable chain without adding extra Queueable steps: pre-capture runs at currentIndex==0 before scenario dispatch (using a local effectivePreResult variable since preSecurityResult is a private final field), post-capture runs inside doFinalize() before doFinalizeForExecution(). A private 8-arg constructor carries preSecurityResult through chain enqueues. All security steps are wrapped in try-catch so failures are non-blocking. Field name mapping: existing SmokeTestSecurityScore__c fields (Execution__c, AbsoluteThreshold__c, RelativeThreshold__c, CheckedAt__c) are used — only ThresholdStatus__c and RiskCategories__c are new. SmokeTestSecurityComplete__e is a new HighVolume platform event.
+
+## WO-041: User Story: WO-041 - Implement Role-Based Scenario Execution with System.runAs
+- **Status:** completed
+- **Commit:** `3b36126`
+- **Files:** 8 (+1005/-0)
+- **Duration:** 767ss
+- **Approach:** Implemented the decorator pattern for role-based scenario execution. RoleBasedScenarioExecutor wraps any ISmokeTestScenario in System.runAs() blocks using a temporary test user created via SmokeTestDataFactory.createUserWithProfile(). Permission failures (NoAccessException, InsufficientAccessException, access-related DmlException) are caught, parsed with regex and string matching to extract object/field name and permission type, and wrapped in PermissionFailureDetail. Results include the profile name and are persisted to SmokeTestResult__c with RoleProfile__c set. Used the existing RoleProfile__c field (Text 255) rather than creating a duplicate ExecutionProfile__c field since RoleProfile__c already exists on both SmokeTestResult__c and SmokeTestScenario__mdt.
