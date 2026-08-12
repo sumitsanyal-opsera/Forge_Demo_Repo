@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CircuitBreakerState__c</fullName>
+    <description>JSON blob persisting the circuit breaker in-memory state across Queueable chain links. Format: {"consecutiveGovernorFailures": 2, "circuitOpen": false}. Written by CircuitBreakerService.saveState() and read by CircuitBreakerService.loadState().</description>
+    <externalId>false</externalId>
+    <label>Circuit Breaker State</label>
+    <length>1000</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>3</visibleLines>
+</CustomField>
