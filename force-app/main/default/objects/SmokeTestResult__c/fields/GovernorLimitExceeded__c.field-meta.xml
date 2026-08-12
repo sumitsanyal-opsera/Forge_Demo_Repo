@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>GovernorLimitExceeded__c</fullName>
+    <description>Set to true when this scenario exceeded its governor limit budget (5000ms CPU, 50 SOQL, 50 DML). Three consecutive true values across scenarios trips the circuit breaker.</description>
+    <defaultValue>false</defaultValue>
+    <externalId>false</externalId>
+    <label>Governor Limit Exceeded</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

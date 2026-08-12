@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DeploymentId__c</fullName>
+    <description>Salesforce deployment job ID or CI/CD pipeline run ID that triggered this execution. Set as external ID for efficient correlation lookups. Indexed.</description>
+    <externalId>true</externalId>
+    <label>Deployment ID</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

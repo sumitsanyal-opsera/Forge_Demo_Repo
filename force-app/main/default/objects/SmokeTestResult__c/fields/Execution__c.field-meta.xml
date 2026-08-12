@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Execution__c</fullName>
+    <description>Master-Detail relationship to the parent SmokeTestExecution__c record. Cascade delete removes all child results when the parent execution is purged.</description>
+    <externalId>false</externalId>
+    <label>Execution</label>
+    <referenceTo>SmokeTestExecution__c</referenceTo>
+    <relationshipLabel>Smoke Test Results</relationshipLabel>
+    <relationshipName>Results</relationshipName>
+    <relationshipOrder>0</relationshipOrder>
+    <reparentableMasterDetail>false</reparentableMasterDetail>
+    <required>true</required>
+    <trackTrending>false</trackTrending>
+    <type>MasterDetail</type>
+    <writeRequiresMasterRead>false</writeRequiresMasterRead>
+</CustomField>

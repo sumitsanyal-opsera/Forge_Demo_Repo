@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ExecutionOrder__c</fullName>
+    <description>Sequence number (1-based) indicating the order in which this scenario was executed within the suite. Used for waterfall timing display in the dashboard.</description>
+    <externalId>false</externalId>
+    <label>Execution Order</label>
+    <precision>18</precision>
+    <required>false</required>
+    <scale>0</scale>
+    <trackTrending>false</trackTrending>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
