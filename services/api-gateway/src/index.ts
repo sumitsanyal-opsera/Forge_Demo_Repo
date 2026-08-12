@@ -1,17 +1,20 @@
 /**
  * API Gateway — entry point
  *
- * Responsible for:
- *  - TLS 1.2+ termination (handled by Kubernetes ingress in production)
- *  - Opsera session token validation on every request
- *  - RBAC enforcement (Admin / Release Engineer / Viewer)
- *  - Rate limiting: 100 requests/minute per authenticated user
- *  - Input validation via shared validation middleware
- *  - Routing to downstream services (Baseline, Detection, Alert, Dashboard)
- *  - Security headers: CSP, HSTS, X-Content-Type-Options, X-Frame-Options
- *
- * Implementation for these features is added in subsequent work orders.
- * This file bootstraps the Express server and registers shared middleware.
+ * Middleware stack (executed in order):
+ *  1. CORS preflight (before auth — must handle OPTIONS before session checks)
+ *  2. WAF (OWASP CRS pattern matching)
+ *  3. Body size limit (reject oversized payloads before parsing)
+ *  4. JSON body parser (with size limit as defence-in-depth)
+ *  5. XML rejection (XXE prevention)
+ *  6. Security headers (injected on every response)
+ *  7. Health endpoints (excluded from auth, WAF, and rate limiting)
+ *  8. Metrics endpoint (excluded from auth and rate limiting)
+ *  9. HTTP metrics instrumentation
+ * 10. Brute-force check (reject locked-out users before rate limiter)
+ * 11. Rate limiter (100 req/min per authenticated user)
+ * 12. Routes (added in subsequent WOs)
+ * 13. Error handler (last middleware)
  */
 
 import express from 'express';
@@ -23,39 +26,55 @@ import {
   createMetricsRouter,
   createHttpMetricsMiddleware,
 } from '@opsera/shared';
+import { createSecurityHeadersMiddleware } from './middleware/security-headers.js';
+import { createCorsMiddleware } from './middleware/cors.js';
+import { createBodySizeLimitMiddleware } from './middleware/body-size-limit.js';
+import { createXmlRejectionMiddleware } from './middleware/xml-rejection.js';
+import { createWafMiddleware } from './middleware/waf.js';
+import { createHealthRouter } from './health/health-controller.js';
+import { loadGatewayConfig } from './config/gateway.config.js';
 
 const SERVICE_NAME = 'api-gateway';
 const PORT = process.env['API_GATEWAY_PORT'] ?? '3000';
 
 const logger = createLogger(SERVICE_NAME);
+const config = loadGatewayConfig();
 const app = express();
 
-// ── Middleware ────────────────────────────────────────────────────────────────
+// ── 1. CORS preflight (before auth — handles OPTIONS before session checks) ───
 
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true }));
-app.use(createHttpMetricsMiddleware());
+app.use(createCorsMiddleware(config.corsAllowedOrigin));
 
-// Basic security headers (full set added in subsequent WOs via helmet or custom middleware)
-app.use((_req, res, next) => {
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  next();
-});
+// ── 2. WAF ────────────────────────────────────────────────────────────────────
 
-// ── Health check (unauthenticated — for Kubernetes liveness probes) ───────────
+app.use(createWafMiddleware({ enabled: config.wafEnabled }));
 
-app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', service: SERVICE_NAME });
-});
+// ── 3 & 4. Body size limit + JSON body parser ─────────────────────────────────
 
-// ── Metrics ───────────────────────────────────────────────────────────────────
+app.use(createBodySizeLimitMiddleware(config.bodySizeLimitBytes));
+app.use(express.json({ limit: config.bodySizeLimitBytes }));
+app.use(express.urlencoded({ extended: true, limit: config.bodySizeLimitBytes }));
+
+// ── 5. XML rejection (XXE prevention) ─────────────────────────────────────────
+
+app.use(createXmlRejectionMiddleware());
+
+// ── 6. Security headers (applied to every response) ───────────────────────────
+
+app.use(createSecurityHeadersMiddleware());
+
+// ── 7. Health endpoints (excluded from auth, WAF, and rate limiting) ──────────
+
+app.use('/health', createHealthRouter());
+
+// ── 8 & 9. Metrics endpoint + HTTP instrumentation ───────────────────────────
 
 app.use('/metrics', createMetricsRouter());
+app.use(createHttpMetricsMiddleware());
 
 // ── Routes (added in subsequent WOs) ─────────────────────────────────────────
 
+// TODO: Wire brute-force protection and rate limiter once session auth is in place.
 // TODO: Mount /api/v1/* routers (baselines, detection, alerts, dashboard, orgs) here.
 
 // ── Error handling ────────────────────────────────────────────────────────────
