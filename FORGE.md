@@ -273,3 +273,10 @@
 - **Files:** 6 (+564/-0)
 - **Duration:** 331ss
 - **Approach:** Thin trigger delegates to DeploymentCompleteTriggerHandler.handleEvents(). Handler resolves ShadowMode__c from SmokeTestConfig__mdt.getAll() (with @TestVisible override), validates DeploymentId__c, performs bulk SOQL duplicate detection (5-minute window), handles same-batch duplicates with an in-memory Set, writes an audit record in shadow mode, and calls SmokeTestOrchestrator.startExecution('Platform Event') for valid non-duplicate events — updating the returned execution record with DeploymentId__c. All exceptions are caught to prevent Platform Event bus disruption.
+
+## WO-027: User Story: WO-027 - Build SmokeTestRunResource POST /v1/run Endpoint
+- **Status:** completed
+- **Commit:** `b77c99b`
+- **Files:** 4 (+670/-0)
+- **Duration:** 559ss
+- **Approach:** Thin controller pattern: SmokeTestRunResource.doPost() delegates validation to SmokeTestApiValidator, permission check to a private hasPermission() SOQL helper, rate limiting to isQueueCapacityExceeded() reading BackpressureQueueDepthPct__c from CMT, execution record creation with Status='Queued' and all request fields, orchestrator enqueueing via the global SmokeTestOrchestrator constructor (with empty-scenario guard), audit logging via AuditLogWriter (try-catch wrapped), and 202 response via direct RestContext manipulation using the existing SmokeTestApiResponse.RunAcknowledgment shape.
