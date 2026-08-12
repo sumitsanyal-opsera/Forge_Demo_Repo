@@ -1,0 +1,16 @@
+// Prisma schema for Opsera Stuck Pipeline Detection System
+// DATABASE_URL must include connection_limit=20 for connection pool configuration
+// Example: postgresql://user:pass@localhost:5432/opsera_stuck_pipeline?connection_limit=20
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Domain models are added in subsequent work orders.
+// Run `npx prisma migrate dev --name init` to create the initial migration baseline.
+// Run `npx prisma generate` to regenerate the Prisma Client after schema changes.
