@@ -1,0 +1,15 @@
+{
+    "packageDirectories": [
+        {
+            "path": "force-app",
+            "default": true,
+            "package": "SmokeTestCenter",
+            "versionName": "ver 0.1",
+            "versionNumber": "0.1.0.NEXT"
+        }
+    ],
+    "namespace": "stcenter",
+    "sfdcLoginUrl": "https://login.salesforce.com",
+    "sourceApiVersion": "60.0",
+    "packageAliases": {}
+}

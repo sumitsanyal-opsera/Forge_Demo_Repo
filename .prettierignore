@@ -1,0 +1,21 @@
+# Salesforce DX generated directories
+.sfdx/
+.sf/
+
+# Dependencies
+node_modules/
+
+# Test coverage output
+coverage/
+
+# Salesforce metadata XML files that should not be reformatted by Prettier
+# (SFDX CLI manages the formatting of these files)
+**/*-meta.xml
+
+# Package lock files
+package-lock.json
+yarn.lock
+
+# Build artifacts
+dist/
+build/
