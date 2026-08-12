@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DefaultRollbackPolicy__c</fullName>
+    <description>Default rollback policy applied to all executions unless overridden at runtime. Valid values: Recommend Only, Auto-Rollback, Manual Approval. Default: Recommend Only.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Default Rollback Policy</label>
+    <length>255</length>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

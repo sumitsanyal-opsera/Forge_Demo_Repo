@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ScenarioClass__c</fullName>
+    <description>Fully qualified Apex class name implementing ISmokeTestScenario. The orchestrator uses Type.forName() to instantiate this class at runtime. The class must exist in the org at execution time; a missing class produces an Error result rather than blocking deployment.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Scenario Class</label>
+    <length>255</length>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

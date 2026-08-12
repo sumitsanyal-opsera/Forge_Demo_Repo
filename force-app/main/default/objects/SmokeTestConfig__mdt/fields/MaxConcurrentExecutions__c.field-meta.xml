@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>MaxConcurrentExecutions__c</fullName>
+    <description>Maximum number of simultaneous smoke test suite executions permitted across the org. Default: 50. The API returns 429 Retry-After when this limit is reached.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Max Concurrent Executions</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

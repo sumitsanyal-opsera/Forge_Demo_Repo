@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>BusinessProcess__c</fullName>
+    <description>Free-text tag identifying the business process this scenario validates (e.g., Lead Management, Opportunity Pipeline, Case Resolution). Used by SmokeTestAlertRoute__mdt.ScenarioFilter__c to route failure alerts to Business Process Owners.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Business Process</label>
+    <length>255</length>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

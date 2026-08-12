@@ -28,3 +28,10 @@
 - **Files:** 28 (+625/-0)
 - **Duration:** 402ss
 - **Approach:** Created two Confidential-tier Custom Objects with full field definitions, then implemented the AuditLog immutability enforcement layer using a trigger-handler pattern. SmokeTestSecurityScore__c uses a Lookup (not MasterDetail) to SmokeTestExecution__c to avoid cascading deletes across data classification tiers. ScoreDelta__c is a Formula field using IF(OR(ISBLANK)) to handle null scores gracefully. SmokeTestAuditLog__c has custom indexes on Timestamp__c, Action__c, and Actor__c for the three primary query patterns. The trigger delegates to a handler class with static methods, enabling testability and single-responsibility. The test class uses Database.update(list, false) with allOrNone=false for the bulk test to collect per-record errors rather than catching a single exception, verifying all 200 records individually receive the error.
+
+## WO-004: User Story: WO-004 - Define SmokeTestConfig and SmokeTestScenario Custom Metadata Types
+- **Status:** completed
+- **Commit:** `80b0802`
+- **Files:** 40 (+962/-0)
+- **Duration:** 436ss
+- **Approach:** Created two Custom Metadata Type definitions in Salesforce DX source format under objects/ (same structure as Custom Objects but with fieldManageability: DeveloperControlled on all fields, and no sharingModel). Created the SmokeTestConfig__mdt Default record and all 10 SmokeTestScenario__mdt records as md-meta.xml files in the customMetadata/ directory. Override number fields on scenario records are explicitly set to xsi:null to allow null (indicating use-global-default) rather than omitting the element. All CMT fields use fieldManageability: DeveloperControlled to restrict field value changes to deployments, not Setup UI edits.

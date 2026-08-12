@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PerScenarioTimeoutSec__c</fullName>
+    <description>Maximum wall-clock time in seconds for a single scenario to execute before it is marked Timeout and the suite continues. Default: 30. Can be overridden per-scenario via SmokeTestScenario__mdt.TimeoutOverrideSec__c.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Per-Scenario Timeout (seconds)</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

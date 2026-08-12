@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>EnableWebhookCallbacks__c</fullName>
+    <description>Master switch for webhook callback delivery. When false, the orchestrator skips all HTTP callouts to WebhookCallbackUrl__c even if a URL is registered. Default: true.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Enable Webhook Callbacks</label>
+    <type>Checkbox</type>
+</CustomField>

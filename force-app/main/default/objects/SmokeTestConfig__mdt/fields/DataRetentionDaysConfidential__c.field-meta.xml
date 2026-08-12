@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DataRetentionDaysConfidential__c</fullName>
+    <description>Retention period in days for Confidential-classification records (SmokeTestAuditLog__c, SmokeTestSecurityScore__c). Default: 365 (1 year minimum per compliance policy).</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Data Retention — Confidential (days)</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>
