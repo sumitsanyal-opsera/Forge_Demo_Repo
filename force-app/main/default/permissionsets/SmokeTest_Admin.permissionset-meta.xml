@@ -102,6 +102,16 @@
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
 
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestSecurityComplete__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
     <!-- ================================================================
          Field Permissions — SmokeTestExecution__c (readable and editable)
          ================================================================ -->
@@ -303,6 +313,16 @@
     <fieldPermissions>
         <editable>true</editable>
         <field>SmokeTestSecurityScore__c.ThresholdMet__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.ThresholdStatus__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.RiskCategories__c</field>
         <readable>true</readable>
     </fieldPermissions>
 

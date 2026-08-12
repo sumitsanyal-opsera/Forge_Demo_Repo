@@ -280,3 +280,10 @@
 - **Files:** 4 (+670/-0)
 - **Duration:** 559ss
 - **Approach:** Thin controller pattern: SmokeTestRunResource.doPost() delegates validation to SmokeTestApiValidator, permission check to a private hasPermission() SOQL helper, rate limiting to isQueueCapacityExceeded() reading BackpressureQueueDepthPct__c from CMT, execution record creation with Status='Queued' and all request fields, orchestrator enqueueing via the global SmokeTestOrchestrator constructor (with empty-scenario guard), audit logging via AuditLogWriter (try-catch wrapped), and 202 response via direct RestContext manipulation using the existing SmokeTestApiResponse.RunAcknowledgment shape.
+
+## WO-040: User Story: WO-040 - Integrate Security Health Check into Orchestrator Flow
+- **Status:** completed
+- **Commit:** `919d71d`
+- **Files:** 12 (+840/-29)
+- **Duration:** 996ss
+- **Approach:** Pre/post security capture injected into the Queueable chain without adding extra Queueable steps: pre-capture runs at currentIndex==0 before scenario dispatch (using a local effectivePreResult variable since preSecurityResult is a private final field), post-capture runs inside doFinalize() before doFinalizeForExecution(). A private 8-arg constructor carries preSecurityResult through chain enqueues. All security steps are wrapped in try-catch so failures are non-blocking. Field name mapping: existing SmokeTestSecurityScore__c fields (Execution__c, AbsoluteThreshold__c, RelativeThreshold__c, CheckedAt__c) are used — only ThresholdStatus__c and RiskCategories__c are new. SmokeTestSecurityComplete__e is a new HighVolume platform event.

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Timestamp__c</fullName>
+    <description>UTC timestamp when the security check finalized. Published by: SmokeTestOrchestrator.postExecutionSecurityCheck(). Consumed by: SmokeTestDashboard LWC to display check completion time without requiring a separate record query.</description>
+    <label>Timestamp</label>
+    <required>false</required>
+    <type>DateTime</type>
+</CustomField>

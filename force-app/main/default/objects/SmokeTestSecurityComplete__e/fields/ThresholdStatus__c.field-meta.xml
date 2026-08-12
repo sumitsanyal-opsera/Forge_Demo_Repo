@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ThresholdStatus__c</fullName>
+    <description>String representation of the SecurityComparisonResult status: Pass, Fail, Error, or Skipped. Published by: SmokeTestOrchestrator.postExecutionSecurityCheck(). Consumed by: SmokeTestDashboard LWC to update the security badge color without an additional SOQL query.</description>
+    <label>Threshold Status</label>
+    <length>20</length>
+    <type>Text</type>
+</CustomField>
