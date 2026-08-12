@@ -38,6 +38,25 @@ public without sharing class AuditLogWriter {
         logActions(new List<AuditLogEntry>{ entry });
     }
 
+    /**
+     * Convenience wrapper for auditing SmokeTestChecklist__mdt configuration changes.
+     * Invoke from the admin layer whenever a checklist CMT record is created or modified.
+     * changeReason is mandatory per AuditLogEntry validation rules.
+     */
+    public void logPolicyChange(String resourceId, String resourceType,
+                                String oldValue, String newValue, String changeReason) {
+        AuditLogEntry entry = new AuditLogEntry.Builder()
+            .actionType(AuditLogEntry.ACTION_CONFIG_CHANGE)
+            .resourceId(resourceId)
+            .resourceType(resourceType)
+            .oldValue(oldValue)
+            .newValue(newValue)
+            .changeReason(changeReason)
+            .outcome('Success')
+            .build();
+        logAction(entry);
+    }
+
     public void logActions(List<AuditLogEntry> entries) {
         if (entries == null || entries.isEmpty()) {
             return;

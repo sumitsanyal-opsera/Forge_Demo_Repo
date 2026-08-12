@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Custom Config Profile Check</label>
+    <protected>false</protected>
+    <values>
+        <field>CheckName__c</field>
+        <value xsi:type="xsd:string">Profile Configuration Check</value>
+    </values>
+    <values>
+        <field>CheckType__c</field>
+        <value xsi:type="xsd:string">config</value>
+    </values>
+    <values>
+        <field>IsEnabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>ExpectedResult__c</field>
+        <value xsi:type="xsd:string">Standard profiles present</value>
+    </values>
+    <values>
+        <field>FailureMessage__c</field>
+        <value xsi:type="xsd:string">Expected standard profiles are missing post-deployment.</value>
+    </values>
+    <values>
+        <field>ExecutionOrder__c</field>
+        <value xsi:type="xsd:double">11</value>
+    </values>
+    <values>
+        <field>Severity__c</field>
+        <value xsi:type="xsd:string">Warning</value>
+    </values>
+</CustomMetadata>

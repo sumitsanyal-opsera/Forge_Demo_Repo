@@ -3,6 +3,10 @@ public without sharing class ChecklistEvaluator {
     @TestVisible
     private static ChecklistContext.IHttpCallout httpCalloutOverride;
 
+    // Overrides SmokeTestChecklist__mdt.getAll() in tests to isolate from deployed CMT records.
+    @TestVisible
+    static Map<String, SmokeTestChecklist__mdt> checklistConfigOverride = null;
+
     private final IDmlHandler dmlHandler;
 
     public ChecklistEvaluator() {
@@ -16,7 +20,9 @@ public without sharing class ChecklistEvaluator {
 
     public List<ChecklistResult> evaluate(Id executionId) {
         List<ManifestComponent> components = loadManifestComponents(executionId);
-        Map<String, SmokeTestChecklist__mdt> config = SmokeTestChecklist__mdt.getAll();
+        Map<String, SmokeTestChecklist__mdt> config = checklistConfigOverride != null
+            ? checklistConfigOverride
+            : SmokeTestChecklist__mdt.getAll();
 
         ChecklistContext.IHttpCallout callout = httpCalloutOverride != null
             ? httpCalloutOverride : new DefaultHttpCallout();
@@ -45,6 +51,10 @@ public without sharing class ChecklistEvaluator {
                 ));
             }
         }
+
+        // Append custom checklist items (CheckType__c = 'query', IsEnabled__c = true)
+        List<ChecklistResult> customResults = new CustomChecklistProcessor().process(config);
+        results.addAll(customResults);
 
         persistResults(executionId, results);
         return results;

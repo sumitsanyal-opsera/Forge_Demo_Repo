@@ -25,6 +25,21 @@
                 <default>false</default>
                 <label>CustomApex</label>
             </value>
+            <value>
+                <fullName>metadata</fullName>
+                <default>false</default>
+                <label>metadata</label>
+            </value>
+            <value>
+                <fullName>config</fullName>
+                <default>false</default>
+                <label>config</label>
+            </value>
+            <value>
+                <fullName>query</fullName>
+                <default>false</default>
+                <label>query</label>
+            </value>
         </valueSetDefinition>
     </valueSet>
 </CustomField>

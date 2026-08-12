@@ -301,3 +301,17 @@
 - **Files:** 25 (+1600/-0)
 - **Duration:** 783ss
 - **Approach:** Built the pluggable alerting engine with interface-first design. IAlertChannelAdapter defines the contract; AlertDispatchService is the orchestrator that reads SmokeTestAlertRoute__mdt.getAll(), filters by new Enabled__c field, applies AlertOnFail/Pass and ScenarioFilter__c tag matching (against failedScenarioNames and SmokeTestScenario__mdt.BusinessProcess__c CMT lookup), resolves recipients via PermissionSetAssignment queries, and dispatches independently per route with full error isolation. InAppNotificationAdapter uses Messaging.CustomNotification with graceful handling for missing CustomNotificationType. EmailAlertAdapter batches in groups of 10 to respect governor limits and escapes HTML in the body. Added Enabled__c Checkbox field to SmokeTestAlertRoute__mdt (required by AC2) and updated all 5 existing CMT records. Used ROLE_TO_PERM_SET static map to translate RecipientRole__c values (Team Lead, Business Owner, etc.) to permission set names for PermissionSetAssignment queries. AlertPayload carries only securityThresholdBreached boolean — no numeric score values, per Confidential data classification.
+
+## WO-068: User Story: WO-068 - Implement Custom Checklist Items with SOQL Query Validation
+- **Status:** completed
+- **Commit:** `7cd75e8`
+- **Files:** 18 (+1004/-1)
+- **Duration:** 1050ss
+- **Approach:** Built the custom checklist extension on top of the existing ChecklistEvaluator/ChecklistResult/ChecklistContext architecture. ChecklistQueryValidator implements 5 independent validation checks (syntax via Database.getQueryLocator(), DML keyword regex, restricted object allow-list, LIMIT clause enforcement up to 10000, binding variable detection) collecting ALL errors rather than failing fast. CustomChecklistProcessor filters SmokeTestChecklist__mdt records by IsEnabled__c=true and CheckType__c='query', validates each query, executes via Database.query(), and compares the returned row count as a string against ExpectedResult__c (blank=any rows pass). ChecklistEvaluator extended to call CustomChecklistProcessor after 5 default checks and merge results. Added @TestVisible checklistConfigOverride to ChecklistEvaluator so existing tests that assert results.size()==5 remain isolated from deployed CMT records. Added logPolicyChange() convenience method to AuditLogWriter for use by admin tooling when CMT records are modified. Key field name mapping: WO spec uses Enabled__c/ExpectedValue__c/ActualValueQuery__c but existing CMT fields are IsEnabled__c/ExpectedResult__c/Query__c — existing names preserved to avoid breaking deployed code.
+
+## WO-076: User Story: WO-076 - Write Apex Unit Tests for Orchestrator and Dispatcher
+- **Status:** completed
+- **Commit:** `e0e4968`
+- **Files:** 0 (+0/-0)
+- **Duration:** 311ss
+- **Approach:** All 5 required test classes (SmokeTestOrchestratorTest, CircuitBreakerServiceTest, ScenarioDispatcherTest, ScenarioTimeoutHandlerTest, GovernorLimitBudgetTest) were already implemented and committed to the branch in a prior execution pass. The tests use ConfigurableMockScenario (a flexible configurable mock with static flags: shouldPass, shouldThrowDmlException, shouldThrowQueryException, shouldThrowException, injectedErrorType, injectedErrorDetail, and a reset() method) plus MockSmokeTestScenario (a constructor-injected mock) rather than 4 separate named mock classes, achieving the same coverage with less code. No new files were required for this WO.

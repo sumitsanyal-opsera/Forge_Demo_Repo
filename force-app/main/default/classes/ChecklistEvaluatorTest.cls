@@ -494,6 +494,7 @@ private class ChecklistEvaluatorTest {
         MockDmlHandler mockDml = new MockDmlHandler();
         ChecklistEvaluator.httpCalloutOverride = new MockHttpCallout(200,
             '{"records":[]}');
+        ChecklistEvaluator.checklistConfigOverride = new Map<String, SmokeTestChecklist__mdt>();
 
         ChecklistEvaluator evaluator = new ChecklistEvaluator(mockDml);
 
@@ -524,6 +525,7 @@ private class ChecklistEvaluatorTest {
         MockDmlHandler mockDml = new MockDmlHandler();
         String mockBody = flowApiResponse('TestFlow', 'a00000000000001AAA');
         ChecklistEvaluator.httpCalloutOverride = new MockHttpCallout(200, mockBody);
+        ChecklistEvaluator.checklistConfigOverride = new Map<String, SmokeTestChecklist__mdt>();
 
         SmokeTestExecution__c exec = new SmokeTestExecution__c(
             DeploymentManifest__c = '[{"componentName":"TestFlow","componentType":"Flow"}]'
@@ -554,6 +556,7 @@ private class ChecklistEvaluatorTest {
     static void evaluator_noExecution_returnsWarnings() {
         MockDmlHandler mockDml = new MockDmlHandler();
         ChecklistEvaluator.httpCalloutOverride = new MockHttpCallout(200, '{"records":[]}');
+        ChecklistEvaluator.checklistConfigOverride = new Map<String, SmokeTestChecklist__mdt>();
 
         ChecklistEvaluator evaluator = new ChecklistEvaluator(mockDml);
 
@@ -569,6 +572,7 @@ private class ChecklistEvaluatorTest {
     static void evaluator_persistsResultsWithCorrectFields() {
         MockDmlHandler mockDml = new MockDmlHandler();
         ChecklistEvaluator.httpCalloutOverride = new MockHttpCallout(200, '{"records":[]}');
+        ChecklistEvaluator.checklistConfigOverride = new Map<String, SmokeTestChecklist__mdt>();
 
         SmokeTestExecution__c exec = new SmokeTestExecution__c();
         insert exec;
