@@ -1,0 +1,16 @@
+{
+    "Id": "a0Xxx0000000002AAA",
+    "Status__c": "Failed",
+    "OverallResult__c": "Fail",
+    "InitiatedBy__c": "005Xxx0000000002AAA",
+    "InitiatedBy__r": {
+        "Name": "John Doe"
+    },
+    "TriggerSource__c": "REST API",
+    "StartTime__c": "2024-03-15T09:00:00.000Z",
+    "EndTime__c": "2024-03-15T09:01:30.000Z",
+    "ExecutionTimeMs__c": 90000,
+    "TotalScenarios__c": 10,
+    "PassedScenarios__c": 6,
+    "FailedScenarios__c": 4
+}

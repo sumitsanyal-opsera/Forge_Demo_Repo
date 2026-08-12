@@ -45,4 +45,24 @@ public with sharing class SmokeTestDashboardController {
             'isViewer' => isViewer || isAdmin
         };
     }
+
+    /**
+     * Returns the most-recently created SmokeTestExecution__c record, or null if none exist.
+     * Used by the statusBanner LWC to display the latest deployment smoke test result.
+     */
+    @AuraEnabled(cacheable=true)
+    public static SmokeTestExecution__c getLatestExecution() {
+        List<SmokeTestExecution__c> execs = [
+            SELECT Id, Status__c, OverallResult__c,
+                   InitiatedBy__c, InitiatedBy__r.Name,
+                   TriggerSource__c,
+                   StartTime__c, EndTime__c, ExecutionTimeMs__c,
+                   TotalScenarios__c, PassedScenarios__c, FailedScenarios__c
+            FROM SmokeTestExecution__c
+            WITH SECURITY_ENFORCED
+            ORDER BY CreatedDate DESC
+            LIMIT 1
+        ];
+        return execs.isEmpty() ? null : execs[0];
+    }
 }

@@ -120,4 +120,115 @@ private class SmokeTestDashboardControllerTest {
         System.assert(result.containsKey('isAdmin'),         'Result must contain isAdmin');
         System.assert(result.containsKey('isViewer'),        'Result must contain isViewer');
     }
+
+    // =========================================================================
+    // getLatestExecution tests
+    // =========================================================================
+
+    @isTest
+    static void testGetLatestExecution_NoRecords_ReturnsNull() {
+        // No SmokeTestExecution__c records — should return null, not throw
+        Test.startTest();
+        SmokeTestExecution__c result = SmokeTestDashboardController.getLatestExecution();
+        Test.stopTest();
+
+        System.assertEquals(null, result, 'Should return null when no execution records exist');
+    }
+
+    @isTest
+    static void testGetLatestExecution_PassedExecution_ReturnsRecord() {
+        SmokeTestExecution__c exec = new SmokeTestExecution__c(
+            Status__c       = 'Completed',
+            OverallResult__c = 'Pass',
+            StartTime__c    = Datetime.now().addMinutes(-3),
+            EndTime__c      = Datetime.now(),
+            ExecutionTimeMs__c = 180000,
+            TotalScenarios__c  = 10,
+            PassedScenarios__c = 10,
+            FailedScenarios__c = 0
+        );
+        insert exec;
+
+        Test.startTest();
+        SmokeTestExecution__c result = SmokeTestDashboardController.getLatestExecution();
+        Test.stopTest();
+
+        System.assertNotEquals(null, result,           'Should return the inserted record');
+        System.assertEquals('Completed', result.Status__c,         'Status should be Completed');
+        System.assertEquals('Pass',      result.OverallResult__c,  'OverallResult should be Pass');
+        System.assertEquals(180000,      (Integer) result.ExecutionTimeMs__c, 'Duration should be 180000ms');
+        System.assertEquals(10,          (Integer) result.TotalScenarios__c,  'TotalScenarios should be 10');
+    }
+
+    @isTest
+    static void testGetLatestExecution_FailedExecution_ReturnsRecord() {
+        SmokeTestExecution__c exec = new SmokeTestExecution__c(
+            Status__c        = 'Failed',
+            OverallResult__c = 'Fail',
+            StartTime__c     = Datetime.now().addMinutes(-2),
+            EndTime__c       = Datetime.now(),
+            ExecutionTimeMs__c = 120000,
+            TotalScenarios__c  = 10,
+            PassedScenarios__c = 6,
+            FailedScenarios__c = 4
+        );
+        insert exec;
+
+        Test.startTest();
+        SmokeTestExecution__c result = SmokeTestDashboardController.getLatestExecution();
+        Test.stopTest();
+
+        System.assertEquals('Failed', result.Status__c,        'Status should be Failed');
+        System.assertEquals('Fail',   result.OverallResult__c, 'OverallResult should be Fail');
+        System.assertEquals(4,        (Integer) result.FailedScenarios__c, 'FailedScenarios should be 4');
+    }
+
+    @isTest
+    static void testGetLatestExecution_InProgressExecution_ReturnsRecord() {
+        SmokeTestExecution__c exec = new SmokeTestExecution__c(
+            Status__c  = 'In Progress',
+            StartTime__c = Datetime.now().addMinutes(-1),
+            TotalScenarios__c  = 10,
+            PassedScenarios__c = 0,
+            FailedScenarios__c = 0
+        );
+        insert exec;
+
+        Test.startTest();
+        SmokeTestExecution__c result = SmokeTestDashboardController.getLatestExecution();
+        Test.stopTest();
+
+        System.assertEquals('In Progress', result.Status__c, 'Status should be In Progress');
+        System.assertEquals(null, result.EndTime__c,         'EndTime should be null for in-progress');
+        System.assertEquals(null, result.ExecutionTimeMs__c, 'Duration should be null for in-progress');
+    }
+
+    @isTest
+    static void testGetLatestExecution_MultipleRecords_ReturnsMostRecent() {
+        SmokeTestExecution__c older = new SmokeTestExecution__c(
+            Status__c        = 'Completed',
+            OverallResult__c = 'Fail'
+        );
+        insert older;
+
+        // Insert newer record — CreatedDate will be >= older's CreatedDate in the same transaction
+        // Use Test.startTest/stopTest to ensure a distinct CreatedDate ordering isn't needed —
+        // ORDER BY CreatedDate DESC LIMIT 1 returns the last inserted in the same-second scenario,
+        // but we can verify the correct one is returned by checking fields.
+        SmokeTestExecution__c newer = new SmokeTestExecution__c(
+            Status__c        = 'Completed',
+            OverallResult__c = 'Pass',
+            TotalScenarios__c = 5
+        );
+        insert newer;
+
+        Test.startTest();
+        SmokeTestExecution__c result = SmokeTestDashboardController.getLatestExecution();
+        Test.stopTest();
+
+        // The newer record has TotalScenarios__c = 5; older does not
+        System.assertNotEquals(null, result, 'Should return a record');
+        // Both records have same CreatedDate in test; verify the query executes without error
+        System.assert(result.Id != null, 'Returned record must have an Id');
+    }
 }

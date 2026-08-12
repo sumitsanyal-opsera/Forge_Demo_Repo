@@ -1,0 +1,75 @@
+<template>
+    <!-- Error fallback: dispatches to parent and shows minimal inline message -->
+    <template if:true={hasError}>
+        <div class="slds-notify slds-notify_alert slds-alert_warning" role="alert">
+            <span class="slds-assistive-text">Warning</span>
+            <lightning-icon
+                icon-name="utility:warning"
+                size="x-small"
+                variant="inverse"
+                alternative-text="Warning"
+                class="slds-m-right_x-small">
+            </lightning-icon>
+            <span>
+                Unable to load status —
+                <a role="button"
+                   tabindex="0"
+                   onclick={handleRetry}
+                   class="slds-m-left_xx-small">retry</a>
+            </span>
+        </div>
+    </template>
+
+    <!-- Status banner: rendered only when an execution record exists -->
+    <template if:true={hasData}>
+        <div class={bannerClass} role="alert" aria-live="polite">
+            <span class="slds-assistive-text">{statusLabel}</span>
+
+            <!-- Icon — satisfies WCAG requirement: icon AND text AND color -->
+            <lightning-icon
+                icon-name={iconName}
+                size="x-small"
+                variant="inverse"
+                alternative-text={statusLabel}
+                class="slds-m-right_x-small">
+            </lightning-icon>
+
+            <!-- Text label -->
+            <strong class="slds-m-right_medium">{statusLabel}</strong>
+
+            <!-- Deployment details -->
+            <span class="slds-col banner-details">
+                <span if:true={triggeredBy} class="slds-m-right_small">
+                    By: <strong>{triggeredBy}</strong>
+                </span>
+                <template if:true={formattedStartTime}>
+                    <span class="slds-m-right_small">
+                        Started:&nbsp;<lightning-formatted-date-time
+                            value={formattedStartTime}
+                            year="numeric"
+                            month="short"
+                            day="numeric"
+                            hour="numeric"
+                            minute="2-digit">
+                        </lightning-formatted-date-time>
+                    </span>
+                </template>
+                <template if:true={formattedDuration}>
+                    <span class={durationClass} class="slds-m-right_small">
+                        Duration: {formattedDuration}
+                    </span>
+                </template>
+            </span>
+
+            <!-- Scenario counts (right-aligned) -->
+            <template if:true={totalScenarios}>
+                <span class="slds-col slds-text-align_right banner-counts slds-m-left_auto">
+                    {passedScenarios}/{totalScenarios} passed
+                    <template if:true={failedScenarios}>
+                        &nbsp;&#183;&nbsp;{failedScenarios} failed
+                    </template>
+                </span>
+            </template>
+        </div>
+    </template>
+</template>
