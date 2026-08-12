@@ -1,0 +1,5 @@
+{
+  "expectedErrorCount": 1,
+  "expectedErrorLineNumber": 6,
+  "expectedErrorMessageSubstring": "bogusElement"
+}

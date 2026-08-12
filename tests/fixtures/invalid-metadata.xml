@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="urn:metadata.tooling.soap.sforce.com">
+    <fullName>MyObject__c</fullName>
+    <label>My Object</label>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <bogusElement>this element is not in the schema</bogusElement>
+</CustomObject>
