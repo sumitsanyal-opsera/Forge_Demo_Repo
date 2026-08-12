@@ -105,3 +105,9 @@ export { aggregateHealth, healthStatusToHttpCode } from './integration/health/He
 export type { ConnectorStatusMonitorConfig } from './integration/health/ConnectorStatusMonitor.js';
 export { ConnectorStatusMonitor } from './integration/health/ConnectorStatusMonitor.js';
 export { createHealthRouter } from './integration/health/routes.js';
+
+// ── SSRF protection ───────────────────────────────────────────────────────────
+export type { DnsResolver, ValidationResult, UrlAllowListConfig } from './common/security/UrlAllowList.js';
+export { DEFAULT_ALLOWED_DOMAINS, UrlAllowList, isPrivateIp, sanitiseUrlForLog } from './common/security/UrlAllowList.js';
+export type { SsrfMiddlewareOptions } from './integration/salesforce/SsrfProtectionMiddleware.js';
+export { createSsrfMiddleware } from './integration/salesforce/SsrfProtectionMiddleware.js';
