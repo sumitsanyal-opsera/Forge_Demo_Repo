@@ -1,0 +1,167 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Alert delivery monitoring: delivery latency SLO compliance, success/failure rates, and a table of recent delivery failures.",
+  "editable": false,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "fillOpacity": 20,
+        "legend": { "calcs": ["mean", "p95"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "histogram_quantile(0.50, sum by (le, org) (rate(alert_delivery_latency_seconds_bucket{org=~\"$org\"}[$__rate_interval])))",
+          "legendFormat": "P50 {{org}}",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "histogram_quantile(0.95, sum by (le, org) (rate(alert_delivery_latency_seconds_bucket{org=~\"$org\"}[$__rate_interval])))",
+          "legendFormat": "P95 {{org}}",
+          "refId": "B"
+        }
+      ],
+      "thresholds": [
+        { "colorMode": "critical", "op": "gt", "value": 120, "visible": true }
+      ],
+      "title": "Alert Delivery Latency (SLO: < 2 min)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 10 },
+      "id": 2,
+      "options": {
+        "legend": { "calcs": ["mean", "sum"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (org, channel) (rate(alert_delivery_latency_seconds_count{org=~\"$org\"}[$__rate_interval]))",
+          "legendFormat": "Delivered — {{org}} / {{channel}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Alert Delivery Rate (success)",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "fixed", "fixedColor": "red" },
+          "custom": {
+            "align": "left",
+            "displayMode": "color-background",
+            "filterable": true
+          }
+        },
+        "overrides": [
+          { "matcher": { "id": "byName", "options": "org" }, "properties": [{ "id": "displayName", "value": "Org" }] },
+          { "matcher": { "id": "byName", "options": "channel" }, "properties": [{ "id": "displayName", "value": "Channel" }] },
+          { "matcher": { "id": "byName", "options": "Value" }, "properties": [{ "id": "displayName", "value": "Failed Deliveries" }] }
+        ]
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 10 },
+      "id": 3,
+      "options": {
+        "footer": { "show": false },
+        "showHeader": true,
+        "sortBy": [{ "desc": true, "displayName": "Failed Deliveries" }]
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "topk(20, sum by (org, channel) (increase(stuck_pipeline_detections_total{org=~\"$org\",severity=\"critical\"}[$__range])) unless sum by (org, channel) (increase(alert_delivery_latency_seconds_count{org=~\"$org\"}[$__range])))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Recent Failed Deliveries (top 20 by org / channel)",
+      "transformations": [
+        { "id": "organize", "options": { "excludeByName": { "Time": true, "__name__": true }, "indexByName": {}, "renameByName": {} } }
+      ],
+      "type": "table"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["opsera", "alerts", "delivery"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "definition": "label_values(sf_api_calls_total, org)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "org",
+        "options": [],
+        "query": {
+          "query": "label_values(sf_api_calls_total, org)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "definition": "label_values(stuck_pipeline_detections_total, pipeline)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "pipeline",
+        "options": [],
+        "query": {
+          "query": "label_values(stuck_pipeline_detections_total, pipeline)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": { "selected": false, "text": "default", "value": "default" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Alert Delivery",
+  "uid": "opsera-alert-delivery",
+  "version": 1
+}

@@ -1,0 +1,60 @@
+{
+  "validSalesforceUrls": [
+    "https://login.salesforce.com",
+    "https://test.salesforce.com",
+    "https://myorg.my.salesforce.com",
+    "https://myorg.lightning.force.com",
+    "https://myorg.sandbox.lightning.force.com",
+    "https://site.force.com",
+    "https://api.salesforce.com/services/data/v58.0/sobjects",
+    "https://myorg.my.salesforce.com/services/data/",
+    "https://login.salesforce.com:443/oauth2/token"
+  ],
+  "invalidExternalUrls": [
+    "https://evil.com",
+    "https://attacker.io/hook",
+    "https://not-salesforce.com",
+    "https://salesforce.com.evil.com",
+    "https://evils-salesforce.com",
+    "https://totally-not-salesforce.com/path",
+    "http://169.254.169.254/latest/meta-data/",
+    "https://169.254.169.254/latest/meta-data/"
+  ],
+  "privateIpUrls": [
+    "http://10.0.0.1",
+    "http://10.255.255.255",
+    "http://172.16.0.1",
+    "http://172.31.255.255",
+    "http://192.168.1.1",
+    "http://192.168.0.254",
+    "http://127.0.0.1",
+    "http://127.0.0.0",
+    "http://[::1]",
+    "http://[fc00::1]",
+    "http://[fd12:3456:789a:1::1]",
+    "http://[fe80::1]"
+  ],
+  "malformedUrls": [
+    "",
+    "not-a-url",
+    "javascript:alert(1)",
+    "file:///etc/passwd",
+    "ftp://login.salesforce.com",
+    "//salesforce.com",
+    "https://",
+    "data:text/html,<script>alert(1)</script>"
+  ],
+  "unicodeHomographUrls": [
+    "https://ѕalesforce.com",
+    "https://salesforcе.com",
+    "https://salesforce.com"
+  ],
+  "embeddedCredentialUrls": [
+    "https://user:pass@evil.com",
+    "https://admin:secret@10.0.0.1/admin"
+  ],
+  "redirectTestUrls": [
+    "https://login.salesforce.com/redirect?to=https://evil.com",
+    "https://myorg.my.salesforce.com/callback?returnUrl=http://attacker.com"
+  ]
+}

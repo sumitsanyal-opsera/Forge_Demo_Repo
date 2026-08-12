@@ -1,0 +1,314 @@
+# Forge Shipping Engine pipeline configuration
+# Project: opsera-stuck-pipeline-detection
+# Format: Forge Shipping Engine v2
+# Ref: https://docs.forge.opsera.io/pipeline-schema/v2
+
+version: "2"
+name: opsera-stuck-pipeline-detection
+description: "Security-hardened CI/CD pipeline for the Opsera Stuck Pipeline Detection System"
+
+# Pipeline triggers
+on:
+  push:
+    branches:
+      - main
+      - "release/**"
+  tag:
+    pattern: "v[0-9]+\\.[0-9]+\\.[0-9]+"
+  pull_request:
+    branches:
+      - main
+
+# Non-secret environment variables
+env:
+  NODE_VERSION: "20"
+  ECR_REGION: us-east-1
+  IMAGE_TAG: "{{ git.sha }}"
+  DEPLOY_DOMAIN: opsera.io
+
+# Total pipeline timeout — all stages must complete within this window
+timeout: 15m
+
+stages:
+
+  # ── Stage 1: Source ──────────────────────────────────────────────────────────
+  - name: source
+    displayName: "Source"
+    steps:
+      - name: checkout
+        displayName: "Checkout source"
+        action: git/checkout
+        config:
+          # Full history required for Gitleaks and SonarQube blame
+          depth: 0
+          fetchTags: true
+
+  # ── Stage 2: Build ────────────────────────────────────────────────────────────
+  - name: build
+    displayName: "Build"
+    # TypeScript compilation and Docker build run in parallel
+    parallel: true
+    steps:
+      - name: typescript-compile
+        displayName: "TypeScript Backend Compilation"
+        action: node/run
+        config:
+          nodeVersion: "{{ env.NODE_VERSION }}"
+          command: "npm ci --ignore-scripts && npm run build && npm run typecheck"
+        artifacts:
+          - path: "packages/*/dist/"
+          - path: "services/*/dist/"
+
+      - name: react-build
+        displayName: "React SPA Build"
+        action: node/run
+        config:
+          nodeVersion: "{{ env.NODE_VERSION }}"
+          workingDirectory: packages/client
+          command: "npm run build"
+        artifacts:
+          - path: "packages/client/dist/"
+
+      - name: docker-build
+        displayName: "Docker Multi-Stage Build"
+        action: docker/build
+        config:
+          dockerfile: Dockerfile
+          context: .
+          buildArgs:
+            SERVICE_NAME: api-gateway
+          tags:
+            - "{{ secrets.ECR_REGISTRY_URL }}/opsera-api-gateway:{{ env.IMAGE_TAG }}"
+            - "{{ secrets.ECR_REGISTRY_URL }}/opsera-api-gateway:latest"
+          cache:
+            from: "{{ secrets.ECR_REGISTRY_URL }}/opsera-api-gateway:latest"
+          platform: linux/amd64
+
+  # ── Stage 3: Security Scan ────────────────────────────────────────────────────
+  - name: security-scan
+    displayName: "Security Scan"
+    # All three scans run in parallel to meet the <15-minute pipeline target
+    parallel: true
+    # A single scan failure immediately fails the whole stage (do not wait for siblings)
+    failFast: true
+    steps:
+      - name: scan-sonarqube
+        displayName: "SonarQube Code Quality & Coverage"
+        action: sonarqube/scan
+        config:
+          projectKey: opsera-stuck-pipeline-detection
+          # SonarQube server URL and token stored as pipeline secrets — never committed
+          serverUrl: "{{ secrets.SONARQUBE_URL }}"
+          token: "{{ secrets.SONARQUBE_TOKEN }}"
+          propertiesFile: sonar-project.properties
+          qualityGate:
+            wait: true
+            timeout: 300
+            # Pipeline fails if quality gate does not pass (80% coverage, complexity thresholds)
+            failOnError: true
+          # Infrastructure failure (server unavailable) is reported distinctly from gate failure
+          failOnInfraError: true
+
+      - name: scan-snyk
+        displayName: "Snyk Dependency Vulnerability Scan"
+        action: snyk/test
+        config:
+          # Snyk token stored as pipeline secret — never committed
+          token: "{{ secrets.SNYK_TOKEN }}"
+          org: "{{ secrets.SNYK_ORG_ID }}"
+          severityThreshold: high
+          policyFile: .snyk
+          # fail on all high+critical CVEs across all dependency types
+          failOn: all
+          # Record snapshot in Snyk dashboard for continuous monitoring
+          monitor: true
+          # Report includes CVE IDs, affected packages, severity, and upgrade paths
+          reportFormat: json
+
+      - name: scan-gitleaks
+        displayName: "Gitleaks Secret Detection"
+        action: gitleaks/scan
+        config:
+          configFile: .gitleaks.toml
+          source: .
+          report:
+            format: json
+            path: reports/gitleaks-report.json
+          # Fail immediately on any leaked secret
+          failOnLeak: true
+          # Do NOT include secret values in log output (OWASP A10 / security constraint)
+          redactSecrets: true
+          verbose: false
+
+      # Grype runs against the image built in the Build stage
+      - name: scan-grype
+        displayName: "Grype Container Image Vulnerability Scan"
+        action: grype/scan
+        config:
+          image: "{{ secrets.ECR_REGISTRY_URL }}/opsera-api-gateway:{{ env.IMAGE_TAG }}"
+          configFile: .grype.yaml
+          output: json
+          report:
+            path: reports/grype-report.json
+          # Fail on any critical or high OS-level CVE
+          failOnSeverity: high
+        dependsOn:
+          - stage: build
+            step: docker-build
+
+  # ── Stage 4: Push ─────────────────────────────────────────────────────────────
+  - name: push
+    displayName: "Push to ECR"
+    steps:
+      - name: ecr-push
+        displayName: "Push Container Images to ECR"
+        action: ecr/push
+        config:
+          region: "{{ env.ECR_REGION }}"
+          # IAM role for ECR push; credentials injected by Forge, never stored here
+          roleArn: "{{ secrets.ECR_PUSH_ROLE_ARN }}"
+          images:
+            - repository: opsera-api-gateway
+              tags:
+                - "{{ env.IMAGE_TAG }}"
+          signing:
+            enabled: true
+            # SHA-256 digest recorded in deployment manifest for auditability
+            algorithm: SHA-256
+            manifestPath: reports/image-digests.json
+          tags:
+            # Immutable tags prevent tag mutation attacks in ECR
+            immutable: true
+
+  # ── Stage 5: Approval Gate ────────────────────────────────────────────────────
+  - name: approval-gate
+    displayName: "Approval Gate"
+    # Only required for main-branch and tagged releases destined for production
+    condition: "{{ git.branch == 'main' || git.isTag }}"
+    steps:
+      - name: manual-approval
+        displayName: "Production Deployment Approval"
+        action: approval/request
+        config:
+          message: |
+            Production deployment of opsera-stuck-pipeline-detection
+            Image: {{ env.IMAGE_TAG }}
+            Commit: {{ git.sha }}
+            Author: {{ git.author }}
+            Security scan: passed
+          approvers:
+            - role: pipeline-owner
+            - role: security-reviewer
+          # Auto-expire to prevent stale approvals; requires re-approval after 24 hours
+          expiry: 24h
+          audit:
+            # Approver identity and timestamp logged for compliance
+            logApprover: true
+            logTimestamp: true
+
+  # ── Stage 6: Deploy ───────────────────────────────────────────────────────────
+  - name: deploy
+    displayName: "Deploy"
+    steps:
+      - name: deploy-dev
+        displayName: "Deploy to Dev (auto)"
+        action: kubernetes/deploy
+        config:
+          environment: dev
+          namespace: opsera-dev
+          # Dev auto-deploys on every main-branch push; single replica
+          replicas: 1
+          autoPromote: true
+          postDeployTests:
+            - type: smoke
+              timeout: 120s
+          rollback:
+            onFailure: true
+
+      - name: deploy-staging
+        displayName: "Deploy to Staging"
+        action: kubernetes/deploy
+        condition: "{{ stages.security-scan.status == 'passed' }}"
+        config:
+          environment: staging
+          namespace: opsera-staging
+          # Two replicas for staging HA testing
+          replicas: 2
+          postDeployTests:
+            - type: integration
+              timeout: 300s
+          rollback:
+            onFailure: true
+        dependsOn:
+          - deploy-dev
+
+      - name: deploy-production
+        displayName: "Deploy to Production (Canary 10%)"
+        action: kubernetes/deploy
+        condition: "{{ stages.approval-gate.status == 'approved' }}"
+        config:
+          environment: production
+          namespace: opsera-prod
+          strategy: canary
+          canary:
+            # Route 10% of traffic to the new version for 15 minutes
+            weight: 10
+            duration: 15m
+            analysis:
+              metric: error_rate
+              # Auto-rollback if error rate exceeds 1% during canary window
+              threshold: 0.01
+              onExceed: rollback
+          rollback:
+            onFailure: true
+            errorRateThreshold: 0.01
+        dependsOn:
+          - deploy-staging
+
+  # ── Stage 7: Post-Deploy Verify ───────────────────────────────────────────────
+  - name: post-deploy-verify
+    displayName: "Post-Deploy Verification"
+    steps:
+      - name: health-check
+        displayName: "Service Health Probe"
+        action: http/probe
+        config:
+          endpoints:
+            - url: "https://api.{{ env.DEPLOY_DOMAIN }}/health/live"
+              expectedStatus: 200
+              timeout: 30s
+              retries: 3
+            - url: "https://api.{{ env.DEPLOY_DOMAIN }}/health/ready"
+              expectedStatus: 200
+              timeout: 30s
+              retries: 3
+
+      - name: metrics-verify
+        displayName: "Prometheus Metrics Verification"
+        action: prometheus/query
+        config:
+          endpoint: "{{ secrets.PROMETHEUS_URL }}"
+          queries:
+            - name: "http_requests_total present"
+              expr: "http_requests_total > 0"
+            - name: "No initial stuck-pipeline alarms"
+              expr: "stuck_pipeline_detections_total >= 0"
+          timeout: 60s
+
+# ── Failure notifications ──────────────────────────────────────────────────────
+notifications:
+  onStageFailure:
+    channels:
+      - type: email
+        recipients:
+          - role: pipeline-owner
+        template: stage-failure
+        includeFields:
+          - stageName
+          - failureReason
+          - pipelineLogUrl
+          - commitSha
+          - triggeredBy
+        # Infrastructure failures (scanner down, network timeout) are clearly labelled
+        # separately from code quality failures so the team can act appropriately
+        distinguishInfraFailures: true

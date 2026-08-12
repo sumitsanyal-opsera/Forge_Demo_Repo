@@ -1,0 +1,56 @@
+{
+  "id": "pipe-006",
+  "name": "Acme Sandbox Deploy",
+  "orgName": "Acme Corp Sandbox",
+  "deployId": "0Af000000006AbcCAE",
+  "startTime": "2026-08-12T10:00:00.000Z",
+  "detectionState": "monitoring",
+  "metrics": {
+    "currentDurationMs": 95000,
+    "p50BaselineMs": null,
+    "p90BaselineMs": null,
+    "p99BaselineMs": null,
+    "staleDurationMs": null,
+    "componentCount": 3
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Validate Metadata",
+      "status": "success",
+      "startTime": "2026-08-12T10:00:00.000Z",
+      "durationMs": 38000
+    },
+    {
+      "id": "step-2",
+      "name": "Deploy Components",
+      "status": "running",
+      "startTime": "2026-08-12T10:00:38.000Z",
+      "durationMs": null
+    },
+    {
+      "id": "step-3",
+      "name": "Run Apex Tests",
+      "status": "pending",
+      "startTime": null,
+      "durationMs": null
+    }
+  ],
+  "metadataComponents": [
+    {
+      "name": "AccountService",
+      "type": "ApexClass",
+      "status": "deployed"
+    },
+    {
+      "name": "AccountDashboard",
+      "type": "LightningComponentBundle",
+      "status": "pending"
+    },
+    {
+      "name": "AccountLayout",
+      "type": "Layout",
+      "status": "pending"
+    }
+  ]
+}

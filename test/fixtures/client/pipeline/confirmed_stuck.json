@@ -1,0 +1,83 @@
+{
+  "id": "pipe-004",
+  "name": "Acme Production Deploy",
+  "orgName": "Acme Corp Production",
+  "deployId": "0Af000000004AbcCAE",
+  "startTime": "2026-08-12T05:00:00.000Z",
+  "detectionState": "confirmed_stuck",
+  "metrics": {
+    "currentDurationMs": 500000,
+    "p50BaselineMs": 180000,
+    "p90BaselineMs": 300000,
+    "p99BaselineMs": 420000,
+    "staleDurationMs": 1200000,
+    "componentCount": 7
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Validate Metadata",
+      "status": "success",
+      "startTime": "2026-08-12T05:00:00.000Z",
+      "durationMs": 45000
+    },
+    {
+      "id": "step-2",
+      "name": "Deploy Components",
+      "status": "running",
+      "startTime": "2026-08-12T05:00:45.000Z",
+      "durationMs": null
+    },
+    {
+      "id": "step-3",
+      "name": "Run Apex Tests",
+      "status": "pending",
+      "startTime": null,
+      "durationMs": null
+    },
+    {
+      "id": "step-4",
+      "name": "Send Notifications",
+      "status": "pending",
+      "startTime": null,
+      "durationMs": null
+    }
+  ],
+  "metadataComponents": [
+    {
+      "name": "AccountService",
+      "type": "ApexClass",
+      "status": "deployed"
+    },
+    {
+      "name": "OpportunityTrigger",
+      "type": "ApexClass",
+      "status": "deployed"
+    },
+    {
+      "name": "CaseHandler",
+      "type": "ApexClass",
+      "status": "deployed"
+    },
+    {
+      "name": "AccountDashboard",
+      "type": "LightningComponentBundle",
+      "status": "pending"
+    },
+    {
+      "name": "OpportunityDashboard",
+      "type": "LightningComponentBundle",
+      "status": "pending"
+    },
+    {
+      "name": "AccountLayout",
+      "type": "Layout",
+      "status": "pending"
+    },
+    {
+      "name": "OpportunityReport",
+      "type": "Report",
+      "status": "pending"
+    }
+  ]
+}

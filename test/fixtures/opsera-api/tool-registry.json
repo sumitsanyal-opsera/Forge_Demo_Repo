@@ -1,0 +1,26 @@
+[
+  {
+    "id": "tool-sf-deploy",
+    "name": "Salesforce Deploy",
+    "type": "salesforce-deploy",
+    "version": "2.4.1",
+    "capabilities": ["deploy", "validate", "rollback"],
+    "metadata": { "maxComponents": 10000 }
+  },
+  {
+    "id": "tool-sf-test",
+    "name": "Apex Test Runner",
+    "type": "salesforce-test",
+    "version": "1.8.0",
+    "capabilities": ["run-tests", "coverage-report"],
+    "metadata": { "testLevels": ["RunLocalTests", "RunAllTestsInOrg"] }
+  },
+  {
+    "id": "tool-git",
+    "name": "Git Source Control",
+    "type": "git",
+    "version": "2.44.0",
+    "capabilities": ["clone", "pull", "branch", "commit"],
+    "metadata": {}
+  }
+]

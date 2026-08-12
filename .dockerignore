@@ -1,0 +1,68 @@
+# ── Node.js ───────────────────────────────────────────────────────────────────
+node_modules
+npm-debug.log*
+.npm
+
+# ── TypeScript build outputs ──────────────────────────────────────────────────
+dist
+build
+*.tsbuildinfo
+
+# ── Test files and coverage ───────────────────────────────────────────────────
+# Test code is not needed in the production container
+**/__tests__
+**/*.test.ts
+**/*.test.tsx
+**/test-utils.ts
+test
+coverage
+reports
+
+# ── Documentation ─────────────────────────────────────────────────────────────
+docs
+*.md
+README.md
+FORGE.md
+CLAUDE.md
+
+# ── CI/CD and security scan configuration ─────────────────────────────────────
+# These config files configure the build pipeline but are not part of the runtime
+.github
+.husky
+pipeline.yaml
+.snyk
+.gitleaks.toml
+.grype.yaml
+sonar-project.properties
+eslint.config.mjs
+.prettierrc
+.editorconfig
+
+# ── Development tooling ────────────────────────────────────────────────────────
+.vscode
+.idea
+scripts
+dashboards
+
+# ── Git ────────────────────────────────────────────────────────────────────────
+.git
+.gitignore
+
+# ── Environment files ──────────────────────────────────────────────────────────
+# Secrets are never baked into images; injected at runtime via Kubernetes secrets
+.env
+.env.local
+.env.*.local
+.env.example
+
+# ── OS / editor artefacts ─────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+
+# ── Frontend client ────────────────────────────────────────────────────────────
+# The React SPA is served via a separate CDN/static hosting; not bundled in the API image
+packages/client
+
+# ── Forge ─────────────────────────────────────────────────────────────────────
+.forge-context
+.forge-results

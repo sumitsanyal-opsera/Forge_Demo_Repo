@@ -1,0 +1,28 @@
+{
+  "name": "@opsera/api-gateway",
+  "version": "1.0.0",
+  "description": "API Gateway: TLS termination, Opsera session validation, RBAC, rate limiting, and routing",
+  "type": "module",
+  "main": "./dist/index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "typecheck": "tsc --noEmit --project tsconfig.json",
+    "start": "node dist/index.js",
+    "dev": "node --watch dist/index.js",
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --config jest.config.mjs",
+    "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch --config jest.config.mjs"
+  },
+  "dependencies": {
+    "@opsera/shared": "*",
+    "express": "^4.19.2",
+    "ioredis": "^5.4.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/node": "^20.14.0",
+    "@types/jest": "^29.5.12",
+    "jest": "^29.7.0",
+    "ts-jest": "^29.2.0",
+    "typescript": "^5.5.0"
+  }
+}

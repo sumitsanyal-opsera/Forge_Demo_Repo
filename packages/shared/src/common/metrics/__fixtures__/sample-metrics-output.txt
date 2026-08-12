@@ -1,0 +1,125 @@
+# HELP stuck_pipeline_detections_total Total number of stuck pipeline detections by org, pipeline, and severity
+# TYPE stuck_pipeline_detections_total counter
+stuck_pipeline_detections_total{org="org-001",pipeline="pipe-abc123",severity="critical"} 3
+stuck_pipeline_detections_total{org="org-001",pipeline="pipe-def456",severity="warning"} 1
+
+# HELP detection_latency_seconds Time from pipeline start to stuck detection in seconds
+# TYPE detection_latency_seconds histogram
+detection_latency_seconds_bucket{org="org-001",le="1"} 0
+detection_latency_seconds_bucket{org="org-001",le="5"} 0
+detection_latency_seconds_bucket{org="org-001",le="10"} 1
+detection_latency_seconds_bucket{org="org-001",le="30"} 2
+detection_latency_seconds_bucket{org="org-001",le="60"} 3
+detection_latency_seconds_bucket{org="org-001",le="120"} 3
+detection_latency_seconds_bucket{org="org-001",le="300"} 3
+detection_latency_seconds_bucket{org="org-001",le="+Inf"} 3
+detection_latency_seconds_sum{org="org-001"} 87.5
+detection_latency_seconds_count{org="org-001"} 3
+
+# HELP false_positive_rate_1h Rolling 1-hour false positive rate (0-1) for stuck pipeline detections
+# TYPE false_positive_rate_1h gauge
+false_positive_rate_1h{org="org-001"} 0.03
+
+# HELP active_monitored_pipelines Number of pipelines currently being actively monitored
+# TYPE active_monitored_pipelines gauge
+active_monitored_pipelines{org="org-001"} 42
+
+# HELP alert_delivery_latency_seconds Time from alert creation to successful delivery in seconds
+# TYPE alert_delivery_latency_seconds histogram
+alert_delivery_latency_seconds_bucket{org="org-001",channel="email",le="1"} 0
+alert_delivery_latency_seconds_bucket{org="org-001",channel="email",le="5"} 1
+alert_delivery_latency_seconds_bucket{org="org-001",channel="email",le="10"} 2
+alert_delivery_latency_seconds_bucket{org="org-001",channel="email",le="30"} 2
+alert_delivery_latency_seconds_bucket{org="org-001",channel="email",le="60"} 2
+alert_delivery_latency_seconds_bucket{org="org-001",channel="email",le="120"} 2
+alert_delivery_latency_seconds_bucket{org="org-001",channel="email",le="+Inf"} 2
+alert_delivery_latency_seconds_sum{org="org-001",channel="email"} 11.2
+alert_delivery_latency_seconds_count{org="org-001",channel="email"} 2
+
+# HELP http_request_duration_seconds HTTP request duration in seconds
+# TYPE http_request_duration_seconds histogram
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="0.005"} 0
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="0.01"} 0
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="0.05"} 3
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="0.1"} 5
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="0.5"} 5
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="1"} 5
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="2"} 5
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="5"} 5
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="10"} 5
+http_request_duration_seconds_bucket{method="GET",path="/api/v1/pipelines",status="200",le="+Inf"} 5
+http_request_duration_seconds_sum{method="GET",path="/api/v1/pipelines",status="200"} 0.245
+http_request_duration_seconds_count{method="GET",path="/api/v1/pipelines",status="200"} 5
+
+# HELP http_requests_total Total number of HTTP requests processed
+# TYPE http_requests_total counter
+http_requests_total{method="GET",path="/api/v1/pipelines",status="200"} 5
+http_requests_total{method="POST",path="/api/v1/pipelines/:id/alerts",status="201"} 2
+
+# HELP http_active_connections Number of currently active HTTP connections being processed
+# TYPE http_active_connections gauge
+http_active_connections 3
+
+# HELP sf_api_calls_total Total Salesforce REST API calls by org and endpoint
+# TYPE sf_api_calls_total counter
+sf_api_calls_total{org="org-001",endpoint="/services/data/v57.0/query"} 120
+
+# HELP sf_api_latency_seconds Salesforce REST API call latency in seconds
+# TYPE sf_api_latency_seconds histogram
+sf_api_latency_seconds_bucket{org="org-001",le="0.1"} 0
+sf_api_latency_seconds_bucket{org="org-001",le="0.5"} 45
+sf_api_latency_seconds_bucket{org="org-001",le="1"} 95
+sf_api_latency_seconds_bucket{org="org-001",le="2"} 115
+sf_api_latency_seconds_bucket{org="org-001",le="5"} 119
+sf_api_latency_seconds_bucket{org="org-001",le="10"} 120
+sf_api_latency_seconds_bucket{org="org-001",le="30"} 120
+sf_api_latency_seconds_bucket{org="org-001",le="60"} 120
+sf_api_latency_seconds_bucket{org="org-001",le="120"} 120
+sf_api_latency_seconds_bucket{org="org-001",le="300"} 120
+sf_api_latency_seconds_bucket{org="org-001",le="600"} 120
+sf_api_latency_seconds_bucket{org="org-001",le="+Inf"} 120
+sf_api_latency_seconds_sum{org="org-001"} 75.3
+sf_api_latency_seconds_count{org="org-001"} 120
+
+# HELP sf_cometd_connection_status Salesforce CometD Streaming API connection status (1 = connected, 0 = disconnected)
+# TYPE sf_cometd_connection_status gauge
+sf_cometd_connection_status{org="org-001"} 1
+
+# HELP sf_token_refresh_total Total Salesforce OAuth token refresh attempts by org and result
+# TYPE sf_token_refresh_total counter
+sf_token_refresh_total{org="org-001",result="success"} 8
+sf_token_refresh_total{org="org-001",result="failure"} 1
+
+# HELP sf_api_budget_utilization Salesforce API request budget utilization ratio (0-1)
+# TYPE sf_api_budget_utilization gauge
+sf_api_budget_utilization{org="org-001"} 0.68
+
+# HELP pg_connections_active Number of active PostgreSQL connections in the connection pool
+# TYPE pg_connections_active gauge
+pg_connections_active 10
+
+# HELP pg_query_duration_seconds PostgreSQL query execution duration in seconds
+# TYPE pg_query_duration_seconds histogram
+pg_query_duration_seconds_bucket{operation="SELECT",le="0.001"} 5
+pg_query_duration_seconds_bucket{operation="SELECT",le="0.005"} 20
+pg_query_duration_seconds_bucket{operation="SELECT",le="0.01"} 35
+pg_query_duration_seconds_bucket{operation="SELECT",le="0.05"} 50
+pg_query_duration_seconds_bucket{operation="SELECT",le="0.1"} 52
+pg_query_duration_seconds_bucket{operation="SELECT",le="0.5"} 52
+pg_query_duration_seconds_bucket{operation="SELECT",le="1"} 52
+pg_query_duration_seconds_bucket{operation="SELECT",le="5"} 52
+pg_query_duration_seconds_bucket{operation="SELECT",le="+Inf"} 52
+pg_query_duration_seconds_sum{operation="SELECT"} 0.387
+pg_query_duration_seconds_count{operation="SELECT"} 52
+
+# HELP redis_memory_used_bytes Redis RSS memory usage in bytes
+# TYPE redis_memory_used_bytes gauge
+redis_memory_used_bytes 52428800
+
+# HELP redis_streams_consumer_lag Number of pending unacknowledged messages in a Redis Streams consumer group
+# TYPE redis_streams_consumer_lag gauge
+redis_streams_consumer_lag{stream="pipeline-events"} 0
+
+# HELP redis_streams_messages_processed_total Total messages successfully processed from Redis Streams
+# TYPE redis_streams_messages_processed_total counter
+redis_streams_messages_processed_total{stream="pipeline-events"} 1450

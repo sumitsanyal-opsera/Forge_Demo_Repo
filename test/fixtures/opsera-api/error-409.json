@@ -1,0 +1,8 @@
+{
+  "code": "PIPELINE_ALREADY_RUNNING",
+  "message": "Pipeline 'pipeline-001' is already in a running state. Wait for the current run to complete before triggering a new one.",
+  "details": {
+    "currentRunId": "run-7f3a2b1c-4d5e-6f7a-8b9c-0d1e2f3a4b5c",
+    "startedAt": "2024-01-15T12:30:00.000Z"
+  }
+}

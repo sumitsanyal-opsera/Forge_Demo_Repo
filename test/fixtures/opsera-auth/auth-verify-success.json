@@ -1,0 +1,6 @@
+{
+  "orgId": "org-abc-123",
+  "orgName": "Acme Engineering",
+  "environment": "production",
+  "plan": "enterprise"
+}

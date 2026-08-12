@@ -1,0 +1,91 @@
+# WAF Rules — OWASP Core Rule Set v4.x configuration
+# Technology: Express middleware with pattern matching (production deployments
+# should use NGINX ModSecurity or Kong WAF plugin with the full CRS).
+
+version: "4.0"
+enabled: true
+
+# Endpoints with tuned exceptions for Salesforce metadata payloads (Apex code
+# snippets in JSONB fields may trigger SQL injection rules).
+# These paths skip body-content WAF checks but still enforce header/path rules.
+trustedPaths:
+  - /api/v1/pipelines
+  - /api/v1/baselines
+
+rules:
+  sqlInjection:
+    enabled: true
+    severity: CRITICAL
+    description: "OWASP CRS v4 — SQL Injection (942xxx)"
+    checkTargets: [path, query, headers]
+    # Body check skipped for trustedPaths to allow Apex code snippets
+    checkBody: true
+    patterns:
+      - "(?i)(\\bselect\\b.+\\bfrom\\b)"
+      - "(?i)(\\bunion\\b.+\\bselect\\b)"
+      - "(?i)(;\\s*drop\\s+table)"
+      - "(?i)(;\\s*delete\\s+from)"
+      - "(?i)('\\s*or\\s+'?[0-9]+'?\\s*=\\s*'?[0-9])"
+      - "(?i)(--\\s*$)"
+      - "(?i)(\\bexec\\s*\\()"
+      - "(?i)(\\bxp_cmdshell\\b)"
+
+  xss:
+    enabled: true
+    severity: HIGH
+    description: "OWASP CRS v4 — Cross-Site Scripting (941xxx)"
+    checkTargets: [path, query, body, headers]
+    patterns:
+      - "(?i)(<\\s*script[^>]*>)"
+      - "(?i)(javascript\\s*:)"
+      - "(?i)(on(error|load|click|mouse|focus|blur|submit)\\s*=)"
+      - "(?i)(<\\s*iframe[^>]*>)"
+      - "(?i)(document\\.cookie)"
+      - "(?i)(document\\.write\\s*\\()"
+      - "(?i)(eval\\s*\\()"
+
+  pathTraversal:
+    enabled: true
+    severity: HIGH
+    description: "OWASP CRS v4 — Path Traversal (930xxx)"
+    checkTargets: [path, query]
+    patterns:
+      - "(\\.\\./)"
+      - "(\\.\\.\\\\/)"
+      - "(%2e%2e%2f)"
+      - "(%2e%2e/)"
+      - "(\\.%2f)"
+      - "(/etc/passwd)"
+      - "(/etc/shadow)"
+      - "(c:\\\\windows)"
+
+  commandInjection:
+    enabled: true
+    severity: CRITICAL
+    description: "OWASP CRS v4 — OS Command Injection (932xxx)"
+    checkTargets: [path, query, body]
+    patterns:
+      - "(?i)(;\\s*cat\\s+/)"
+      - "(?i)(;\\s*ls\\s+)"
+      - "(?i)(`[^`]+`)"
+      - "(?i)(\\$\\([^)]+\\))"
+      - "(?i)(\\|\\s*nc\\s+)"
+      - "(?i)(wget\\s+http)"
+      - "(?i)(curl\\s+http)"
+
+  xxe:
+    enabled: true
+    severity: HIGH
+    description: "OWASP CRS v4 — XML External Entity (921xxx) — supplemental check"
+    checkTargets: [body]
+    patterns:
+      - "(?i)(<!entity)"
+      - "(?i)(<!doctype)"
+      - "(?i)(system\\s+\"[^\"]+\")"
+
+response:
+  statusCode: 403
+  body:
+    errors:
+      - code: "WAF_BLOCKED"
+        message: "Request blocked by security policy"

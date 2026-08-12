@@ -1,0 +1,48 @@
+# Snyk policy file for opsera-stuck-pipeline-detection
+# Reference: https://docs.snyk.io/snyk-cli/test-for-vulnerabilities/the-.snyk-file
+#
+# IMPORTANT: SNYK_TOKEN and SNYK_ORG_ID are stored as Forge Shipping Engine pipeline
+# secrets. They must never be committed to this file or any version-controlled file.
+#
+# Pipeline behaviour (configured in pipeline.yaml):
+#   severityThreshold: high
+#   failOn: all               — fails on critical and high CVEs in all dependency types
+#   monitor: true             — snapshots reported to Snyk dashboard for tracking
+#
+# Temporary exceptions:
+#   - Each ignore entry MUST include: reason, expires (max 90 days), and createdBy.
+#   - Expired entries are treated as active vulnerabilities by the Snyk CLI.
+#   - Review schedule: weekly by the security team.
+#   - All exceptions must reference a tracking issue (Jira/GitHub).
+
+version: v1.25.0
+
+# ── Language settings ──────────────────────────────────────────────────────────
+# Language-level configuration for the Node.js/TypeScript project
+language-settings:
+  javascript:
+    packageManager: npm
+    # Only audit production dependencies in CI; devDependency CVEs are reported
+    # but do not block the build (they cannot reach production)
+    includeDevDependencies: false
+
+# ── Vulnerability exceptions ───────────────────────────────────────────────────
+# Template — DO NOT add entries here without security team review.
+#
+# Format:
+#   SNYK-JS-<PACKAGE>-<ID>:
+#     - '*':
+#         reason: >
+#           No upstream fix available. Transitive via <direct-dep>@<version>.
+#           Tracking: https://jira.opsera.io/browse/SEC-NNNNN
+#         expires: 'YYYY-MM-DDTHH:MM:SS.000Z'   # max 90 days from creation
+#         created: 'YYYY-MM-DDTHH:MM:SS.000Z'
+#         ignoredBy:
+#           name: Security Team
+#           email: security@opsera.io
+ignore: {}
+
+# ── Patch overrides ────────────────────────────────────────────────────────────
+# Snyk-managed patches applied to node_modules at install time for CVEs
+# where an upgrade path is not yet available.
+patch: {}

@@ -1,0 +1,325 @@
+// Prisma schema for Opsera Stuck Pipeline Detection System
+// DATABASE_URL must include connection_limit=20 for connection pool configuration
+// Example: postgresql://user:pass@localhost:5432/opsera_stuck_pipeline?connection_limit=20
+//
+// Hybrid migration strategy: standard models use prisma migrate; partitioned tables
+// (pipeline_executions, execution_steps) use hand-authored SQL migrations.
+// See prisma/MIGRATION_PATTERNS.md for the full pattern.
+
+generator client {
+  provider      = "prisma-client-js"
+  // native: local dev (Mac/Linux); debian-openssl-3.0.x: gcr.io/distroless/nodejs20-debian12 runtime
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ── Enums ─────────────────────────────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  RELEASE_ENGINEER
+  VIEWER
+}
+
+enum ConnectionStatus {
+  CONNECTED
+  DISCONNECTED
+  ERROR
+}
+
+enum ExecutionStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  CANCELLED
+  STUCK
+}
+
+enum StepStatus {
+  QUEUED
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  SKIPPED
+}
+
+enum ThresholdMode {
+  COMPUTED
+  STATIC
+}
+
+enum DetectionState {
+  MONITORING
+  AT_RISK
+  POTENTIALLY_STUCK
+  CONFIRMED_STUCK
+  RESOLVED
+}
+
+enum AlertStatus {
+  PENDING
+  SENT
+  DELIVERED
+  FAILED
+  ACKNOWLEDGED
+}
+
+enum NotificationPreference {
+  REALTIME
+  DIGEST
+}
+
+// ── Core relational models ─────────────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  opseraUserId String   @unique @map("opsera_user_id")
+  // Confidential: email is a PII field. Application-layer encryption applied before persist.
+  // Data classification: CONFIDENTIAL. Encryption story tracked in a subsequent WO.
+  email        String
+  displayName  String   @map("display_name")
+  role         Role     @default(VIEWER)
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime @updatedAt @map("updated_at") @db.Timestamptz
+  isActive     Boolean  @default(true) @map("is_active")
+
+  salesforceOrgs     SalesforceOrg[]
+  monitoredPipelines MonitoredPipeline[]
+
+  @@index([email])
+  @@map("users")
+}
+
+model SalesforceOrg {
+  id                String           @id @default(uuid()) @db.Uuid
+  orgId             String           @unique @map("org_id")
+  orgName           String           @map("org_name")
+  instanceUrl       String           @map("instance_url")
+  connectionStatus  ConnectionStatus @default(DISCONNECTED) @map("connection_status")
+  // tokenVaultReference stores the vault key reference only — never the raw OAuth token.
+  tokenVaultReference String?        @map("token_vault_reference")
+  connectedBy       String?          @db.Uuid @map("connected_by")
+  connectedAt       DateTime?        @map("connected_at") @db.Timestamptz
+  lastHealthCheckAt DateTime?        @map("last_health_check_at") @db.Timestamptz
+  createdAt         DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt         DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  connectedByUser    User?             @relation(fields: [connectedBy], references: [id], onDelete: Restrict)
+  monitoredPipelines MonitoredPipeline[]
+  thresholdConfigs   ThresholdConfig[]
+  alertRecipients    AlertRecipient[]
+
+  @@index([orgId])
+  @@index([connectionStatus])
+  @@map("salesforce_orgs")
+}
+
+model MonitoredPipeline {
+  id               String   @id @default(uuid()) @db.Uuid
+  opseraPipelineId String   @unique @map("opsera_pipeline_id")
+  pipelineName     String   @map("pipeline_name")
+  salesforceOrgId  String   @db.Uuid @map("salesforce_org_id")
+  monitoringEnabled Boolean @default(true) @map("monitoring_enabled")
+  createdBy        String?  @db.Uuid @map("created_by")
+  createdAt        DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  salesforceOrg      SalesforceOrg      @relation(fields: [salesforceOrgId], references: [id], onDelete: Cascade)
+  createdByUser      User?              @relation(fields: [createdBy], references: [id], onDelete: Restrict)
+  thresholdConfigs   ThresholdConfig[]
+  executionBaselines ExecutionBaseline[]
+  alertRecipients    AlertRecipient[]
+
+  @@index([opseraPipelineId])
+  @@map("monitored_pipelines")
+}
+
+// ── Time-series models (partitioned) ──────────────────────────────────────────
+// These tables use PostgreSQL PARTITION BY RANGE on started_at.
+// Prisma cannot create partitioned tables natively — schema.prisma defines the
+// model shape for type generation; the actual DDL is in the hand-authored migration SQL.
+// Composite primary key (id, startedAt) is required because the partition key must
+// be part of the PK in PostgreSQL declarative partitioning.
+
+model PipelineExecution {
+  id                  String          @default(uuid()) @db.Uuid
+  monitoredPipelineId String          @db.Uuid @map("monitored_pipeline_id")
+  salesforceDeployId  String?         @map("salesforce_deploy_id")
+  status              ExecutionStatus @default(QUEUED)
+  startedAt           DateTime        @map("started_at") @db.Timestamptz
+  completedAt         DateTime?       @map("completed_at") @db.Timestamptz
+  durationSeconds     Int?            @map("duration_seconds")
+  // metadata JSONB: component_count, test_count, test_results, error_messages, deployment_type
+  metadata            Json?
+  createdAt           DateTime        @default(now()) @map("created_at") @db.Timestamptz
+
+  steps           ExecutionStep[]
+  detectionEvents DetectionEvent[]
+
+  // Composite PK required for partition-key inclusion
+  @@id([id, startedAt])
+  @@index([monitoredPipelineId, startedAt(sort: Desc)])
+  @@index([status, startedAt(sort: Desc)])
+  @@map("pipeline_executions")
+}
+
+model ExecutionStep {
+  id                         String     @default(uuid()) @db.Uuid
+  pipelineExecutionId        String     @db.Uuid @map("pipeline_execution_id")
+  // pipelineExecutionStartedAt mirrors the FK partition key from pipeline_executions
+  pipelineExecutionStartedAt DateTime   @map("pipeline_execution_started_at") @db.Timestamptz
+  stepName                   String     @map("step_name")
+  stepType                   String     @map("step_type")
+  status                     StepStatus @default(QUEUED)
+  startedAt                  DateTime   @map("started_at") @db.Timestamptz
+  completedAt                DateTime?  @map("completed_at") @db.Timestamptz
+  durationSeconds            Int?       @map("duration_seconds")
+  // progress_indicators JSONB: components_processed, tests_completed, last_status_change_at
+  progressIndicators         Json?      @map("progress_indicators")
+  createdAt                  DateTime   @default(now()) @map("created_at") @db.Timestamptz
+
+  pipelineExecution PipelineExecution @relation(
+    fields: [pipelineExecutionId, pipelineExecutionStartedAt],
+    references: [id, startedAt],
+    onDelete: Cascade
+  )
+
+  @@id([id, startedAt])
+  @@index([pipelineExecutionId, startedAt])
+  @@map("execution_steps")
+}
+
+// ── Supporting models ─────────────────────────────────────────────────────────
+
+model ThresholdConfig {
+  id                       String        @id @default(uuid()) @db.Uuid
+  // NULL monitoredPipelineId = org-level default (applies to all pipelines in the org)
+  monitoredPipelineId      String?       @db.Uuid @map("monitored_pipeline_id")
+  salesforceOrgId          String        @db.Uuid @map("salesforce_org_id")
+  // NULL stepName = pipeline-level threshold (applies to the full pipeline, not a specific step)
+  stepName                 String?       @map("step_name")
+  thresholdMode            ThresholdMode @default(COMPUTED) @map("threshold_mode")
+  p50Seconds               Int?          @map("p50_seconds")
+  p90Seconds               Int?          @map("p90_seconds")
+  p99Seconds               Int?          @map("p99_seconds")
+  staleStateTimeoutMinutes Int           @default(30) @map("stale_state_timeout_minutes")
+  gracePeriodMinutes       Int           @default(5) @map("grace_period_minutes")
+  peakHourMultiplier       Decimal       @default(1.5) @map("peak_hour_multiplier") @db.Decimal(4, 2)
+  createdAt                DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt                DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  monitoredPipeline MonitoredPipeline? @relation(fields: [monitoredPipelineId], references: [id], onDelete: Cascade)
+  salesforceOrg     SalesforceOrg      @relation(fields: [salesforceOrgId], references: [id], onDelete: Cascade)
+
+  // Note: PostgreSQL treats NULL as distinct in unique constraints, so two NULL monitoredPipelineId
+  // rows with the same stepName would NOT be unique-constrained. A partial unique index on
+  // (salesforce_org_id, step_name) WHERE monitored_pipeline_id IS NULL is added in migration SQL.
+  @@unique([monitoredPipelineId, stepName])
+  @@map("threshold_configs")
+}
+
+model ExecutionBaseline {
+  id                  String   @id @default(uuid()) @db.Uuid
+  monitoredPipelineId String   @db.Uuid @map("monitored_pipeline_id")
+  // NULL stepName = pipeline-level baseline
+  stepName            String?  @map("step_name")
+  // timeBucket: "2026-08" (monthly) or "weekday_morning" (time-of-day bucket)
+  timeBucket          String   @map("time_bucket")
+  p50Seconds          Int      @map("p50_seconds")
+  p90Seconds          Int      @map("p90_seconds")
+  p99Seconds          Int      @map("p99_seconds")
+  sampleCount         Int      @map("sample_count")
+  lastComputedAt      DateTime @map("last_computed_at") @db.Timestamptz
+  // time_of_day_factors JSONB: { hour_0: 0.8, hour_9: 1.2, ... }
+  timeOfDayFactors    Json?    @map("time_of_day_factors")
+  createdAt           DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt           DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  monitoredPipeline MonitoredPipeline @relation(fields: [monitoredPipelineId], references: [id], onDelete: Cascade)
+
+  @@unique([monitoredPipelineId, stepName, timeBucket])
+  @@map("execution_baselines")
+}
+
+model DetectionEvent {
+  id                         String         @id @default(uuid()) @db.Uuid
+  pipelineExecutionId        String         @db.Uuid @map("pipeline_execution_id")
+  // Composite FK to partitioned pipeline_executions requires the partition key
+  pipelineExecutionStartedAt DateTime       @map("pipeline_execution_started_at") @db.Timestamptz
+  previousState              DetectionState? @map("previous_state")
+  newState                   DetectionState  @map("new_state")
+  transitionReason           String?        @map("transition_reason")
+  detectedAt                 DateTime       @default(now()) @map("detected_at") @db.Timestamptz
+  metadata                   Json?
+
+  pipelineExecution PipelineExecution @relation(
+    fields: [pipelineExecutionId, pipelineExecutionStartedAt],
+    references: [id, startedAt],
+    onDelete: Cascade
+  )
+  alertRecords AlertRecord[]
+
+  @@index([pipelineExecutionId])
+  @@index([newState, detectedAt(sort: Desc)])
+  @@map("detection_events")
+}
+
+model AlertRecord {
+  id               String      @id @default(uuid()) @db.Uuid
+  detectionEventId String      @db.Uuid @map("detection_event_id")
+  alertType        String      @map("alert_type")
+  status           AlertStatus @default(PENDING)
+  sentAt           DateTime?   @map("sent_at") @db.Timestamptz
+  deliveredAt      DateTime?   @map("delivered_at") @db.Timestamptz
+  acknowledgedAt   DateTime?   @map("acknowledged_at") @db.Timestamptz
+  acknowledgedBy   String?     @db.Uuid @map("acknowledged_by")
+  retryCount       Int         @default(0) @map("retry_count")
+  createdAt        DateTime    @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt        DateTime    @updatedAt @map("updated_at") @db.Timestamptz
+
+  detectionEvent DetectionEvent @relation(fields: [detectionEventId], references: [id], onDelete: Cascade)
+
+  @@index([detectionEventId])
+  @@index([status, createdAt(sort: Desc)])
+  @@map("alert_records")
+}
+
+model AlertRecipient {
+  id                     String                 @id @default(uuid()) @db.Uuid
+  monitoredPipelineId    String?                @db.Uuid @map("monitored_pipeline_id")
+  salesforceOrgId        String?                @db.Uuid @map("salesforce_org_id")
+  email                  String
+  notificationPreference NotificationPreference @default(REALTIME) @map("notification_preference")
+  isActive               Boolean                @default(true) @map("is_active")
+  createdAt              DateTime               @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt              DateTime               @updatedAt @map("updated_at") @db.Timestamptz
+
+  monitoredPipeline MonitoredPipeline? @relation(fields: [monitoredPipelineId], references: [id], onDelete: Cascade)
+  salesforceOrg     SalesforceOrg?     @relation(fields: [salesforceOrgId], references: [id], onDelete: Cascade)
+
+  @@unique([monitoredPipelineId, email])
+  @@map("alert_recipients")
+}
+
+// AuditLog: no foreign keys to other tables to ensure audit records survive entity deletion.
+// Immutability enforced by a PostgreSQL trigger — see migration SQL for prevent_audit_modification().
+model AuditLog {
+  id            String   @id @default(uuid()) @db.Uuid
+  actor         String
+  action        String
+  resourceType  String   @map("resource_type")
+  resourceId    String   @map("resource_id")
+  changeDetails Json?    @map("change_details")
+  ipAddress     String?  @map("ip_address")
+  timestamp     DateTime @default(now()) @db.Timestamptz
+  correlationId String?  @map("correlation_id")
+
+  @@index([resourceType, resourceId])
+  @@index([actor, timestamp(sort: Desc)])
+  @@map("audit_log")
+}
