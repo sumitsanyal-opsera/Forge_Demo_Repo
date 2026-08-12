@@ -140,3 +140,10 @@
 - **Files:** 2 (+67/-7)
 - **Duration:** 500ss
 - **Approach:** WO-075 required the CLI two-arg mode to use validateXml(xmlContent, xsdContent) from src/validate.ts (WO-074) with a new output format. src/cli.ts already existed from WO-087/072/096 with validateWithExplicitXsd that called validateXmlAgainstXsd from src/validateXml.ts and printed 'PASS: {fullPath} conforms to {xsdPath}'. Changed: (1) Added 'import { validateXml } from ./validate' to src/cli.ts. (2) Replaced validateXmlAgainstXsd call inside validateWithExplicitXsd with validateXml(xmlContent, xsdContent) — which returns { valid: boolean; errors: string[] }. (3) Changed output format to 'PASS: {basename} is valid against the schema' and 'FAIL: {basename} has N validation error(s):' with '  - error' lines. The existing src/__tests__/cli.test.ts still passes because it only checks for 'PASS'/'FAIL' presence, not exact format. (4) Created tests/cli.integration.test.ts at root tests/ directory (not src/__tests__/) with 4 execSync tests using WO-074 fixtures from fixtures/ directory.
+
+## WO-089: User Story: WO-089 - Validate Parsed XML Against Salesforce Metadata XSD
+- **Status:** completed
+- **Commit:** `a430456`
+- **Files:** 3 (+105/-0)
+- **Duration:** 198ss
+- **Approach:** WO-089 required a new validateAgainstXsd(xmlString, xsdPath) function — distinct from the existing src/validate/validateAgainstXsd.ts which takes (xmlPath, xsdPath) as file paths. Created src/validate/validateXsd.ts with the new signature: reads the XSD from disk via fs.readFileSync, parses both with libxmljs2.parseXml, calls xmlDoc.validate(xsdDoc), and maps validationErrors to {message, line, column} objects. All three error paths (XSD file read failure, XSD parse failure, XML parse failure) return {valid:false, errors:[...]} without throwing. Created a minimal CustomObject.xsd fixture using the http://soap.sforce.com/2006/04/metadata namespace with fullName (required string), label and deploymentStatus (optional strings). Tests use inline XML strings for the valid/invalid cases.
