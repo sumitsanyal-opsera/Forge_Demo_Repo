@@ -1,5 +1,8 @@
+import { readFile } from 'fs/promises';
 import * as libxmljs from 'libxmljs2';
 import { validateXml as validateXmlFromPath } from './xml-validator';
+import { FileNotFoundError, SchemaError } from './errors';
+import type { XmlValidationResult } from './types';
 
 // WO-097: structured error with phase discrimination
 export interface ValidationError {
@@ -64,6 +67,48 @@ export function validateMetadataXml(
   }));
 
   return { filePath, valid: errors.length === 0, errors };
+}
+
+// WO-095: file-path-based async validation returning flat string errors
+export async function validateXmlAgainstXsd(
+  xmlPath: string,
+  xsdPath: string,
+): Promise<XmlValidationResult> {
+  let xmlContent: string;
+  try {
+    xmlContent = await readFile(xmlPath, 'utf-8');
+  } catch (err: unknown) {
+    throw new FileNotFoundError(xmlPath, err);
+  }
+
+  let xsdContent: string;
+  try {
+    xsdContent = await readFile(xsdPath, 'utf-8');
+  } catch (err: unknown) {
+    throw new FileNotFoundError(xsdPath, err);
+  }
+
+  let xsdDoc: libxmljs.Document;
+  try {
+    xsdDoc = libxmljs.parseXml(xsdContent);
+  } catch (err: unknown) {
+    throw new SchemaError(xsdPath, err);
+  }
+
+  let xmlDoc: libxmljs.Document;
+  try {
+    xmlDoc = libxmljs.parseXml(xmlContent);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { isValid: false, errors: [`XML parse error: ${msg}`] };
+  }
+
+  xmlDoc.validate(xsdDoc);
+  const errors = xmlDoc.validationErrors.map((e) => {
+    const linePrefix = e.line != null ? `Line ${e.line}: ` : '';
+    return `${linePrefix}${e.message.trim()}`;
+  });
+  return { isValid: errors.length === 0, errors };
 }
 
 // Legacy function for the batch directory scanner — accepts a file path and pre-parsed schema

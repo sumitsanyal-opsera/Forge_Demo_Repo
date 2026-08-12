@@ -11,6 +11,7 @@
     "validate": "ts-node src/cli.ts"
   },
   "dependencies": {
+    "fast-xml-parser": "^4.4.0",
     "libxmljs2": "^0.31.0",
     "ts-node": "^10.9.2",
     "typescript": "^5.4.5"

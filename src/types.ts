@@ -8,3 +8,9 @@ export interface ValidationResult {
   isValid: boolean;
   errors: ValidationError[];
 }
+
+// WO-095: flat string errors for file-path-based validation
+export interface XmlValidationResult {
+  isValid: boolean;
+  errors: string[];
+}
