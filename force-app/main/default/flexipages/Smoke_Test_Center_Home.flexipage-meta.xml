@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FlexiPage xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Smoke Test Center — main app page hosting the smokeTestCenter shell component.</description>
+    <flexiPageRegions>
+        <itemInstances>
+            <componentInstance>
+                <componentName>c:smokeTestCenter</componentName>
+                <visibilityRule/>
+            </componentInstance>
+        </itemInstances>
+        <mode>AppBuilder</mode>
+        <name>main</name>
+        <type>Region</type>
+    </flexiPageRegions>
+    <label>Smoke Test Center Home</label>
+    <pageTemplate>AppPage_Default</pageTemplate>
+    <type>AppPage</type>
+</FlexiPage>

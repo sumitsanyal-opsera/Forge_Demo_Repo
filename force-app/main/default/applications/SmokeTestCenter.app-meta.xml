@@ -11,4 +11,5 @@
     <uiType>Lightning</uiType>
     <utilityBar></utilityBar>
     <tabs>Home</tabs>
+    <tabs>Smoke_Test_Center</tabs>
 </CustomApplication>
