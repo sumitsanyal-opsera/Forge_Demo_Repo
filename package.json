@@ -1,0 +1,16 @@
+{
+  "name": "sf-metadata-validator-prototype",
+  "version": "0.1.0",
+  "description": "Salesforce Metadata XML Validation Prototype using libxmljs2 and TypeScript",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "ts-node src/main.ts"
+  },
+  "dependencies": {
+    "libxmljs2": "^0.31.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.4.5"
+  }
+}
