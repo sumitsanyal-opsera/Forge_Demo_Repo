@@ -1,0 +1,12 @@
+{
+    "Id": "a0Xxx0000000002AAA",
+    "PreDeploymentScore__c": 85,
+    "PostDeploymentScore__c": 60,
+    "ScoreDelta__c": -25,
+    "ThresholdStatus__c": "Fail",
+    "ThresholdMet__c": false,
+    "AbsoluteThreshold__c": 80,
+    "RelativeThreshold__c": 5,
+    "RiskCategories__c": "Password Policies,Session Settings,Network Access",
+    "CheckedAt__c": "2024-03-15T11:00:00.000Z"
+}
