@@ -1,0 +1,155 @@
+# Gitleaks secret detection configuration for opsera-stuck-pipeline-detection
+# Reference: https://github.com/gitleaks/gitleaks/tree/master/config
+#
+# This config EXTENDS the built-in Gitleaks default ruleset and adds:
+#   - Custom rules for Salesforce-specific token patterns
+#   - Custom rule for Opsera API keys
+#   - Path-based allowlist for test fixtures with dummy/generated credentials
+#
+# IMPORTANT: Every allowlist entry has a comment explaining WHY it is allowed.
+# Overly broad allowlists defeat the purpose of secret detection.
+# Do NOT use global regex ignores — always scope by path.
+
+title = "Opsera Stuck Pipeline Detection — Gitleaks Config"
+
+# Inherit all built-in default rules (AWS keys, GCP tokens, GitHub PATs, etc.)
+[extend]
+useDefault = true
+
+# ── Custom rules ───────────────────────────────────────────────────────────────
+
+[[rules]]
+id = "salesforce-access-token"
+description = "Salesforce session-based access token"
+# Salesforce access tokens from the OAuth 2.0 JWT Bearer flow are long (100+ chars)
+regex = '''(?i)(salesforce[_\-\s]?)(access[_\-]?token|session[_\-]?token)[_\-\s]*[=:]\s*['\"]?([0-9A-Za-z!.]{100,})['\"]?'''
+tags = ["salesforce", "token", "session"]
+severity = "critical"
+keywords = ["salesforce"]
+
+[[rules]]
+id = "salesforce-oauth-bearer"
+description = "Salesforce Connected App OAuth bearer token"
+regex = '''(?i)(sf[_\-]?|salesforce[_\-]?)(bearer|oauth[_\-]?token)[_\-\s]*[=:]\s*['\"]?([0-9A-Za-z._\-]{40,})['\"]?'''
+tags = ["salesforce", "oauth", "bearer"]
+severity = "critical"
+keywords = ["salesforce"]
+
+[[rules]]
+id = "salesforce-instance-url"
+description = "Salesforce org instance URL containing embedded credentials"
+# Matches URLs of the form https://user:password@xxx.salesforce.com
+regex = '''https?://[^@\s]+:[^@\s]+@[a-z0-9\-]+\.salesforce\.com'''
+tags = ["salesforce", "url", "credentials"]
+severity = "high"
+
+[[rules]]
+id = "opsera-api-key"
+description = "Opsera platform API key"
+regex = '''(?i)(opsera[_\-]?api[_\-]?key)\s*[=:]\s*['\"]?([A-Za-z0-9\-_]{32,})['\"]?'''
+tags = ["opsera", "api-key"]
+severity = "critical"
+keywords = ["opsera"]
+
+# ── Path-based allowlists ──────────────────────────────────────────────────────
+# Rule: each allowlist entry is scoped to a specific path, not a global regex ignore.
+# This limits the allowlist blast radius — only the stated paths are exempted.
+
+[allowlist]
+description = "Global allowlist index — all per-path exceptions are defined in the rules below"
+# No global regex ignores. All exceptions below use path + regex scoping.
+commits = []
+paths = []
+regexes = []
+
+[[allowlist.rules]]
+id = "allow-test-rsa-keypair"
+description = """
+Test RSA private/public key pair committed for JWT unit tests in WO-025.
+SAFE TO STORE: this key was generated exclusively for automated testing.
+It is NOT connected to any Salesforce org, Opsera tenant, or production system.
+It cannot be used to authenticate to any real service.
+"""
+paths = [
+  '''test[/\\]fixtures[/\\]salesforce-auth[/\\]test-rsa-keypair\\.json''',
+]
+regexes = [
+  '''-----BEGIN (RSA |EC |)PRIVATE KEY-----''',
+  '''BEGIN PUBLIC KEY''',
+]
+
+[[allowlist.rules]]
+id = "allow-mock-salesforce-oauth-responses"
+description = """
+Fabricated Salesforce OAuth response fixtures for SalesforceAuthService unit tests (WO-025).
+These contain structurally valid but cryptographically invalid JWT-shaped tokens.
+They are NOT valid credentials for any Salesforce org.
+"""
+paths = [
+  '''test[/\\]fixtures[/\\]salesforce-auth[/\\]mock-oauth-responses\\.json''',
+]
+regexes = [
+  '''access_token''',
+  '''refresh_token''',
+  '''instance_url''',
+  # JWT-shaped test token: header.payload.signature format
+  '''eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+''',
+]
+
+[[allowlist.rules]]
+id = "allow-opsera-auth-test-fixtures"
+description = """
+Opsera Auth test fixtures for OpseraAuthService unit tests (WO-095).
+Contain fabricated OAuth token responses used in mocked HTTP assertions.
+These are NOT valid credentials for any Opsera platform instance.
+"""
+paths = [
+  '''test[/\\]fixtures[/\\]opsera-auth[/\\].*\\.json''',
+]
+regexes = [
+  '''access_token''',
+  '''eyJ[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+\.[A-Za-z0-9_\-]+''',
+]
+
+[[allowlist.rules]]
+id = "allow-owasp-payload-fixtures"
+description = """
+OWASP attack payload test data committed for WAF middleware unit tests (WO-114).
+These strings intentionally resemble injection attacks — they are test inputs, not secrets.
+They trigger the SQL injection and command injection Gitleaks rules (false positive).
+"""
+paths = [
+  '''test[/\\]fixtures[/\\]owasp-payloads\\.json''',
+]
+# Allow all patterns in this fixture file — it is entirely test data
+regexes = [
+  '''.+''',
+]
+
+[[allowlist.rules]]
+id = "allow-snyk-policy-examples"
+description = """
+The .snyk policy file contains an EXAMPLE exception block in a YAML comment.
+The example references a fictional CVE ID and placeholder credentials to
+illustrate the required format for future exception entries.
+These are documentation examples, not real credentials or suppressions.
+"""
+paths = [
+  '''\\.snyk''',
+]
+regexes = [
+  '''SNYK-JS-EXAMPLE-12345''',
+]
+
+[[allowlist.rules]]
+id = "allow-pipeline-yaml-template-vars"
+description = """
+pipeline.yaml uses Forge Shipping Engine template variable syntax ({{ secrets.X }}).
+These are pipeline variable references, not hardcoded secret values.
+"""
+paths = [
+  '''pipeline\\.yaml''',
+]
+regexes = [
+  '''\{\{\s*secrets\.[A-Z_]+\s*\}\}''',
+]

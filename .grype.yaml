@@ -1,0 +1,57 @@
+# Grype container image vulnerability scanner configuration
+# Reference: https://github.com/anchore/grype#configuration
+#
+# Used by: pipeline.yaml — scan:grype step in the Security Scan stage
+# Target: built container images pushed to ECR by the Build stage
+
+# Output format for the pipeline report artefact
+output: json
+
+# ── Severity gate ──────────────────────────────────────────────────────────────
+# Pipeline fails if any matched vulnerability meets or exceeds this severity.
+# Critical and high OS-level CVEs must be resolved before any image is pushed.
+fail-on-severity: high
+
+# ── Ignore rules ──────────────────────────────────────────────────────────────
+# Vulnerabilities matching these rules are excluded from the severity gate.
+# Order: most-specific rule first.
+ignore:
+  # Unfixed vulnerabilities have no available remediation action — we cannot patch them.
+  # They are still reported in the JSON output for awareness.
+  - fix-state: not-fixed
+  - fix-state: wont-fix
+
+# ── Temporary CVE exceptions ───────────────────────────────────────────────────
+# Each exception requires: security team approval, tracked justification, and an expiry date.
+# Add entries here ONLY after completing the exception process in docs/security-exceptions-register.md.
+# Review schedule: weekly by the security team.
+#
+# Format:
+#   - id: CVE-YYYY-NNNNN
+#     namespace: nvd
+#     reason: >
+#       Upstream patch not yet released for <package>@<version> in <base-image>.
+#       Tracking: https://jira.opsera.io/browse/SEC-NNNNN
+#     expires: "YYYY-MM-DD"
+#     approvedBy: "Security Team"
+#     approvedDate: "YYYY-MM-DD"
+exceptions: []
+
+# ── Vulnerability database ─────────────────────────────────────────────────────
+db:
+  # Always fetch the latest database in CI; ensures CVEs published in the last 24h are caught
+  auto-update: true
+  validate-age: true
+  # Fail if the vulnerability database is older than 24 hours (stale DB is a security gap)
+  max-allowed-built-age: 24h
+
+# ── Registry configuration ─────────────────────────────────────────────────────
+# ECR credentials are injected by the Forge Shipping Engine via IAM role assumption.
+# They are never stored in this file.
+registry:
+  insecure-skip-tls-verify: false
+  insecure-use-http: false
+
+# ── Scope ─────────────────────────────────────────────────────────────────────
+# Scan the full image including all layers (not just the final layer)
+scope: all-layers

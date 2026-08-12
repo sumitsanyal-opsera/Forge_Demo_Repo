@@ -1,0 +1,20 @@
+#!/usr/bin/env sh
+# Gitleaks pre-commit hook — scans staged files for secrets before they enter the repository.
+#
+# This hook is the LOCAL safety net. The Gitleaks scan in the CI pipeline (pipeline.yaml,
+# scan:gitleaks step) is the BACKSTOP and will catch any secrets that bypass this hook
+# (e.g. via git commit --no-verify).
+#
+# Requirements:
+#   gitleaks must be installed and on PATH. Install via:
+#     brew install gitleaks         # macOS
+#     apt-get install gitleaks      # Debian/Ubuntu
+#     https://github.com/gitleaks/gitleaks/releases  # other platforms
+#
+# To run manually against all staged files:
+#   gitleaks protect --staged --config .gitleaks.toml --verbose
+#
+# Emergency bypass (CI pipeline will still catch leaks — use only in true emergencies):
+#   git commit --no-verify
+
+gitleaks protect --staged --config .gitleaks.toml --verbose
