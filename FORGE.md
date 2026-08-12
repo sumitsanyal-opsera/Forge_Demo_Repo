@@ -42,3 +42,10 @@
 - **Files:** 28 (+683/-0)
 - **Duration:** 687ss
 - **Approach:** Created two Custom Metadata Type definitions in Salesforce DX source format. SmokeTestChecklist__mdt is Public visibility with 7 fields and 5 default records covering core post-deployment verification checks (Flows, Permission Sets, Page Layouts, Custom Settings, Scheduled Jobs). SmokeTestAlertRoute__mdt is Protected visibility — this prevents subscriber orgs from reading WebhookSecret__c values via the Metadata API, leveraging the stcenter namespace established in WO-001. All 8 AlertRoute fields and 5 default records are created with placeholder webhook values for the Slack route. All CMT fields use fieldManageability: DeveloperControlled consistent with WO-004 patterns. A verification script uses getAll() to assert record counts and field values for both types.
+
+## WO-006: User Story: WO-006 - Define Platform Events for Deployment and Test Lifecycle
+- **Status:** completed
+- **Commit:** `ae3d62d`
+- **Files:** 22 (+257/-0)
+- **Duration:** 275ss
+- **Approach:** Created three Platform Event definitions in Salesforce DX source format under objects/ using the standard CustomObject schema with eventType HighVolume and publishBehavior PublishImmediately. Platform Events use only Text, Number, Checkbox, and DateTime field types (no Picklist or LookupRelationship support). All field descriptions document the expected publisher and subscriber for each event, satisfying AC-6. A verification script uses EventBus.publish() with SaveResult assertions for all three event types.

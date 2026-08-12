@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>OverallResult__c</fullName>
+    <description>Final pass/fail result for the entire smoke test suite. Published by: SmokeTestOrchestrator after evaluating all scenario results and security score thresholds. Consumed by: AlertRoutingService to determine which SmokeTestAlertRoute__mdt records to activate; SmokeTestDashboard LWC to display the final pass/fail badge. Expected values: Passed, Failed, Aborted (max 50 characters).</description>
+    <label>Overall Result</label>
+    <length>50</length>
+    <type>Text</type>
+</CustomField>

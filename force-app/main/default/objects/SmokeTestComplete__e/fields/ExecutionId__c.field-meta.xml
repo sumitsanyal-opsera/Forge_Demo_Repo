@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ExecutionId__c</fullName>
+    <description>18-character Salesforce ID of the completed SmokeTestExecution__c record. Published by: SmokeTestOrchestrator on suite completion. Consumed by: AlertRoutingService to load the execution record details for notification content; WebhookCallbackHandler to include in outbound webhook payload; SmokeTestDashboard LWC to finalize the results view for this execution.</description>
+    <label>Execution ID</label>
+    <length>255</length>
+    <type>Text</type>
+</CustomField>

@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SecurityScoreMet__c</fullName>
+    <description>True if the post-deployment security score met both the absolute threshold (SecurityScoreAbsoluteThreshold__c) and relative threshold (SecurityScoreRelativeThreshold__c) from SmokeTestConfig__mdt. Published by: SmokeTestOrchestrator after evaluating SmokeTestSecurityScore__c. Consumed by: AlertRoutingService (drives Admin_SecurityAlerts route); WebhookCallbackHandler.</description>
+    <label>Security Score Met</label>
+    <type>Checkbox</type>
+</CustomField>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DeployedBy__c</fullName>
+    <description>Username or user ID of the person or service account that initiated the deployment. Published by: deployment tooling or CI/CD pipeline. Consumed by: SmokeTestOrchestratorTrigger to populate InitiatedBy__c on SmokeTestExecution__c for audit trail. Expected format: Salesforce username (user@domain.com) or 18-character User ID.</description>
+    <label>Deployed By</label>
+    <length>255</length>
+    <type>Text</type>
+</CustomField>

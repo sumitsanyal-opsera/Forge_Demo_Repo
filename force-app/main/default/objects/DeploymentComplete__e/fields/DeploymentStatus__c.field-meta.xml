@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DeploymentStatus__c</fullName>
+    <description>Final status of the deployment that triggered this event. Published by: deployment tooling. Consumed by: SmokeTestOrchestratorTrigger — smoke tests only initiate if status is Succeeded; failed deployments do not trigger smoke test execution. Expected values: Succeeded, Failed, SucceededPartial (max 50 characters).</description>
+    <label>Deployment Status</label>
+    <length>50</length>
+    <type>Text</type>
+</CustomField>

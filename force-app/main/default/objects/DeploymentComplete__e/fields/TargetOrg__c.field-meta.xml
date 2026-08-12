@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>TargetOrg__c</fullName>
+    <description>Org ID or alias of the target org where the deployment was applied. Published by: deployment tooling. Consumed by: SmokeTestOrchestratorTrigger to set TargetOrg__c on the SmokeTestExecution__c record. Expected format: 15- or 18-character Salesforce Org ID, or a human-readable alias string up to 255 characters.</description>
+    <label>Target Org</label>
+    <length>255</length>
+    <type>Text</type>
+</CustomField>

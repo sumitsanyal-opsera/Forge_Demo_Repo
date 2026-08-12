@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>PassedCount__c</fullName>
+    <description>Number of scenarios that passed in this execution run. Published by: SmokeTestOrchestrator. Consumed by: AlertRoutingService to include in notification content; SmokeTestDashboard LWC to display the final passed/failed breakdown.</description>
+    <label>Passed Count</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>
