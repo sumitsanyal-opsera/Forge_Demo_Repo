@@ -65,6 +65,32 @@ export function validateFiles(
   });
 }
 
+// WO-074: content-based validate (takes strings, returns flat string errors)
+export function validateXml(xmlContent: string, xsdContent: string): { valid: boolean; errors: string[] } {
+  let xsdDoc: libxmljs.Document;
+  try {
+    xsdDoc = libxmljs.parseXml(xsdContent);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { valid: false, errors: [`XSD parse error: ${msg}`] };
+  }
+
+  let xmlDoc: libxmljs.Document;
+  try {
+    xmlDoc = libxmljs.parseXml(xmlContent);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { valid: false, errors: [msg] };
+  }
+
+  xmlDoc.validate(xsdDoc);
+  const errors = xmlDoc.validationErrors.map((e) => {
+    const linePrefix = e.line != null ? `Line ${e.line}: ` : '';
+    return `${linePrefix}${e.message.trim()}`;
+  });
+  return { valid: errors.length === 0, errors };
+}
+
 export interface ValidationError {
   message: string;
   line: number | null;
@@ -76,7 +102,7 @@ export interface ValidationResult {
   errors: ValidationError[];
 }
 
-export function validateXml(xmlPath: string, xsdPath: string): ValidationResult {
+export function validateXmlFile(xmlPath: string, xsdPath: string): ValidationResult {
   let xsdContent: string;
   try {
     xsdContent = fs.readFileSync(xsdPath, 'utf-8');

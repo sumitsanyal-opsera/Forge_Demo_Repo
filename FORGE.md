@@ -105,3 +105,10 @@
 - **Files:** 5 (+152/-0)
 - **Duration:** 546ss
 - **Approach:** Extended the existing src/validate.ts (from WO-066) by adding three exports at the top of the file: a DEFAULT_SCHEMA_PATH constant pointing to schemas/CustomObject.xsd, a FileValidationResult interface ({filePath, valid, errors: {line, message}[]}), a loadSchema(xsdPath) function wrapping readFileSync+parseXml with descriptive error messages, and a validateFiles(schema, xmlPaths[]) function that reads/parses each file and maps libxmljs2 validationErrors. The original ValidationResult, ValidationError interfaces and validateXml function were left intact. Created a minimal CustomObject XSD with required fullName and optional label/description using the Salesforce metadata namespace. Created matching valid and invalid XML test fixtures. Tests cover all 6 acceptance criteria scenarios.
+
+## WO-074: User Story: WO-074 - Implement XML-against-XSD Validation with libxmljs2
+- **Status:** completed
+- **Commit:** `3c3df26`
+- **Files:** 7 (+89/-7)
+- **Duration:** 285ss
+- **Approach:** WO-074 requires a content-string-based validateXml(xmlContent, xsdContent): {valid, errors: string[]} in src/validate.ts. The existing validateXml in that file was a file-path-based function (validateXml(xmlPath, xsdPath): ValidationResult) from WO-066, which conflicted on export name. Resolved by renaming the existing function to validateXmlFile and aliasing it in src/main.ts (the only caller) via 'import { validateXmlFile as validateXml }'. Added the new WO-074 content-based validateXml above the legacy type definitions: it wraps libxmljs2.parseXml for both XSD and XML with try-catch (returning string errors on failure), then calls xmlDoc.validate(xsdDoc) and maps validationErrors to 'Line N: message' strings. Created 4 fixture files in fixtures/ matching the WO spec: testMetadata.xsd (CustomObject with required label, optional pluralLabel), validAccount.object-meta.xml, invalidProfile.profile-meta.xml (has unknownElement), malformed.xml (unclosed label tag). Replaced the single WO-073 smoke test in tests/validate.test.ts with 3 new content-based tests that read fixtures with fs.readFileSync.

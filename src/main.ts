@@ -1,5 +1,5 @@
 import * as path from 'path';
-import { validateXml, ValidationResult } from './validate';
+import { validateXmlFile as validateXml, ValidationResult } from './validate';
 
 const FIXTURES_DIR = path.resolve(__dirname, '..', 'fixtures');
 const XSD_PATH = path.join(FIXTURES_DIR, 'custom-object.xsd');
