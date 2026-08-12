@@ -197,12 +197,19 @@
 
                 <!-- Normal dashboard panels — shown by default and when executions exist -->
                 <template if:false={showOnboarding}>
-                    <template if:true={isAdmin}>
-                        <div class="admin-panels">
-                            <slot name="admin-content"></slot>
-                        </div>
+                    <!-- Test Scenarios configuration page (admin only) -->
+                    <template if:true={isScenariosPage}>
+                        <c-test-scenarios-page is-admin={isAdmin}></c-test-scenarios-page>
                     </template>
-                    <slot></slot>
+                    <!-- All other pages -->
+                    <template if:false={isScenariosPage}>
+                        <template if:true={isAdmin}>
+                            <div class="admin-panels">
+                                <slot name="admin-content"></slot>
+                            </div>
+                        </template>
+                        <slot></slot>
+                    </template>
                 </template>
             </div>
         </div>

@@ -75,6 +75,10 @@ export default class SmokeTestCenter extends NavigationMixin(LightningElement) {
         return this.hasAccess && this._executionData === null;
     }
 
+    get isScenariosPage() {
+        return this.activePageId === 'scenarios';
+    }
+
     get navItemClass() {
         const classes = {};
         PAGE_IDS.forEach(pageId => {

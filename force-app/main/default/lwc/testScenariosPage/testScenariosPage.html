@@ -1,0 +1,268 @@
+<template>
+    <!-- Permission denied -->
+    <template if:true={hasPermissionError}>
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert" aria-live="assertive">
+            <span class="slds-assistive-text">Error</span>
+            <lightning-icon
+                icon-name="utility:lock"
+                alternative-text="Access denied"
+                variant="inverse"
+                size="x-small"
+                class="slds-m-right_x-small">
+            </lightning-icon>
+            <span>You need the <strong>SmokeTest_Admin</strong> permission set to manage test scenarios.
+                Contact your Salesforce Administrator.</span>
+        </div>
+    </template>
+
+    <!-- Admin content -->
+    <template if:false={hasPermissionError}>
+
+        <!-- Page header -->
+        <div class="slds-page-header slds-m-bottom_medium">
+            <div class="slds-page-header__row">
+                <div class="slds-page-header__col-title">
+                    <div class="slds-media">
+                        <div class="slds-media__figure">
+                            <lightning-icon
+                                icon-name="utility:settings"
+                                size="small"
+                                class="slds-m-right_small">
+                            </lightning-icon>
+                        </div>
+                        <div class="slds-media__body">
+                            <h1 class="slds-page-header__title">Test Scenarios</h1>
+                            <p class="slds-text-body_small slds-line-height_reset">
+                                Manage SmokeTestScenario__mdt configuration records
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="slds-page-header__col-actions">
+                    <lightning-button
+                        label="Add Scenario"
+                        icon-name="utility:add"
+                        variant="brand"
+                        onclick={handleAddClick}
+                        aria-label="Add new test scenario">
+                    </lightning-button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Wire error banner -->
+        <template if:true={hasWireError}>
+            <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small"
+                 role="alert" aria-live="assertive">
+                <span class="slds-assistive-text">Error</span>
+                <lightning-icon
+                    icon-name="utility:error"
+                    alternative-text="Error"
+                    variant="inverse"
+                    size="x-small"
+                    class="slds-m-right_x-small">
+                </lightning-icon>
+                <span>{wireError}</span>
+            </div>
+        </template>
+
+        <!-- InfoBanner — live region so screen readers announce count changes -->
+        <div class="slds-grid slds-gutters slds-m-bottom_medium"
+             role="status"
+             aria-label="Scenario counts">
+            <div class="slds-col slds-size_1-of-3">
+                <div class="slds-box slds-box_x-small slds-text-align_center info-card">
+                    <p class="slds-text-heading_large">{totalCount}</p>
+                    <p class="slds-text-body_small slds-text-color_weak">Total Scenarios</p>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-3">
+                <div class="slds-box slds-box_x-small slds-text-align_center info-card info-card_enabled">
+                    <p class="slds-text-heading_large enabled-count">{enabledCount}</p>
+                    <p class="slds-text-body_small slds-text-color_weak">
+                        <lightning-icon icon-name="utility:success" size="xx-small"
+                            class="slds-m-right_xx-small" aria-hidden="true">
+                        </lightning-icon>
+                        Enabled
+                    </p>
+                </div>
+            </div>
+            <div class="slds-col slds-size_1-of-3">
+                <div class="slds-box slds-box_x-small slds-text-align_center info-card info-card_disabled">
+                    <p class="slds-text-heading_large disabled-count">{disabledCount}</p>
+                    <p class="slds-text-body_small slds-text-color_weak">
+                        <lightning-icon icon-name="utility:warning" size="xx-small"
+                            class="slds-m-right_xx-small" aria-hidden="true">
+                        </lightning-icon>
+                        Disabled
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- FilterBar -->
+        <div class="slds-grid slds-gutters slds-m-bottom_medium filter-bar"
+             role="search"
+             aria-label="Filter scenarios">
+            <div class="slds-col slds-size_4-of-12">
+                <lightning-input
+                    type="search"
+                    label="Search scenarios"
+                    placeholder="Search by name..."
+                    value={searchText}
+                    onchange={handleSearchChange}
+                    aria-label="Search scenarios by name">
+                </lightning-input>
+            </div>
+            <div class="slds-col slds-size_4-of-12">
+                <lightning-combobox
+                    label="Category"
+                    value={categoryFilter}
+                    options={categoryOptions}
+                    onchange={handleCategoryChange}
+                    aria-label="Filter by category">
+                </lightning-combobox>
+            </div>
+            <div class="slds-col slds-size_4-of-12">
+                <lightning-combobox
+                    label="Status"
+                    value={statusFilter}
+                    options={statusOptions}
+                    onchange={handleStatusChange}
+                    aria-label="Filter by enabled status">
+                </lightning-combobox>
+            </div>
+        </div>
+
+        <!-- Loading spinner overlay -->
+        <template if:true={isLoading}>
+            <div class="slds-spinner_container">
+                <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                    <span class="slds-assistive-text">Deploying scenario...</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Empty state -->
+        <template if:true={isEmpty}>
+            <div class="slds-illustration slds-illustration_small slds-p-around_large">
+                <div class="slds-text-align_center">
+                    <lightning-icon
+                        icon-name="utility:settings"
+                        size="large"
+                        class="slds-m-bottom_medium"
+                        aria-hidden="true">
+                    </lightning-icon>
+                    <h3 class="slds-text-heading_medium slds-m-bottom_small">No Scenarios Configured</h3>
+                    <p class="slds-text-body_regular slds-m-bottom_medium">
+                        Add your first smoke test scenario to begin configuring post-deployment verification.
+                    </p>
+                    <lightning-button
+                        label="Add First Scenario"
+                        variant="brand"
+                        onclick={handleAddClick}
+                        aria-label="Add your first test scenario">
+                    </lightning-button>
+                </div>
+            </div>
+        </template>
+
+        <!-- Scenario list -->
+        <template if:true={hasScenarios}>
+            <table class="slds-table slds-table_cell-buffer slds-table_bordered scenario-table"
+                   role="grid"
+                   aria-label="Test scenarios list">
+                <thead>
+                    <tr class="slds-line-height_reset">
+                        <th scope="col" class="slds-text-title_caps" style="width:4rem">
+                            <span class="slds-truncate" title="Order">#</span>
+                        </th>
+                        <th scope="col" class="slds-text-title_caps">
+                            <span class="slds-truncate" title="Scenario Name">Scenario</span>
+                        </th>
+                        <th scope="col" class="slds-text-title_caps">
+                            <span class="slds-truncate" title="Category">Category</span>
+                        </th>
+                        <th scope="col" class="slds-text-title_caps" style="width:6rem">
+                            <span class="slds-truncate" title="Critical">Critical</span>
+                        </th>
+                        <th scope="col" class="slds-text-title_caps" style="width:6rem">
+                            <span class="slds-truncate" title="Timeout">Timeout</span>
+                        </th>
+                        <th scope="col" class="slds-text-title_caps" style="width:8rem">
+                            <span class="slds-truncate" title="Enabled">Status</span>
+                        </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <template for:each={scenarioRows} for:item="row">
+                        <tr key={row.rowKey} class="slds-hint-parent">
+                            <td data-label="Order">
+                                <span class="slds-truncate">{row.executionOrder}</span>
+                            </td>
+                            <td data-label="Scenario">
+                                <div class="slds-truncate">
+                                    <span class="slds-text-body_regular slds-m-bottom_xx-small">{row.label}</span>
+                                    <span class="slds-text-body_small slds-text-color_weak">
+                                        {row.developerName}
+                                    </span>
+                                </div>
+                            </td>
+                            <td data-label="Category">
+                                <span class="slds-badge">{row.businessProcess}</span>
+                            </td>
+                            <td data-label="Critical">
+                                <lightning-icon
+                                    icon-name={row.criticalIcon}
+                                    size="x-small"
+                                    alternative-text={row.criticalLabel}
+                                    title={row.criticalLabel}>
+                                </lightning-icon>
+                                <span class="slds-assistive-text">{row.criticalLabel}</span>
+                            </td>
+                            <td data-label="Timeout">
+                                <span class="slds-truncate">{row.timeoutDisplay}</span>
+                            </td>
+                            <td data-label="Status">
+                                <template if:true={row.isToggling}>
+                                    <div role="status" class="slds-spinner slds-spinner_x-small slds-spinner_brand"
+                                         aria-label="Deploying...">
+                                        <span class="slds-assistive-text">Deploying...</span>
+                                        <div class="slds-spinner__dot-a"></div>
+                                        <div class="slds-spinner__dot-b"></div>
+                                    </div>
+                                </template>
+                                <template if:false={row.isToggling}>
+                                    <button
+                                        class="slds-button toggle-btn"
+                                        data-developer-name={row.developerName}
+                                        onclick={handleToggle}
+                                        role="switch"
+                                        aria-checked={row.isEnabled}
+                                        aria-label={row.enabledLabel}
+                                        title={row.enabledLabel}>
+                                        <lightning-badge
+                                            label={row.enabledLabel}>
+                                        </lightning-badge>
+                                        <span class="slds-assistive-text">{row.enabledLabel}</span>
+                                    </button>
+                                </template>
+                            </td>
+                        </tr>
+                    </template>
+                </tbody>
+            </table>
+        </template>
+
+        <!-- Add Scenario Modal -->
+        <template if:true={showModal}>
+            <c-add-scenario-modal
+                onsave={handleModalSave}
+                onclose={handleModalClose}>
+            </c-add-scenario-modal>
+        </template>
+
+    </template>
+</template>

@@ -1,0 +1,260 @@
+<template>
+    <!-- Modal backdrop -->
+    <section role="dialog"
+             tabindex="-1"
+             aria-modal="true"
+             aria-label="Add Test Scenario"
+             class="slds-modal slds-fade-in-open"
+             onkeydown={handleKeyDown}>
+        <div class="slds-modal__container">
+
+            <!-- Modal header -->
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Close"
+                        onclick={handleClose}
+                        aria-label="Close Add Scenario modal">
+                    <lightning-icon icon-name="utility:close" size="small"
+                        alternative-text="Close">
+                    </lightning-icon>
+                </button>
+                <h2 class="slds-text-heading_medium slds-hyphenate">Add Test Scenario</h2>
+                <p class="slds-text-body_small">
+                    Create a new SmokeTestScenario__mdt record via Metadata API deployment
+                </p>
+            </header>
+
+            <!-- Modal body -->
+            <div class="slds-modal__content slds-p-around_medium" id="add-scenario-modal-body">
+                <!-- Required fields -->
+                <div class="slds-grid slds-gutters slds-m-bottom_small">
+                    <div class="slds-col slds-size_6-of-12">
+                        <lightning-input
+                            type="text"
+                            label="Scenario Name (DeveloperName)"
+                            data-field="developerName"
+                            value={formData.developerName}
+                            onchange={handleFieldChange}
+                            required
+                            aria-required="true"
+                            aria-describedby="developerName-error"
+                            maxlength="40"
+                            placeholder="e.g. Account_CRUD_V2">
+                        </lightning-input>
+                        <template if:true={hasDeveloperNameError}>
+                            <p id="developerName-error" class="field-error" role="alert">
+                                {developerNameError}
+                            </p>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_6-of-12">
+                        <lightning-input
+                            type="text"
+                            label="Label"
+                            data-field="label"
+                            value={formData.label}
+                            onchange={handleFieldChange}
+                            placeholder="Human-readable name">
+                        </lightning-input>
+                    </div>
+                </div>
+
+                <div class="slds-grid slds-gutters slds-m-bottom_small">
+                    <div class="slds-col slds-size_6-of-12">
+                        <lightning-input
+                            type="text"
+                            label="Apex Class Name"
+                            data-field="scenarioClass"
+                            value={formData.scenarioClass}
+                            onchange={handleFieldChange}
+                            required
+                            aria-required="true"
+                            aria-describedby="scenarioClass-error"
+                            placeholder="e.g. AccountCrudScenario">
+                        </lightning-input>
+                        <template if:true={hasScenarioClassError}>
+                            <p id="scenarioClass-error" class="field-error" role="alert">
+                                {scenarioClassError}
+                            </p>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-size_6-of-12">
+                        <lightning-combobox
+                            label="Category"
+                            data-field="businessProcess"
+                            value={formData.businessProcess}
+                            options={categoryOptions}
+                            onchange={handleFieldChange}>
+                        </lightning-combobox>
+                    </div>
+                </div>
+
+                <div class="slds-m-bottom_small">
+                    <lightning-input
+                        type="textarea"
+                        label="Description"
+                        data-field="description"
+                        value={formData.description}
+                        onchange={handleFieldChange}
+                        placeholder="Brief description of what this scenario verifies">
+                    </lightning-input>
+                </div>
+
+                <!-- Optional overrides -->
+                <div class="slds-section slds-m-top_medium">
+                    <h3 class="slds-section__title slds-theme_shade slds-p-horizontal_small slds-p-vertical_xx-small">
+                        Optional Overrides
+                    </h3>
+                    <div class="slds-grid slds-gutters slds-m-top_small">
+                        <div class="slds-col slds-size_3-of-12">
+                            <lightning-input
+                                type="number"
+                                label="Timeout (seconds)"
+                                data-field="timeoutSec"
+                                value={formData.timeoutSec}
+                                onchange={handleFieldChange}
+                                min="1"
+                                max="60"
+                                step="1"
+                                placeholder="1-60"
+                                aria-describedby="timeoutSec-error">
+                            </lightning-input>
+                            <template if:true={hasTimeoutSecError}>
+                                <p id="timeoutSec-error" class="field-error" role="alert">
+                                    {timeoutSecError}
+                                </p>
+                            </template>
+                        </div>
+                        <div class="slds-col slds-size_3-of-12">
+                            <lightning-input
+                                type="number"
+                                label="CPU Budget (ms)"
+                                data-field="cpuBudget"
+                                value={formData.cpuBudget}
+                                onchange={handleFieldChange}
+                                min="1"
+                                max="10000"
+                                step="1"
+                                placeholder="1-10000"
+                                aria-describedby="cpuBudget-error">
+                            </lightning-input>
+                            <template if:true={hasCpuBudgetError}>
+                                <p id="cpuBudget-error" class="field-error" role="alert">
+                                    {cpuBudgetError}
+                                </p>
+                            </template>
+                        </div>
+                        <div class="slds-col slds-size_3-of-12">
+                            <lightning-input
+                                type="number"
+                                label="SOQL Budget"
+                                data-field="soqlBudget"
+                                value={formData.soqlBudget}
+                                onchange={handleFieldChange}
+                                min="1"
+                                max="200"
+                                step="1"
+                                placeholder="1-200"
+                                aria-describedby="soqlBudget-error">
+                            </lightning-input>
+                            <template if:true={hasSoqlBudgetError}>
+                                <p id="soqlBudget-error" class="field-error" role="alert">
+                                    {soqlBudgetError}
+                                </p>
+                            </template>
+                        </div>
+                        <div class="slds-col slds-size_3-of-12">
+                            <lightning-input
+                                type="number"
+                                label="DML Budget"
+                                data-field="dmlBudget"
+                                value={formData.dmlBudget}
+                                onchange={handleFieldChange}
+                                min="1"
+                                max="150"
+                                step="1"
+                                placeholder="1-150"
+                                aria-describedby="dmlBudget-error">
+                            </lightning-input>
+                            <template if:true={hasDmlBudgetError}>
+                                <p id="dmlBudget-error" class="field-error" role="alert">
+                                    {dmlBudgetError}
+                                </p>
+                            </template>
+                        </div>
+                    </div>
+
+                    <div class="slds-grid slds-gutters slds-m-top_small">
+                        <div class="slds-col slds-size_6-of-12">
+                            <lightning-combobox
+                                label="Role / Profile"
+                                data-field="roleProfile"
+                                value={formData.roleProfile}
+                                options={profileOptions}
+                                onchange={handleFieldChange}
+                                aria-label="Optional profile restriction for this scenario">
+                            </lightning-combobox>
+                        </div>
+                        <div class="slds-col slds-size_3-of-12">
+                            <lightning-input
+                                type="checkbox"
+                                label="Critical Scenario"
+                                data-field="isCritical"
+                                checked={formData.isCritical}
+                                onchange={handleFieldChange}
+                                aria-label="Mark this scenario as critical">
+                            </lightning-input>
+                        </div>
+                        <div class="slds-col slds-size_3-of-12">
+                            <lightning-input
+                                type="checkbox"
+                                label="Enable Immediately"
+                                data-field="isEnabled"
+                                checked={formData.isEnabled}
+                                onchange={handleFieldChange}
+                                aria-label="Enable this scenario immediately after deployment">
+                            </lightning-input>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Change reason (required) -->
+                <div class="slds-m-top_medium">
+                    <lightning-input
+                        type="text"
+                        label="Change Reason (required for audit log)"
+                        data-field="changeReason"
+                        value={formData.changeReason}
+                        onchange={handleFieldChange}
+                        required
+                        aria-required="true"
+                        aria-describedby="changeReason-error"
+                        placeholder="Briefly describe why this scenario is being added">
+                    </lightning-input>
+                    <template if:true={hasChangeReasonError}>
+                        <p id="changeReason-error" class="field-error" role="alert">
+                            {changeReasonError}
+                        </p>
+                    </template>
+                </div>
+            </div>
+
+            <!-- Modal footer -->
+            <footer class="slds-modal__footer">
+                <lightning-button
+                    label="Cancel"
+                    variant="neutral"
+                    onclick={handleClose}
+                    aria-label="Cancel and close modal">
+                </lightning-button>
+                <lightning-button
+                    label="Add Scenario"
+                    variant="brand"
+                    onclick={handleSave}
+                    aria-label="Submit new test scenario">
+                </lightning-button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+</template>
