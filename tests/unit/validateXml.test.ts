@@ -1,56 +1,53 @@
 import { describe, it, expect, beforeAll } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as libxmljs from 'libxmljs2';
-import { validateXml } from '../../src/validateXml';
+import { validateXml, validateXmlAgainstXsd } from '../../src/validateXml';
 
 const FIXTURES_DIR = path.resolve(__dirname, '../fixtures');
 const SCHEMAS_DIR = path.resolve(__dirname, '../../schemas');
 
 describe('validateXml', () => {
-  let xsdDoc: libxmljs.Document;
+  it('returns empty array for well-formed valid XML', () => {
+    const xmlContent = fs.readFileSync(path.join(FIXTURES_DIR, 'valid-metadata.xml'), 'utf-8');
+    expect(validateXml(xmlContent)).toHaveLength(0);
+  });
+
+  it('returns wellformedness error for malformed XML', () => {
+    const results = validateXml('<root><unclosed>');
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].phase).toBe('wellformedness');
+    expect(results[0].xsdRule).toBeNull();
+  });
+
+  it('returns descriptive error for empty string without throwing', () => {
+    const results = validateXml('');
+    expect(results).toHaveLength(1);
+    expect(results[0].message).toMatch(/empty/i);
+    expect(results[0].phase).toBe('wellformedness');
+  });
+});
+
+describe('validateXmlAgainstXsd', () => {
+  let xsdContent: string;
 
   beforeAll(() => {
-    const xsdContent = fs.readFileSync(path.join(SCHEMAS_DIR, 'metadata.xsd'), 'utf-8');
-    xsdDoc = libxmljs.parseXml(xsdContent);
+    xsdContent = fs.readFileSync(path.join(SCHEMAS_DIR, 'metadata.xsd'), 'utf-8');
   });
 
-  it('returns isValid: true and empty errors for valid metadata XML', () => {
-    const xmlContent = fs.readFileSync(
-      path.join(FIXTURES_DIR, 'valid-metadata.xml'),
-      'utf-8'
-    );
-    const result = validateXml(xmlContent, xsdDoc);
-    expect(result.isValid).toBe(true);
-    expect(result.errors).toHaveLength(0);
+  it('returns empty array for valid metadata XML conforming to the schema', () => {
+    const xmlContent = fs.readFileSync(path.join(FIXTURES_DIR, 'valid-metadata.xml'), 'utf-8');
+    expect(validateXmlAgainstXsd(xmlContent, xsdContent)).toHaveLength(0);
   });
 
-  it('returns isValid: false with errors for XML with schema violations', () => {
-    const xmlContent = fs.readFileSync(
-      path.join(FIXTURES_DIR, 'invalid-metadata.xml'),
-      'utf-8'
-    );
-    const result = validateXml(xmlContent, xsdDoc);
-    expect(result.isValid).toBe(false);
-    expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.errors[0]).toMatchObject({
+  it('returns xsd-phase errors for XML with schema violations', () => {
+    const xmlContent = fs.readFileSync(path.join(FIXTURES_DIR, 'invalid-metadata.xml'), 'utf-8');
+    const results = validateXmlAgainstXsd(xmlContent, xsdContent);
+    expect(results.length).toBeGreaterThan(0);
+    expect(results[0].phase).toBe('xsd');
+    expect(results[0]).toMatchObject({
       line: expect.any(Number),
       column: expect.any(Number),
       message: expect.any(String),
     });
-  });
-
-  it('returns isValid: false with a parse error for malformed XML', () => {
-    const result = validateXml('<root><unclosed>', xsdDoc);
-    expect(result.isValid).toBe(false);
-    expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.errors[0].message).toMatch(/parse error/i);
-  });
-
-  it('returns isValid: false with a descriptive error for an empty string', () => {
-    const result = validateXml('', xsdDoc);
-    expect(result.isValid).toBe(false);
-    expect(result.errors.length).toBeGreaterThan(0);
-    expect(result.errors[0].message).toMatch(/empty/i);
   });
 });
