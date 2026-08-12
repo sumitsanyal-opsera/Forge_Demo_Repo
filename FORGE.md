@@ -266,3 +266,10 @@
 - **Files:** 19 (+1766/-19)
 - **Duration:** 911ss
 - **Approach:** Built the Guided Setup Wizard bottom-up: ScenarioTemplateService provides static template definitions for 9 scenarios across 3 clouds plus Apex class validation via Type.forName and bulk deploy via a single Metadata.DeployContainer. MetadataDeployService got a deployBulk() method for pre-built containers. Three child LWCs (cloudTemplateCard, scenarioPreviewTable, guidedSetupWizard) implement the 3-step wizard. TestScenariosPage renders the wizard inline for empty state and as a modal overlay for the 'Add from Templates' button on non-empty state.
+
+## WO-025: User Story: WO-025 - Implement DeploymentComplete Platform Event Trigger for Auto-Initiation
+- **Status:** completed
+- **Commit:** `b5c2650`
+- **Files:** 6 (+564/-0)
+- **Duration:** 331ss
+- **Approach:** Thin trigger delegates to DeploymentCompleteTriggerHandler.handleEvents(). Handler resolves ShadowMode__c from SmokeTestConfig__mdt.getAll() (with @TestVisible override), validates DeploymentId__c, performs bulk SOQL duplicate detection (5-minute window), handles same-batch duplicates with an in-memory Set, writes an audit record in shadow mode, and calls SmokeTestOrchestrator.startExecution('Platform Event') for valid non-duplicate events — updating the returned execution record with DeploymentId__c. All exceptions are caught to prevent Platform Event bus disruption.
