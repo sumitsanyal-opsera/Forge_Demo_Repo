@@ -42,3 +42,10 @@
 - **Files:** 3 (+128/-5)
 - **Duration:** 199ss
 - **Approach:** Created src/validate.ts with a new validateXml(xmlPath, xsdPath) function that takes both file paths as strings (different from the existing src/xml-validator.ts which accepts a pre-parsed schema Document). The function uses four separate try-catch blocks for XSD file read, XML file read, XSD parse, and XML parse — each returns a structured error at the appropriate stage. ValidationResult errors are objects with { message, line } rather than plain strings, matching the WO spec. Replaced the WO-064 hello-world src/main.ts with a validation orchestrator that iterates the two fixture XML files against fixtures/custom-object.xsd, prints formatted per-file output, and sets process.exitCode=1 if any file fails. Created test/validate.test.ts using only Node.js assert module (no Vitest/Jest), runnable via npx ts-node test/validate.test.ts and also compatible with Vitest's test runner.
+
+## WO-090: User Story: WO-090 - CLI Entry Point to Validate File and Print Results
+- **Status:** completed
+- **Commit:** `3ed8305`
+- **Files:** 5 (+156/-0)
+- **Duration:** 259ss
+- **Approach:** Created a thin CLI at src/index.ts (using the 'or src/index.ts' option from AC1 to avoid conflicting with the existing WO-087 src/cli.ts). Created the two missing dependency modules as src/validate/parseXml.ts (WO-088 interface: well-formedness check returning XmlParseResult) and src/validate/validateAgainstXsd.ts (WO-089 interface: full XSD validation returning same shape). Both modules use a consistent XmlParseResult type with { valid, errors: [{message, line, column}] } that includes the column field needed by the CLI output format. The formatting helper src/validate/formatResults.ts is a pure function with no side effects, enabling isolated unit testing. The src/validate/ subdirectory coexists with the existing src/validate.ts file (different filesystem names). Two Vitest tests in tests/validate/formatResults.test.ts cover both the PASS and FAIL output formats.
