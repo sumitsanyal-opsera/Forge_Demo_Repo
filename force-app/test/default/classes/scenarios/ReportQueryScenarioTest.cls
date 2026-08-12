@@ -218,4 +218,29 @@ private class ReportQueryScenarioTest {
         System.assertNotEquals(null, scenario.getMetadata());
         System.assertNotEquals(null, scenario.getGovernorBudget());
     }
+
+    // =========================================================================
+    // Governor limit budget compliance
+    // =========================================================================
+
+    @isTest
+    static void testGovernorLimitBudget() {
+        SmokeTestContext ctx = makeContextWithQuery('SELECT Id FROM User LIMIT 1');
+        Test.startTest();
+        Integer soqlBefore = Limits.getQueries();
+        Integer dmlBefore  = Limits.getDmlStatements();
+        Integer cpuBefore  = Limits.getCpuTime();
+        new ReportQueryScenario().execute(ctx);
+        Integer soqlDelta  = Limits.getQueries()        - soqlBefore;
+        Integer dmlDelta   = Limits.getDmlStatements()  - dmlBefore;
+        Integer cpuDelta   = Limits.getCpuTime()        - cpuBefore;
+        Test.stopTest();
+
+        System.assert(soqlDelta <= 50,
+            'SOQL budget exceeded: ReportQueryScenario used ' + soqlDelta + ' of 50 allowed');
+        System.assert(dmlDelta  <= 50,
+            'DML budget exceeded: ReportQueryScenario used '  + dmlDelta  + ' of 50 allowed');
+        System.assert(cpuDelta  <= 5000,
+            'CPU budget exceeded: ReportQueryScenario used '  + cpuDelta  + 'ms of 5000ms allowed');
+    }
 }

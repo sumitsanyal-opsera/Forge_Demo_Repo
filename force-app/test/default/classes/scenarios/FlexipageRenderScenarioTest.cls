@@ -253,4 +253,30 @@ private class FlexipageRenderScenarioTest {
         System.assertNotEquals(null, scenario.getMetadata());
         System.assertNotEquals(null, scenario.getGovernorBudget());
     }
+
+    // =========================================================================
+    // Governor limit budget compliance
+    // =========================================================================
+
+    @isTest
+    static void testGovernorLimitBudget() {
+        Test.setMock(HttpCalloutMock.class, new MockHttpCallout(200, FOUND_BODY));
+        SmokeTestContext ctx = makeContextWithPage('Account_Record_Page');
+        Test.startTest();
+        Integer soqlBefore = Limits.getQueries();
+        Integer dmlBefore  = Limits.getDmlStatements();
+        Integer cpuBefore  = Limits.getCpuTime();
+        new FlexipageRenderScenario().execute(ctx);
+        Integer soqlDelta  = Limits.getQueries()        - soqlBefore;
+        Integer dmlDelta   = Limits.getDmlStatements()  - dmlBefore;
+        Integer cpuDelta   = Limits.getCpuTime()        - cpuBefore;
+        Test.stopTest();
+
+        System.assert(soqlDelta <= 50,
+            'SOQL budget exceeded: FlexipageRenderScenario used ' + soqlDelta + ' of 50 allowed');
+        System.assert(dmlDelta  <= 50,
+            'DML budget exceeded: FlexipageRenderScenario used '  + dmlDelta  + ' of 50 allowed');
+        System.assert(cpuDelta  <= 5000,
+            'CPU budget exceeded: FlexipageRenderScenario used '  + cpuDelta  + 'ms of 5000ms allowed');
+    }
 }

@@ -251,4 +251,35 @@ private class FlowExecutionScenarioTest {
         System.assertNotEquals(null, scenario.getMetadata());
         System.assertNotEquals(null, scenario.getGovernorBudget());
     }
+
+    // =========================================================================
+    // Governor limit budget compliance
+    // =========================================================================
+
+    @isTest
+    static void testGovernorLimitBudget() {
+        // Inject an active screen flow so no FlowDefinitionView SOQL is needed
+        FlowExecutionScenario.injectFlowCheckResult = makeActiveFlow('Flow');
+        try {
+            SmokeTestContext ctx = makeContextWithFlow('SMOKE_TEST_GovLimitFlow');
+            Test.startTest();
+            Integer soqlBefore = Limits.getQueries();
+            Integer dmlBefore  = Limits.getDmlStatements();
+            Integer cpuBefore  = Limits.getCpuTime();
+            new FlowExecutionScenario().execute(ctx);
+            Integer soqlDelta  = Limits.getQueries()        - soqlBefore;
+            Integer dmlDelta   = Limits.getDmlStatements()  - dmlBefore;
+            Integer cpuDelta   = Limits.getCpuTime()        - cpuBefore;
+            Test.stopTest();
+
+            System.assert(soqlDelta <= 50,
+                'SOQL budget exceeded: FlowExecutionScenario used ' + soqlDelta + ' of 50 allowed');
+            System.assert(dmlDelta  <= 50,
+                'DML budget exceeded: FlowExecutionScenario used '  + dmlDelta  + ' of 50 allowed');
+            System.assert(cpuDelta  <= 5000,
+                'CPU budget exceeded: FlowExecutionScenario used '  + cpuDelta  + 'ms of 5000ms allowed');
+        } finally {
+            FlowExecutionScenario.injectFlowCheckResult = null;
+        }
+    }
 }

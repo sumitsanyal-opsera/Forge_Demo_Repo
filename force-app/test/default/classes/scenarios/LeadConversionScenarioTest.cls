@@ -141,4 +141,29 @@ private class LeadConversionScenarioTest {
         System.assertNotEquals(null, scenario.getMetadata());
         System.assertNotEquals(null, scenario.getGovernorBudget());
     }
+
+    // =========================================================================
+    // Governor limit budget compliance
+    // =========================================================================
+
+    @isTest
+    static void testGovernorLimitBudget() {
+        SmokeTestContext ctx = makeContext();
+        Test.startTest();
+        Integer soqlBefore = Limits.getQueries();
+        Integer dmlBefore  = Limits.getDmlStatements();
+        Integer cpuBefore  = Limits.getCpuTime();
+        new LeadConversionScenario().execute(ctx);
+        Integer soqlDelta  = Limits.getQueries()        - soqlBefore;
+        Integer dmlDelta   = Limits.getDmlStatements()  - dmlBefore;
+        Integer cpuDelta   = Limits.getCpuTime()        - cpuBefore;
+        Test.stopTest();
+
+        System.assert(soqlDelta <= 50,
+            'SOQL budget exceeded: LeadConversionScenario used ' + soqlDelta + ' of 50 allowed');
+        System.assert(dmlDelta  <= 50,
+            'DML budget exceeded: LeadConversionScenario used '  + dmlDelta  + ' of 50 allowed');
+        System.assert(cpuDelta  <= 5000,
+            'CPU budget exceeded: LeadConversionScenario used '  + cpuDelta  + 'ms of 5000ms allowed');
+    }
 }

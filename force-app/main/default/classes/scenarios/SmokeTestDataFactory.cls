@@ -261,6 +261,38 @@ public with sharing class SmokeTestDataFactory {
     }
 
     // =========================================================================
+    // User
+    // =========================================================================
+
+    /**
+     * Creates and inserts a User with the given profile name.
+     * Useful for System.runAs() tests that verify scenario behavior under
+     * different permission levels.
+     *
+     * @param profileName - exact Profile Name (e.g. 'Standard User', 'System Administrator',
+     *                      'Minimum Access - Salesforce')
+     */
+    public static User createUserWithProfile(String profileName) {
+        Profile p = [SELECT Id FROM Profile WHERE Name = :profileName LIMIT 1];
+        Long ts  = DateTime.now().getTime();
+        Integer seq = counter++;
+        User u = new User(
+            FirstName         = 'SMOKE_TEST',
+            LastName          = 'User' + zeroPad(seq),
+            Email             = 'smoketest.u' + seq + '@test.example.com',
+            Username          = 'smoketest.u' + seq + '.' + ts + '@test.example.com',
+            Alias             = 'smu' + seq,
+            ProfileId         = p.Id,
+            TimeZoneSidKey    = 'America/New_York',
+            LocaleSidKey      = 'en_US',
+            EmailEncodingKey  = 'UTF-8',
+            LanguageLocaleKey = 'en_US'
+        );
+        insert u;
+        return u;
+    }
+
+    // =========================================================================
     // Private helpers
     // =========================================================================
 

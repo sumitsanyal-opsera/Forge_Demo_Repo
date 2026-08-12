@@ -110,4 +110,76 @@ private class OpportunityCrudScenarioTest {
         System.assertNotEquals(null, scenario.getMetadata());
         System.assertNotEquals(null, scenario.getGovernorBudget());
     }
+
+    // =========================================================================
+    // Governor limit budget compliance
+    // =========================================================================
+
+    @isTest
+    static void testGovernorLimitBudget() {
+        SmokeTestContext ctx = makeContext();
+        Test.startTest();
+        Integer soqlBefore = Limits.getQueries();
+        Integer dmlBefore  = Limits.getDmlStatements();
+        Integer cpuBefore  = Limits.getCpuTime();
+        new OpportunityCrudScenario().execute(ctx);
+        Integer soqlDelta  = Limits.getQueries()        - soqlBefore;
+        Integer dmlDelta   = Limits.getDmlStatements()  - dmlBefore;
+        Integer cpuDelta   = Limits.getCpuTime()        - cpuBefore;
+        Test.stopTest();
+
+        System.assert(soqlDelta <= 50,
+            'SOQL budget exceeded: OpportunityCrudScenario used ' + soqlDelta + ' of 50 allowed');
+        System.assert(dmlDelta  <= 50,
+            'DML budget exceeded: OpportunityCrudScenario used '  + dmlDelta  + ' of 50 allowed');
+        System.assert(cpuDelta  <= 5000,
+            'CPU budget exceeded: OpportunityCrudScenario used '  + cpuDelta  + 'ms of 5000ms allowed');
+    }
+
+    // =========================================================================
+    // System.runAs() role-based execution
+    // =========================================================================
+
+    @isTest
+    static void testRunAsSystemAdministrator() {
+        User adminUser = SmokeTestDataFactory.createUserWithProfile('System Administrator');
+        SmokeTestContext ctx = makeContext();
+        System.runAs(adminUser) {
+            Test.startTest();
+            ScenarioResult result = new OpportunityCrudScenario().execute(ctx);
+            Test.stopTest();
+            System.assertEquals(true, result.passed,
+                'Opportunity pipeline must pass under System Administrator profile; error: ' + result.errorDetail);
+        }
+    }
+
+    @isTest
+    static void testRunAsStandardUser() {
+        User stdUser = SmokeTestDataFactory.createUserWithProfile('Standard User');
+        SmokeTestContext ctx = makeContext();
+        System.runAs(stdUser) {
+            Test.startTest();
+            ScenarioResult result = new OpportunityCrudScenario().execute(ctx);
+            Test.stopTest();
+            System.assertNotEquals(null, result,
+                'OpportunityCrudScenario must return a structured result (not throw) under Standard User profile');
+            System.assertNotEquals(null, result.durationMs,
+                'durationMs must be populated for Standard User execution');
+        }
+    }
+
+    @isTest
+    static void testRunAsMinimumAccessProfile_FailsGracefully() {
+        User minUser = SmokeTestDataFactory.createUserWithProfile('Minimum Access - Salesforce');
+        SmokeTestContext ctx = makeContext();
+        System.runAs(minUser) {
+            Test.startTest();
+            ScenarioResult result = new OpportunityCrudScenario().execute(ctx);
+            Test.stopTest();
+            System.assertEquals(false, result.passed,
+                'Opportunity pipeline must fail gracefully for Minimum Access profile (no Opportunity DML permission)');
+            System.assertNotEquals(null, result.errorType,
+                'errorType must identify the failure kind for Minimum Access profile execution');
+        }
+    }
 }

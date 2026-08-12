@@ -112,4 +112,29 @@ private class CaseCreationScenarioTest {
         System.assertNotEquals(null, scenario.getMetadata());
         System.assertNotEquals(null, scenario.getGovernorBudget());
     }
+
+    // =========================================================================
+    // Governor limit budget compliance
+    // =========================================================================
+
+    @isTest
+    static void testGovernorLimitBudget() {
+        SmokeTestContext ctx = makeContext();
+        Test.startTest();
+        Integer soqlBefore = Limits.getQueries();
+        Integer dmlBefore  = Limits.getDmlStatements();
+        Integer cpuBefore  = Limits.getCpuTime();
+        new CaseCreationScenario().execute(ctx);
+        Integer soqlDelta  = Limits.getQueries()        - soqlBefore;
+        Integer dmlDelta   = Limits.getDmlStatements()  - dmlBefore;
+        Integer cpuDelta   = Limits.getCpuTime()        - cpuBefore;
+        Test.stopTest();
+
+        System.assert(soqlDelta <= 50,
+            'SOQL budget exceeded: CaseCreationScenario used ' + soqlDelta + ' of 50 allowed');
+        System.assert(dmlDelta  <= 50,
+            'DML budget exceeded: CaseCreationScenario used '  + dmlDelta  + ' of 50 allowed');
+        System.assert(cpuDelta  <= 5000,
+            'CPU budget exceeded: CaseCreationScenario used '  + cpuDelta  + 'ms of 5000ms allowed');
+    }
 }

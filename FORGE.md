@@ -203,3 +203,10 @@
 - **Files:** 21 (+1308/-0)
 - **Duration:** 894ss
 - **Approach:** Implemented MetadataIntegrityService as a without-sharing Apex service that loads DeploymentManifest__c JSON from SmokeTestExecution__c, parses it via DeploymentManifestParser, groups components by type, makes one Tooling API REST callout per distinct type, evaluates each component (PASS/FAIL/WARNING), and persists results as SmokeTestResult__c records with ResultType__c='METADATA_INTEGRITY'. New schema fields on both SObjects support the manifest and per-component tracking. Value types are handled: FlowDefinition checks ActiveVersionId, ApexClass/ApexTrigger check Status field. Unsupported types yield WARNING rather than hard failures.
+
+## WO-075: User Story: WO-075 - Write Apex Unit Tests for All Scenario Implementations
+- **Status:** completed
+- **Commit:** `874f156`
+- **Files:** 11 (+394/-0)
+- **Duration:** 556ss
+- **Approach:** WO-017/018/019 had already created all 10 test classes with happy-path, exception-injection, metadata, and budget assertion tests (8-13 methods per class). WO-075 adds the missing acceptance criteria: (1) added createUserWithProfile(String) to SmokeTestDataFactory for profile-based test users; (2) added testGovernorLimitBudget() to all 10 test classes using Limits.getQueries/getDmlStatements/getCpuTime deltas within Test.startTest/stopTest; (3) added testRunAsSystemAdministrator(), testRunAsStandardUser(), and testRunAsMinimumAccessProfile_FailsGracefully() to AccountCrudScenarioTest and OpportunityCrudScenarioTest. The 10th scenario is FlexipageRenderScenario (not PlatformEventScenario as in WO spec) — its governor test uses MockHttpCallout with a FOUND_BODY fixture.
