@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+    SmokeTest Integration Profile — Read-only service account profile for CI/CD pipeline
+    integration and Tooling API SecurityHealthCheck queries.
+
+    Principle of least privilege:
+      - ApiEnabled: allows REST/Tooling API access (required for service account)
+      - ViewSetup: allows Tooling API SecurityHealthCheck queries (minimum required permission)
+      - Standard business objects: allowRead=true only; no Create/Edit/Delete
+      - Custom SmokeTest objects: granted via SmokeTest_API_User permission set (not this profile)
+
+    Based on: Minimum Access — Salesforce (no inherited object permissions)
+    License:  Salesforce (standard) or Salesforce Integration — see docs/integration-user-setup.md
+-->
+<Profile xmlns="http://soap.sforce.com/2006/04/metadata">
+    <custom>true</custom>
+    <description>Read-only service account profile for the SmokeTest CI/CD integration user. Grants API access and ViewSetup for Tooling API SecurityHealthCheck queries. All standard business object permissions are read-only. SmokeTest custom object access is granted via the SmokeTest_API_User permission set.</description>
+    <userLicense>Salesforce</userLicense>
+
+    <!-- ================================================================
+         System Permissions
+         ApiEnabled:  Required for REST API and Tooling API access
+         ViewSetup:   Required for Tooling API SecurityHealthCheck queries
+         ================================================================ -->
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ApiEnabled</name>
+    </userPermissions>
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ViewSetup</name>
+    </userPermissions>
+
+    <!-- ================================================================
+         Standard Business Object Permissions — Read-only
+         allowCreate=false, allowEdit=false, allowDelete=false enforces
+         the service account's read-only contract on all business data.
+         SmokeTest custom object permissions are in SmokeTest_API_User.
+         ================================================================ -->
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Account</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Contact</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Opportunity</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Case</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>Lead</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <!-- ================================================================
+         Tab Visibility — none; service account is headless API access only
+         ================================================================ -->
+
+    <!-- ================================================================
+         Apex Class Access — deferred until REST resources are created (EPIC-02)
+         ================================================================ -->
+</Profile>
