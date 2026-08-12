@@ -21,3 +21,10 @@
 - **Files:** 8 (+106/-2)
 - **Duration:** 299ss
 - **Approach:** Created the core XML validation function in src/xml-validator.ts. The validateXml function reads a file from disk, parses it with libxmljs2.parseXml (try-catch for malformed XML), calls xmlDoc.validate(schema) for XSD conformance, and maps xmlDoc.validationErrors to human-readable 'Line N: message' strings. A minimal fixture XSD (test-fixtures/CustomObject.xsd) defines the Salesforce metadata namespace with label/pluralLabel/deploymentStatus elements, enabling fully self-contained tests without depending on external WOs. Added Vitest as a devDependency with a test script; excluded __tests__ dirs from the production tsconfig compile.
+
+## WO-087: User Story: WO-087 - Implement CLI Runner and End-to-End Validation Test
+- **Status:** completed
+- **Commit:** `e280b0c`
+- **Files:** 9 (+253/-1)
+- **Duration:** 384ss
+- **Approach:** Built the CLI runner on top of the existing validateXml from WO-083. Created src/validator.ts with validateMetadataXml that wraps validateXml and adds filePath to the result, defining the ValidationResult interface needed by the CLI. Created the hardcoded XSD path at test/fixtures/schemas/metadata-61.0.xsd (Salesforce-namespace XSD matching the existing fixture structure). Created fixture directories test/fixtures/valid/ and test/fixtures/invalid/ with representative XML files. Implemented src/cli.ts under 80 lines with discoverXmlFiles (manual recursion for broad Node.js compatibility) and formatResults as named exports for unit testability; main() handles all edge cases (missing arg, missing dir, missing XSD). Unit tests use tmp directories created in beforeEach for isolation. E2E test uses child_process.execSync with try/catch to capture both exit codes and stdout for both success and failure paths. Added tsx devDependency for zero-build-step CLI execution and excluded *.test.ts from production tsconfig compile.
