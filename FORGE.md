@@ -49,3 +49,10 @@
 - **Files:** 22 (+257/-0)
 - **Duration:** 275ss
 - **Approach:** Created three Platform Event definitions in Salesforce DX source format under objects/ using the standard CustomObject schema with eventType HighVolume and publishBehavior PublishImmediately. Platform Events use only Text, Number, Checkbox, and DateTime field types (no Picklist or LookupRelationship support). All field descriptions document the expected publisher and subscriber for each event, satisfying AC-6. A verification script uses EventBus.publish() with SaveResult assertions for all three event types.
+
+## WO-012: User Story: WO-012 - Build PII Masking ErrorSanitizer Utility Class
+- **Status:** completed
+- **Commit:** `4722e5f`
+- **Files:** 6 (+593/-0)
+- **Duration:** 526ss
+- **Approach:** Implemented ErrorSanitizer as a stateless static utility class with three compiled Pattern constants (EMAIL_PATTERN, PHONE_PATTERN, SSN_PATTERN) stored as private static finals for one-time class-load compilation. A PatternReplacement inner class holds each pattern, its replacement token, and a name — enabling future extension without modifying the sanitize loop. Patterns are applied in SSN-first order to prevent partial-match issues. A 50ms CPU budget guard in sanitize() returns a partially-sanitized string with [SANITIZATION_TIMEOUT] appended rather than blocking the calling transaction. sanitizeStackTrace() splits on newlines and processes per line to preserve Apex class/method/line references. SanitizationTestData provides static fixture constants for reuse across epics. ErrorSanitizerTest contains 23 test methods covering all patterns, false-positive prevention, stack trace preservation, and performance.
