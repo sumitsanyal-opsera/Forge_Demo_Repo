@@ -49,3 +49,10 @@
 - **Files:** 5 (+156/-0)
 - **Duration:** 259ss
 - **Approach:** Created a thin CLI at src/index.ts (using the 'or src/index.ts' option from AC1 to avoid conflicting with the existing WO-087 src/cli.ts). Created the two missing dependency modules as src/validate/parseXml.ts (WO-088 interface: well-formedness check returning XmlParseResult) and src/validate/validateAgainstXsd.ts (WO-089 interface: full XSD validation returning same shape). Both modules use a consistent XmlParseResult type with { valid, errors: [{message, line, column}] } that includes the column field needed by the CLI output format. The formatting helper src/validate/formatResults.ts is a pure function with no side effects, enabling isolated unit testing. The src/validate/ subdirectory coexists with the existing src/validate.ts file (different filesystem names). Two Vitest tests in tests/validate/formatResults.test.ts cover both the PASS and FAIL output formats.
+
+## WO-091: User Story: WO-091 - Load XSD and Validate Metadata XML
+- **Status:** completed
+- **Commit:** `d5b20ee`
+- **Files:** 9 (+207/-0)
+- **Duration:** 271ss
+- **Approach:** Created four new source modules without touching existing WO-083/066/087/090 code. schemas/metadata.xsd uses the same Salesforce tooling namespace and CustomObject structure already established in fixtures/custom-object.xsd, ensuring consistency across fixture sets. src/types.ts defines the canonical WO-091 ValidationResult/ValidationError interfaces (with line, column, message — distinct from the earlier ValidationError in src/validate.ts which lacked column). src/loadSchema.ts uses __dirname-relative default path so it resolves correctly from both ts-node and compiled dist/. src/validateXml.ts is a pure function accepting XML content string (not a file path), making it side-effect-free and easy to unit test; XXE prevention is applied via { noent: false, nonet: true } options cast to any (libxmljs2 accepts these libxml2 parser flags). Test fixtures are placed in tests/fixtures/ to align with the WO-090-established tests/ directory structure.
