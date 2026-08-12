@@ -3,7 +3,7 @@ import * as fs from 'fs';
 import * as os from 'os';
 import * as path from 'path';
 import { discoverXmlFiles, formatResults } from './cli';
-import type { ValidationResult } from './validator';
+import type { BatchValidationResult as ValidationResult } from './validator';
 
 describe('discoverXmlFiles', () => {
   let tmpDir: string;

@@ -1,7 +1,7 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import * as libxmljs from 'libxmljs2';
-import { validateMetadataXml, ValidationResult as BatchValidationResult } from './validator';
+import { validateMetadataXmlLegacy, BatchValidationResult } from './validator';
 import { validateXmlAgainstXsd } from './validateXml';
 import { formatResults as formatSingleResult } from './formatResults';
 import { formatResult } from './formatResult';
@@ -99,7 +99,7 @@ function validateDirectory(dirPath: string): void {
   const xsdContent = fs.readFileSync(BATCH_XSD_PATH, 'utf-8');
   const schema = libxmljs.parseXml(xsdContent);
 
-  const results: BatchValidationResult[] = xmlFiles.map((f) => validateMetadataXml(f, schema));
+  const results: BatchValidationResult[] = xmlFiles.map((f) => validateMetadataXmlLegacy(f, schema));
   const output = formatResults(results);
   console.log(output);
 
