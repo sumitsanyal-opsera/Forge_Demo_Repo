@@ -252,3 +252,10 @@
 - **Files:** 7 (+592/-13)
 - **Duration:** 600ss
 - **Approach:** Extended smokeTestCenter.js with lightning/empApi subscription logic. connectedCallback registers onError and subscribes to /event/SmokeTestProgress__e and /event/SmokeTestComplete__e with replay ID -1. Progress events update a @track progressData object (idempotent — ignores events with lower completedScenarios count) and start a 30-second setInterval auto-refresh timer. Complete events dispatch 'refreshdashboard' CustomEvent and clear the timer. Reconnection retries up to 3 times (5s delay each) on empApi errors; after MAX_RETRY_ATTEMPTS the component activates fallback mode showing a warning banner and starting the auto-refresh timer. disconnectedCallback clears timer and unsubscribes. The HTML adds a content-header bar with progress indicator, manual refresh button, and fallback warning. A lightning/empApi Jest mock + two Platform Event payload fixtures enable unit tests without a scratch org.
+
+## WO-067: User Story: WO-067 - Implement Five Default Post-Deployment Checklist Validations
+- **Status:** completed
+- **Commit:** `3892658`
+- **Files:** 20 (+1363/-0)
+- **Duration:** 759ss
+- **Approach:** Implemented Strategy pattern: IChecklistCheck interface, ChecklistResult value class, ChecklistContext DTO with injectable IHttpCallout for Tooling API mocking. Five check classes: FlowActivationCheck (Tooling API FlowDefinition, verifies ActiveVersionId), PermissionSetAssignmentCheck (SOQL PermissionSetAssignment, zero-assignment = FAIL), PageLayoutAssignmentCheck (Tooling API ProfileLayout, multi-assignment = WARNING), ConfigValueCheck (reads enabled SOQLValidation CMT entries, executes Query__c, non-empty result = PASS), ScheduledJobCheck (CronTrigger WAITING state, supports named job list from CMT ExpectedResult__c). ChecklistEvaluator orchestrates all five in sequence without short-circuit, injects DefaultHttpCallout and IDmlHandler, persists to SmokeTestResult__c with ResultType__c = 'CHECKLIST'. ChecklistEvaluatorTest uses MockHttpCallout and MockDmlHandler for full isolation.
