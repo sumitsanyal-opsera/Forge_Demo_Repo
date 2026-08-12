@@ -1,0 +1,80 @@
+{
+  "id": "pipe-005",
+  "name": "Acme Production Deploy",
+  "orgName": "Acme Corp Production",
+  "deployId": "0Af000000005AbcCAE",
+  "startTime": "2026-08-12T06:00:00.000Z",
+  "detectionState": "resolved",
+  "metrics": {
+    "currentDurationMs": 280000,
+    "p50BaselineMs": 180000,
+    "p90BaselineMs": 300000,
+    "p99BaselineMs": 420000,
+    "staleDurationMs": null,
+    "componentCount": 5
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Validate Metadata",
+      "status": "success",
+      "startTime": "2026-08-12T06:00:00.000Z",
+      "durationMs": 45000
+    },
+    {
+      "id": "step-2",
+      "name": "Deploy Components",
+      "status": "success",
+      "startTime": "2026-08-12T06:00:45.000Z",
+      "durationMs": 138000
+    },
+    {
+      "id": "step-3",
+      "name": "Run Apex Tests",
+      "status": "success",
+      "startTime": "2026-08-12T06:03:03.000Z",
+      "durationMs": 72000
+    },
+    {
+      "id": "step-4",
+      "name": "Send Notifications",
+      "status": "success",
+      "startTime": "2026-08-12T06:04:15.000Z",
+      "durationMs": 18000
+    },
+    {
+      "id": "step-5",
+      "name": "Finalize Deployment",
+      "status": "success",
+      "startTime": "2026-08-12T06:04:33.000Z",
+      "durationMs": 7000
+    }
+  ],
+  "metadataComponents": [
+    {
+      "name": "AccountService",
+      "type": "ApexClass",
+      "status": "deployed"
+    },
+    {
+      "name": "OpportunityTrigger",
+      "type": "ApexClass",
+      "status": "deployed"
+    },
+    {
+      "name": "CaseHandler",
+      "type": "ApexClass",
+      "status": "deployed"
+    },
+    {
+      "name": "AccountDashboard",
+      "type": "LightningComponentBundle",
+      "status": "deployed"
+    },
+    {
+      "name": "AccountLayout",
+      "type": "Layout",
+      "status": "deployed"
+    }
+  ]
+}

@@ -1,0 +1,40 @@
+{
+  "id": "pipe-007",
+  "name": "Acme Dev Deploy",
+  "orgName": "Acme Corp Dev",
+  "deployId": "0Af000000007AbcCAE",
+  "startTime": "2026-08-12T11:00:00.000Z",
+  "detectionState": "monitoring",
+  "metrics": {
+    "currentDurationMs": 60000,
+    "p50BaselineMs": 180000,
+    "p90BaselineMs": 300000,
+    "p99BaselineMs": 420000,
+    "staleDurationMs": null,
+    "componentCount": 0
+  },
+  "steps": [
+    {
+      "id": "step-1",
+      "name": "Validate Metadata",
+      "status": "success",
+      "startTime": "2026-08-12T11:00:00.000Z",
+      "durationMs": 30000
+    },
+    {
+      "id": "step-2",
+      "name": "Deploy Components",
+      "status": "running",
+      "startTime": "2026-08-12T11:00:30.000Z",
+      "durationMs": null
+    },
+    {
+      "id": "step-3",
+      "name": "Run Apex Tests",
+      "status": "pending",
+      "startTime": null,
+      "durationMs": null
+    }
+  ],
+  "metadataComponents": []
+}
