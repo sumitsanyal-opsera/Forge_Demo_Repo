@@ -134,6 +134,102 @@ await prisma.$executeRaw`
 
 ---
 
+## Concrete Example: WO-091 Full Schema Migration
+
+Migration `20260812000000_add_all_tables` demonstrates all patterns in use simultaneously.
+
+### Composite primary key for partitioned tables
+
+PostgreSQL requires the partition key to be part of the primary key on declarative partitioned tables. Standard Prisma `@id` on a single UUID is incompatible:
+
+```sql
+-- Correct: composite PK including partition key
+CREATE TABLE "pipeline_executions" (
+    "id"          UUID        NOT NULL DEFAULT gen_random_uuid(),
+    "started_at"  TIMESTAMPTZ NOT NULL,
+    ...
+    CONSTRAINT "pipeline_executions_pkey" PRIMARY KEY ("id", "started_at")
+) PARTITION BY RANGE ("started_at");
+```
+
+In `schema.prisma`, use `@@id([id, startedAt])` instead of `@id`:
+
+```prisma
+model PipelineExecution {
+  id        String   @default(uuid()) @db.Uuid
+  startedAt DateTime @map("started_at") @db.Timestamptz
+  ...
+  @@id([id, startedAt])
+  @@map("pipeline_executions")
+}
+```
+
+### Composite foreign keys for partitioned table references
+
+Any table FK-ing into a partitioned table must include the partition key:
+
+```sql
+-- execution_steps references pipeline_executions (composite PK)
+FOREIGN KEY ("pipeline_execution_id", "pipeline_execution_started_at")
+    REFERENCES "pipeline_executions"("id", "started_at") ON DELETE CASCADE
+```
+
+In `schema.prisma`:
+
+```prisma
+model ExecutionStep {
+  pipelineExecutionId        String   @db.Uuid @map("pipeline_execution_id")
+  pipelineExecutionStartedAt DateTime @map("pipeline_execution_started_at") @db.Timestamptz
+
+  pipelineExecution PipelineExecution @relation(
+    fields: [pipelineExecutionId, pipelineExecutionStartedAt],
+    references: [id, startedAt],
+    onDelete: Cascade
+  )
+  ...
+}
+```
+
+### GIN indexes on JSONB columns
+
+Always use `jsonb_path_ops` to minimize index size and support containment operators (`@>`):
+
+```sql
+CREATE INDEX "pipeline_executions_metadata_gin_idx"
+    ON "pipeline_executions" USING GIN ("metadata" jsonb_path_ops);
+```
+
+### Partial unique index for NULL-key defaults
+
+PostgreSQL treats `NULL` as distinct in unique constraints, so `@@unique([monitoredPipelineId, stepName])` does NOT prevent two org-level defaults (both `monitored_pipeline_id IS NULL`). Add a partial unique index:
+
+```sql
+-- Prevents duplicate org-level default configs
+CREATE UNIQUE INDEX "threshold_configs_org_default_uidx"
+    ON "threshold_configs" ("salesforce_org_id", "step_name")
+    WHERE "monitored_pipeline_id" IS NULL;
+```
+
+### Audit log immutability trigger
+
+```sql
+CREATE OR REPLACE FUNCTION prevent_audit_modification()
+RETURNS TRIGGER LANGUAGE plpgsql AS $$
+BEGIN
+    RAISE EXCEPTION 'Audit log records are immutable: % on audit_log is not permitted', TG_OP;
+END;
+$$;
+
+CREATE TRIGGER audit_immutability
+    BEFORE UPDATE OR DELETE ON "audit_log"
+    FOR EACH ROW
+    EXECUTE FUNCTION prevent_audit_modification();
+```
+
+This is enforced at the database level — application-level guards alone are insufficient.
+
+---
+
 ## Rules
 
 1. **Never use raw string interpolation for user-provided values** — always use
@@ -141,3 +237,5 @@ await prisma.$executeRaw`
 2. **Always test migrations** against a local Docker Compose database before committing.
 3. **Label hand-authored migrations** with `-- [HAND_AUTHORED]` at the top of `migration.sql`.
 4. **Commit migration files** — never regenerate them in a way that loses the raw SQL.
+5. **Composite PK models** — any Prisma model for a partitioned table must use `@@id([id, startedAt])`, not `@id`. Application code must always include `startedAt` in single-row lookups.
+6. **Composite FK models** — any model referencing a partitioned table must carry the partition key as an explicit field (e.g., `pipelineExecutionStartedAt`) and declare it in the `@relation` `fields`/`references` arrays.

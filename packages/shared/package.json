@@ -34,7 +34,11 @@
     "test:watch": "node --experimental-vm-modules node_modules/.bin/jest --watch --config jest.config.mjs",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "prisma:migrate:deploy": "prisma migrate deploy"
+    "prisma:migrate:deploy": "prisma migrate deploy",
+    "prisma:seed": "node --loader ts-node/esm prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "npm run prisma:seed"
   },
   "dependencies": {
     "@prisma/client": "^5.16.0",
