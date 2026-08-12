@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Severity__c</fullName>
+    <description>Impact level when this checklist check fails. Critical failures block the deployment gate and trigger immediate alerts. Warning failures are logged and reported but do not block. Info failures are informational and do not affect the overall pass/fail result.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Severity</label>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value>
+                <fullName>Critical</fullName>
+                <default>false</default>
+                <label>Critical</label>
+            </value>
+            <value>
+                <fullName>Warning</fullName>
+                <default>false</default>
+                <label>Warning</label>
+            </value>
+            <value>
+                <fullName>Info</fullName>
+                <default>false</default>
+                <label>Info</label>
+            </value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

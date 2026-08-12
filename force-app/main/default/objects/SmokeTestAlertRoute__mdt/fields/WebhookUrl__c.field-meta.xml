@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>WebhookUrl__c</fullName>
+    <description>Webhook endpoint URL for Slack or Teams alert channels. Must be a valid HTTPS URL pointing to an incoming webhook integration. Default records use a placeholder value; replace with the actual webhook URL in each target org after deployment. Not applicable for InApp or Email channels.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Webhook URL</label>
+    <type>Url</type>
+</CustomField>

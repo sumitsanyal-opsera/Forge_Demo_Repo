@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>DevOps Pipeline Failures</label>
+    <protected>false</protected>
+    <values>
+        <field>Channel__c</field>
+        <value xsi:type="xsd:string">Slack</value>
+    </values>
+    <values>
+        <field>WebhookUrl__c</field>
+        <value xsi:type="xsd:string">https://hooks.example.com/placeholder</value>
+    </values>
+    <values>
+        <field>WebhookSecret__c</field>
+        <value xsi:type="xsd:string">PLACEHOLDER_SECRET_REPLACE_IN_TARGET_ORG</value>
+    </values>
+    <values>
+        <field>RecipientRole__c</field>
+        <value xsi:type="xsd:string">DevOps Engineer</value>
+    </values>
+    <values>
+        <field>ScenarioFilter__c</field>
+        <value xsi:null="true"/>
+    </values>
+    <values>
+        <field>AlertOnPass__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>AlertOnFail__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>IncludeDetails__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+</CustomMetadata>

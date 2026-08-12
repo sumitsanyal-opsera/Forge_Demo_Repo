@@ -35,3 +35,10 @@
 - **Files:** 40 (+962/-0)
 - **Duration:** 436ss
 - **Approach:** Created two Custom Metadata Type definitions in Salesforce DX source format under objects/ (same structure as Custom Objects but with fieldManageability: DeveloperControlled on all fields, and no sharingModel). Created the SmokeTestConfig__mdt Default record and all 10 SmokeTestScenario__mdt records as md-meta.xml files in the customMetadata/ directory. Override number fields on scenario records are explicitly set to xsi:null to allow null (indicating use-global-default) rather than omitting the element. All CMT fields use fieldManageability: DeveloperControlled to restrict field value changes to deployments, not Setup UI edits.
+
+## WO-005: User Story: WO-005 - Define SmokeTestChecklist and AlertRoute Custom Metadata Types
+- **Status:** completed
+- **Commit:** `06147f0`
+- **Files:** 28 (+683/-0)
+- **Duration:** 687ss
+- **Approach:** Created two Custom Metadata Type definitions in Salesforce DX source format. SmokeTestChecklist__mdt is Public visibility with 7 fields and 5 default records covering core post-deployment verification checks (Flows, Permission Sets, Page Layouts, Custom Settings, Scheduled Jobs). SmokeTestAlertRoute__mdt is Protected visibility — this prevents subscriber orgs from reading WebhookSecret__c values via the Metadata API, leveraging the stcenter namespace established in WO-001. All 8 AlertRoute fields and 5 default records are created with placeholder webhook values for the Slack route. All CMT fields use fieldManageability: DeveloperControlled consistent with WO-004 patterns. A verification script uses getAll() to assert record counts and field values for both types.

@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ScenarioFilter__c</fullName>
+    <description>Comma-separated list of BusinessProcess__c tag values from SmokeTestScenario__mdt. When populated, alerts are only sent for scenario failures matching one of these tags (e.g., Sales,Lead Management). When blank, alerts apply to all scenario failures regardless of business process tag.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Scenario Filter</label>
+    <length>255</length>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

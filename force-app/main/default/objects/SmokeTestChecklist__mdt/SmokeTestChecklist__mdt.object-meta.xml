@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Post-deployment metadata integrity checklist items. Each record defines a verification check (Flow activation, permission set existence, page layout assignment, custom settings, scheduled jobs) with configurable SOQL or Tooling API queries and expected results. Accessed via SmokeTestChecklist__mdt.getAll() in Apex.</description>
+    <label>Smoke Test Checklist</label>
+    <pluralLabel>Smoke Test Checklists</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>
