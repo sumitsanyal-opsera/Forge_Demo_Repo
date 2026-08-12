@@ -1,0 +1,7 @@
+[
+  {
+    "errorCode": "FIELD_INTEGRITY_EXCEPTION",
+    "message": "value of incorrect type: Account.BillingState",
+    "fields": ["BillingState"]
+  }
+]

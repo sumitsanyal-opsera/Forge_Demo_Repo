@@ -1,0 +1,7 @@
+[
+  {
+    "errorCode": "MALFORMED_QUERY",
+    "message": "unexpected token: 'FORM'",
+    "fields": []
+  }
+]

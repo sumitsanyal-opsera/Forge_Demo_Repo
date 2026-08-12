@@ -1,0 +1,12 @@
+{
+  "attributes": {
+    "type": "Account",
+    "url": "/services/data/v59.0/sobjects/Account/001RM000006tJBvYAM"
+  },
+  "Id": "001RM000006tJBvYAM",
+  "Name": "Opsera Test Account",
+  "BillingCity": "San Francisco",
+  "BillingState": "CA",
+  "CreatedDate": "2026-01-15T10:00:00.000+0000",
+  "LastModifiedDate": "2026-08-01T08:30:00.000+0000"
+}

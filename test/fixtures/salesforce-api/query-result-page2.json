@@ -1,0 +1,14 @@
+{
+  "totalSize": 3,
+  "done": true,
+  "records": [
+    {
+      "attributes": { "type": "AsyncApexJob", "url": "/services/data/v59.0/sobjects/AsyncApexJob/7071R000007d8ADQAY" },
+      "Id": "7071R000007d8ADQAY",
+      "Status": "Failed",
+      "JobType": "BatchApex",
+      "CreatedDate": "2026-08-09T09:00:00.000+0000",
+      "CompletedDate": "2026-08-09T09:02:00.000+0000"
+    }
+  ]
+}

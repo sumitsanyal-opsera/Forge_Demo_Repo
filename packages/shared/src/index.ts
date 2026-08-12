@@ -148,3 +148,20 @@ export {
 export type { SfAuthErrorCode } from './integration/salesforce/auth/SalesforceAuthError.js';
 export type { SalesforceAuthConfig, SalesforceHttpClient } from './integration/salesforce/auth/SalesforceAuthService.js';
 export { SalesforceAuthService } from './integration/salesforce/auth/SalesforceAuthService.js';
+
+// ── Salesforce REST API client ────────────────────────────────────────────────
+export type {
+  QueryResult,
+  SObjectRecord,
+  SalesforceErrorBody,
+  SalesforceApiClientConfig,
+} from './integration/salesforce/client/types.js';
+export {
+  SalesforceApiError,
+  SF_API_ERROR_CODES,
+  RATE_LIMIT_ERROR_CODES,
+  SESSION_EXPIRED_ERROR_CODES,
+  parseSalesforceApiError,
+  isSalesforceApiError,
+} from './integration/salesforce/client/SalesforceApiError.js';
+export { SalesforceApiClient } from './integration/salesforce/client/SalesforceApiClient.js';

@@ -1,0 +1,23 @@
+{
+  "totalSize": 3,
+  "done": false,
+  "nextRecordsUrl": "/services/data/v59.0/query/01gRM00000065RBYAY-2000",
+  "records": [
+    {
+      "attributes": { "type": "AsyncApexJob", "url": "/services/data/v59.0/sobjects/AsyncApexJob/7071R000007d8ABQAY" },
+      "Id": "7071R000007d8ABQAY",
+      "Status": "Processing",
+      "JobType": "BatchApex",
+      "CreatedDate": "2026-08-10T14:00:00.000+0000",
+      "CompletedDate": null
+    },
+    {
+      "attributes": { "type": "AsyncApexJob", "url": "/services/data/v59.0/sobjects/AsyncApexJob/7071R000007d8ACQAY" },
+      "Id": "7071R000007d8ACQAY",
+      "Status": "Completed",
+      "JobType": "BatchApex",
+      "CreatedDate": "2026-08-10T12:00:00.000+0000",
+      "CompletedDate": "2026-08-10T12:45:00.000+0000"
+    }
+  ]
+}

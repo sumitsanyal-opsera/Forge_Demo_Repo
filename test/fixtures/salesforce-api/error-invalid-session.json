@@ -1,0 +1,7 @@
+[
+  {
+    "errorCode": "INVALID_SESSION_ID",
+    "message": "Session expired or invalid",
+    "fields": []
+  }
+]
