@@ -1,0 +1,220 @@
+<template>
+    <div class="slds-card slds-p-around_medium guided-setup-wizard"
+         role="dialog"
+         aria-label="Guided Setup Wizard">
+
+        <!-- Progress indicator -->
+        <div class="slds-path slds-m-bottom_medium" role="navigation"
+             aria-label="Setup wizard steps">
+            <div class="slds-grid slds-path__track">
+                <div class="slds-grid slds-path__scroller-container">
+                    <div class="slds-path__scroller" role="listbox">
+                        <ul class="slds-path__scroller_inner">
+                            <li class={step1Class} role="presentation"
+                                aria-selected="true">
+                                <a class="slds-path__link" role="option">
+                                    <span class="slds-path__stage">
+                                        <lightning-icon icon-name="utility:check" size="xx-small"
+                                            aria-hidden="true"></lightning-icon>
+                                    </span>
+                                    <span class="slds-path__title">1. Select Templates</span>
+                                </a>
+                            </li>
+                            <li class={step2Class} role="presentation">
+                                <a class="slds-path__link" role="option">
+                                    <span class="slds-path__stage">
+                                        <lightning-icon icon-name="utility:check" size="xx-small"
+                                            aria-hidden="true"></lightning-icon>
+                                    </span>
+                                    <span class="slds-path__title">2. Preview &amp; Customize</span>
+                                </a>
+                            </li>
+                            <li class={step3Class} role="presentation">
+                                <a class="slds-path__link" role="option">
+                                    <span class="slds-path__stage">
+                                        <lightning-icon icon-name="utility:check" size="xx-small"
+                                            aria-hidden="true"></lightning-icon>
+                                    </span>
+                                    <span class="slds-path__title">3. Deploy</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 1: Select Templates -->
+        <template if:true={isStep1}>
+            <div class="wizard-step wizard-step_select" data-step="1">
+                <h2 class="slds-text-heading_medium slds-m-bottom_small">
+                    Select Cloud Templates
+                </h2>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_medium">
+                    Choose one or more cloud scenario templates to add to your smoke test suite.
+                    You can customize timeouts and budgets in the next step.
+                </p>
+                <div class="slds-grid slds-gutters slds-wrap">
+                    <template for:each={cloudCards} for:item="card">
+                        <div key={card.key}
+                             class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small">
+                            <c-cloud-template-card
+                                template-key={card.key}
+                                template-name={card.label}
+                                description={card.description}
+                                scenario-count={card.scenarioCount}
+                                icon={card.icon}
+                                is-selected={card.isSelected}
+                                ontemplateselected={handleTemplateSelected}>
+                            </c-cloud-template-card>
+                        </div>
+                    </template>
+                </div>
+            </div>
+        </template>
+
+        <!-- Step 2: Preview and Customize -->
+        <template if:true={isStep2}>
+            <div class="wizard-step wizard-step_preview" data-step="2">
+                <h2 class="slds-text-heading_medium slds-m-bottom_small">
+                    Preview &amp; Customize Scenarios
+                </h2>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_medium">
+                    Review the scenarios that will be created. You can edit timeout and
+                    governor budget values before deploying.
+                </p>
+
+                <!-- Missing class warning banner -->
+                <template if:true={hasWarnings}>
+                    <div class="slds-notify slds-notify_alert slds-theme_warning slds-m-bottom_small"
+                         role="alert">
+                        <lightning-icon icon-name="utility:warning" size="x-small"
+                            class="slds-m-right_x-small" alternative-text="Warning">
+                        </lightning-icon>
+                        <span>
+                            One or more Apex classes were not found in this org.
+                            Deploy the missing class(es) before running these scenarios.
+                            Scenarios with warnings will still be configured.
+                        </span>
+                    </div>
+                </template>
+
+                <c-scenario-preview-table
+                    scenarios={scenariosToPreview}
+                    class-validation={classValidation}>
+                </c-scenario-preview-table>
+            </div>
+        </template>
+
+        <!-- Step 3: Deploy Result -->
+        <template if:true={isStep3}>
+            <div class="wizard-step wizard-step_result" data-step="3">
+                <template if:true={deploySuccess}>
+                    <div class="slds-illustration slds-illustration_small slds-p-around_medium">
+                        <div class="slds-text-align_center">
+                            <lightning-icon
+                                icon-name="utility:success"
+                                size="large"
+                                variant="success"
+                                class="slds-m-bottom_medium"
+                                aria-hidden="true">
+                            </lightning-icon>
+                            <h3 class="slds-text-heading_medium slds-m-bottom_small">
+                                Deployment Queued
+                            </h3>
+                            <p class="slds-text-body_regular deploy-success-message">
+                                {successMessage}
+                            </p>
+                        </div>
+                    </div>
+                </template>
+
+                <template if:false={deploySuccess}>
+                    <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_medium"
+                         role="alert">
+                        <lightning-icon icon-name="utility:error" size="x-small"
+                            variant="inverse" class="slds-m-right_x-small"
+                            alternative-text="Error">
+                        </lightning-icon>
+                        <span>Deployment failed. Check the error details and retry.</span>
+                    </div>
+                    <p class="slds-text-body_small slds-text-color_error">
+                        {deployResult.errorMessage}
+                    </p>
+                </template>
+            </div>
+        </template>
+
+        <!-- Loading spinner -->
+        <template if:true={isLoading}>
+            <div class="slds-spinner_container">
+                <div role="status"
+                     class="slds-spinner slds-spinner_medium slds-spinner_brand deploy-spinner">
+                    <span class="slds-assistive-text">Deploying scenarios...</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </div>
+        </template>
+
+        <!-- Footer actions -->
+        <div class="slds-m-top_medium slds-grid slds-grid_align-spread wizard-footer">
+            <div>
+                <template if:true={isStep2}>
+                    <button
+                        class="slds-button slds-button_neutral"
+                        onclick={handleBack}
+                        data-id="back-btn">
+                        Back
+                    </button>
+                </template>
+                <template if:false={isStep3}>
+                    <button
+                        class="slds-button slds-button_neutral"
+                        onclick={handleCancel}
+                        data-id="cancel-btn">
+                        Cancel
+                    </button>
+                </template>
+            </div>
+            <div>
+                <template if:true={isStep1}>
+                    <button
+                        class="slds-button slds-button_brand"
+                        onclick={handleNext}
+                        disabled={isNextDisabled}
+                        data-id="next-btn"
+                        aria-label="Next step: Preview and Customize">
+                        Next
+                    </button>
+                </template>
+                <template if:true={isStep2}>
+                    <button
+                        class="slds-button slds-button_brand"
+                        onclick={handleDeploy}
+                        disabled={deployButtonDisabled}
+                        data-id="deploy-btn"
+                        aria-label="Deploy selected scenarios">
+                        Deploy
+                    </button>
+                </template>
+                <template if:true={isStep3}>
+                    <template if:false={deploySuccess}>
+                        <button
+                            class="slds-button slds-button_neutral slds-m-right_x-small"
+                            onclick={handleRetry}
+                            data-id="retry-btn">
+                            Retry
+                        </button>
+                    </template>
+                    <button
+                        class="slds-button slds-button_brand"
+                        onclick={handleDone}
+                        data-id="done-btn">
+                        Done
+                    </button>
+                </template>
+            </div>
+        </div>
+    </div>
+</template>

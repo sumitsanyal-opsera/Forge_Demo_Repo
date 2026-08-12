@@ -33,6 +33,29 @@ public with sharing class MetadataDeployService implements Metadata.DeployCallba
     }
 
     /**
+     * Deploys a pre-built Metadata.DeployContainer (used for bulk operations).
+     *
+     * @param container Pre-built container with one or more CMT records
+     * @return          DeployResult with success flag and async jobId
+     */
+    public static DeployResult deployBulk(Metadata.DeployContainer container) {
+        try {
+            lastContainer = container;
+
+            if (bypassDeployment) {
+                return new DeployResult(true, 'TEST_JOB_ID', null);
+            }
+
+            MetadataDeployService callback = new MetadataDeployService();
+            Id jobId = Metadata.Operations.enqueueDeployment(container, callback);
+            return new DeployResult(true, String.valueOf(jobId), null);
+
+        } catch (Exception ex) {
+            return new DeployResult(false, null, ex.getMessage());
+        }
+    }
+
+    /**
      * Upserts a single Custom Metadata Type record via the Metadata API.
      *
      * @param mdtApiName    Object API name, e.g. 'SmokeTestScenario__mdt'

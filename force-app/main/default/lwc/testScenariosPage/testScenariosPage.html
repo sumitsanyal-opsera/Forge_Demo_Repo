@@ -40,6 +40,15 @@
                 </div>
                 <div class="slds-page-header__col-actions">
                     <lightning-button
+                        class="slds-m-right_x-small"
+                        label="Add from Templates"
+                        icon-name="utility:template"
+                        variant="neutral"
+                        onclick={handleAddFromTemplates}
+                        aria-label="Add scenarios from cloud templates"
+                        data-id="add-from-templates-btn">
+                    </lightning-button>
+                    <lightning-button
                         label="Add Scenario"
                         icon-name="utility:add"
                         variant="brand"
@@ -145,28 +154,30 @@
             </div>
         </template>
 
-        <!-- Empty state -->
+        <!-- Empty state — show Guided Setup Wizard -->
         <template if:true={isEmpty}>
-            <div class="slds-illustration slds-illustration_small slds-p-around_large">
-                <div class="slds-text-align_center">
-                    <lightning-icon
-                        icon-name="utility:settings"
-                        size="large"
-                        class="slds-m-bottom_medium"
-                        aria-hidden="true">
-                    </lightning-icon>
-                    <h3 class="slds-text-heading_medium slds-m-bottom_small">No Scenarios Configured</h3>
-                    <p class="slds-text-body_regular slds-m-bottom_medium">
-                        Add your first smoke test scenario to begin configuring post-deployment verification.
-                    </p>
-                    <lightning-button
-                        label="Add First Scenario"
-                        variant="brand"
-                        onclick={handleAddClick}
-                        aria-label="Add your first test scenario">
-                    </lightning-button>
+            <c-guided-setup-wizard
+                onwizardcomplete={handleWizardComplete}
+                onwizardcancel={handleWizardCancel}
+                data-id="onboarding-wizard">
+            </c-guided-setup-wizard>
+        </template>
+
+        <!-- Wizard modal for non-empty state (Add from Templates button) -->
+        <template if:true={showWizard}>
+            <div class="slds-modal slds-fade-in-open" role="dialog"
+                 aria-modal="true" aria-label="Add from Templates">
+                <div class="slds-modal__container">
+                    <div class="slds-modal__content slds-p-around_medium">
+                        <c-guided-setup-wizard
+                            onwizardcomplete={handleWizardComplete}
+                            onwizardcancel={handleWizardCancel}
+                            data-id="templates-wizard-modal">
+                        </c-guided-setup-wizard>
+                    </div>
                 </div>
             </div>
+            <div class="slds-backdrop slds-backdrop_open"></div>
         </template>
 
         <!-- Scenario list -->

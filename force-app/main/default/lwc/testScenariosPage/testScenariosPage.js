@@ -32,6 +32,7 @@ export default class TestScenariosPage extends LightningElement {
     // UI state
     @track isLoading      = false;
     @track showModal      = false;
+    @track showWizard     = false;
     @track togglingIds    = new Set();
 
     categoryOptions = CATEGORY_OPTIONS;
@@ -192,6 +193,26 @@ export default class TestScenariosPage extends LightningElement {
 
     handleModalClose() {
         this.showModal = false;
+    }
+
+    // =========================================================================
+    // Guided Setup Wizard
+    // =========================================================================
+
+    handleAddFromTemplates() {
+        this.showWizard = true;
+    }
+
+    handleWizardComplete() {
+        this.showWizard = false;
+        // Refresh scenarios after wizard deployment
+        getScenarios()
+            .then(data => { if (data) this._scenarios = data; })
+            .catch(() => {});
+    }
+
+    handleWizardCancel() {
+        this.showWizard = false;
     }
 
     handleModalSave(event) {

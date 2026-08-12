@@ -1,0 +1,54 @@
+[
+  {
+    "scenarioName": "Account_CRUD",
+    "label": "Account CRUD",
+    "apexClassName": "AccountCrudScenario",
+    "executionOrder": 10,
+    "timeout": 30,
+    "cpuBudget": 2000,
+    "soqlBudget": 25,
+    "dmlBudget": 10,
+    "cloudType": "Sales",
+    "critical": true,
+    "description": "Verifies Account create, read, update, and delete operations"
+  },
+  {
+    "scenarioName": "Contact_CRUD",
+    "label": "Contact CRUD",
+    "apexClassName": "ContactCrudScenario",
+    "executionOrder": 20,
+    "timeout": 30,
+    "cpuBudget": 2000,
+    "soqlBudget": 25,
+    "dmlBudget": 10,
+    "cloudType": "Sales",
+    "critical": true,
+    "description": "Verifies Contact create, read, update, and delete with parent Account"
+  },
+  {
+    "scenarioName": "Opportunity_Pipeline",
+    "label": "Opportunity Pipeline",
+    "apexClassName": "OpportunityCrudScenario",
+    "executionOrder": 30,
+    "timeout": 45,
+    "cpuBudget": 3000,
+    "soqlBudget": 30,
+    "dmlBudget": 15,
+    "cloudType": "Sales",
+    "critical": true,
+    "description": "Verifies Opportunity pipeline stage progression through Closed Won"
+  },
+  {
+    "scenarioName": "Lead_Conversion",
+    "label": "Lead Conversion",
+    "apexClassName": "LeadConversionScenario",
+    "executionOrder": 40,
+    "timeout": 45,
+    "cpuBudget": 3000,
+    "soqlBudget": 30,
+    "dmlBudget": 15,
+    "cloudType": "Sales",
+    "critical": true,
+    "description": "Verifies Lead qualification and conversion"
+  }
+]

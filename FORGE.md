@@ -259,3 +259,10 @@
 - **Files:** 20 (+1363/-0)
 - **Duration:** 759ss
 - **Approach:** Implemented Strategy pattern: IChecklistCheck interface, ChecklistResult value class, ChecklistContext DTO with injectable IHttpCallout for Tooling API mocking. Five check classes: FlowActivationCheck (Tooling API FlowDefinition, verifies ActiveVersionId), PermissionSetAssignmentCheck (SOQL PermissionSetAssignment, zero-assignment = FAIL), PageLayoutAssignmentCheck (Tooling API ProfileLayout, multi-assignment = WARNING), ConfigValueCheck (reads enabled SOQLValidation CMT entries, executes Query__c, non-empty result = PASS), ScheduledJobCheck (CronTrigger WAITING state, supports named job list from CMT ExpectedResult__c). ChecklistEvaluator orchestrates all five in sequence without short-circuit, injects DefaultHttpCallout and IDmlHandler, persists to SmokeTestResult__c with ResultType__c = 'CHECKLIST'. ChecklistEvaluatorTest uses MockHttpCallout and MockDmlHandler for full isolation.
+
+## WO-082: User Story: WO-082 - Guided Setup Wizard with Cloud Scenario Templates
+- **Status:** completed
+- **Commit:** `1ba39a1`
+- **Files:** 19 (+1766/-19)
+- **Duration:** 911ss
+- **Approach:** Built the Guided Setup Wizard bottom-up: ScenarioTemplateService provides static template definitions for 9 scenarios across 3 clouds plus Apex class validation via Type.forName and bulk deploy via a single Metadata.DeployContainer. MetadataDeployService got a deployBulk() method for pre-built containers. Three child LWCs (cloudTemplateCard, scenarioPreviewTable, guidedSetupWizard) implement the 3-step wizard. TestScenariosPage renders the wizard inline for empty state and as a modal overlay for the 'Add from Templates' button on non-empty state.
