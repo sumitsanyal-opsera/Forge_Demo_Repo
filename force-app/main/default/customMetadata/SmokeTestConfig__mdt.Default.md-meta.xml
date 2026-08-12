@@ -7,6 +7,10 @@
         <value xsi:type="xsd:double">5</value>
     </values>
     <values>
+        <field>SuiteTimeoutSec__c</field>
+        <value xsi:type="xsd:double">300</value>
+    </values>
+    <values>
         <field>MaxConcurrentExecutions__c</field>
         <value xsi:type="xsd:double">50</value>
     </values>
@@ -23,12 +27,28 @@
         <value xsi:type="xsd:double">5</value>
     </values>
     <values>
+        <field>SecurityHealthCheckEnabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
         <field>DefaultRollbackPolicy__c</field>
         <value xsi:type="xsd:string">Recommend Only</value>
     </values>
     <values>
+        <field>DryRunMode__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
         <field>RollbackConfirmationWindowSec__c</field>
         <value xsi:type="xsd:double">60</value>
+    </values>
+    <values>
+        <field>ShadowMode__c</field>
+        <value xsi:type="xsd:boolean">false</value>
+    </values>
+    <values>
+        <field>AutoTriggerEnabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
     </values>
     <values>
         <field>DataRetentionDaysInternal__c</field>
@@ -36,6 +56,14 @@
     </values>
     <values>
         <field>DataRetentionDaysConfidential__c</field>
+        <value xsi:type="xsd:double">365</value>
+    </values>
+    <values>
+        <field>DataRetentionDaysSecurityScores__c</field>
+        <value xsi:type="xsd:double">365</value>
+    </values>
+    <values>
+        <field>DataRetentionDaysAuditLogs__c</field>
         <value xsi:type="xsd:double">365</value>
     </values>
     <values>

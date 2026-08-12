@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SecurityHealthCheckEnabled__c</fullName>
+    <description>When true, the security health check comparison runs after each smoke test suite and failures can block the rollback decision. When false, health check is skipped. Default: true.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Security Health Check Enabled</label>
+    <type>Checkbox</type>
+    <defaultValue>true</defaultValue>
+</CustomField>

@@ -6,7 +6,7 @@ import getLatestExecution from '@salesforce/apex/SmokeTestDashboardController.ge
 const PAGE_IDS = [
     'overview', 'executionDetail', 'security',
     'scenarios', 'cicd', 'alerts',
-    'history', 'auditLog'
+    'history', 'auditLog', 'settings'
 ];
 const ACTIVE_CLASS  = 'slds-nav-vertical__item slds-is-active';
 const DEFAULT_CLASS = 'slds-nav-vertical__item';
@@ -77,6 +77,10 @@ export default class SmokeTestCenter extends NavigationMixin(LightningElement) {
 
     get isScenariosPage() {
         return this.activePageId === 'scenarios';
+    }
+
+    get isSettingsPage() {
+        return this.activePageId === 'settings';
     }
 
     get navItemClass() {

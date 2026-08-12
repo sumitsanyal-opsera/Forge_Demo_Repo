@@ -149,6 +149,18 @@
                                     Alert Routing
                                 </a>
                             </li>
+                            <li class={navItemClass.settings}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="settings"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:setup" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Settings
+                                </a>
+                            </li>
                         </ul>
                     </div>
 
@@ -201,14 +213,20 @@
                     <template if:true={isScenariosPage}>
                         <c-test-scenarios-page is-admin={isAdmin}></c-test-scenarios-page>
                     </template>
+                    <!-- Settings configuration page (admin only) -->
+                    <template if:true={isSettingsPage}>
+                        <c-settings-page is-admin={isAdmin}></c-settings-page>
+                    </template>
                     <!-- All other pages -->
                     <template if:false={isScenariosPage}>
-                        <template if:true={isAdmin}>
-                            <div class="admin-panels">
-                                <slot name="admin-content"></slot>
-                            </div>
+                        <template if:false={isSettingsPage}>
+                            <template if:true={isAdmin}>
+                                <div class="admin-panels">
+                                    <slot name="admin-content"></slot>
+                                </div>
+                            </template>
+                            <slot></slot>
                         </template>
-                        <slot></slot>
                     </template>
                 </template>
             </div>
