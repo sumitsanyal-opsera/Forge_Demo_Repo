@@ -3,6 +3,7 @@ import * as path from 'path';
 import * as libxmljs from 'libxmljs2';
 import { validateMetadataXmlLegacy, BatchValidationResult } from './validator';
 import { validateXmlAgainstXsd } from './validateXml';
+import { validateXml } from './validate';
 import { formatResults as formatSingleResult } from './formatResults';
 import { formatResult } from './formatResult';
 import type { ValidationResult as SingleValidationResult } from './types';
@@ -127,16 +128,17 @@ function validateWithExplicitXsd(xmlPath: string, xsdPath: string): void {
     process.exit(1);
   }
 
-  const errors = validateXmlAgainstXsd(xmlContent, xsdContent);
-  if (errors.length === 0) {
-    console.log(`PASS: ${xmlPath} conforms to ${xsdPath}`);
+  const result = validateXml(xmlContent, xsdContent);
+  const filename = path.basename(xmlPath);
+  if (result.valid) {
+    console.log(`PASS: ${filename} is valid against the schema`);
     process.exit(0);
   }
 
-  console.log(`FAIL: ${xmlPath} does not conform to ${xsdPath}`);
-  errors.forEach((err, i) => {
-    console.log(`  ${i + 1}. Line ${err.line}, Col ${err.column} [${err.phase}]: ${err.message}`);
-  });
+  console.log(`FAIL: ${filename} has ${result.errors.length} validation error(s):`);
+  for (const err of result.errors) {
+    console.log(`  - ${err}`);
+  }
   process.exit(1);
 }
 
