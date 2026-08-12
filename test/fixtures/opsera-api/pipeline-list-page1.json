@@ -1,0 +1,31 @@
+{
+  "data": [
+    {
+      "id": "pipeline-001",
+      "name": "Pipeline Alpha",
+      "orgId": "org-abc-123",
+      "status": "running",
+      "createdAt": "2024-01-10T08:00:00.000Z",
+      "updatedAt": "2024-01-15T12:30:00.000Z",
+      "tags": ["alpha"],
+      "owner": "alice@example.com",
+      "config": { "steps": [], "timeout": 1800 }
+    },
+    {
+      "id": "pipeline-002",
+      "name": "Pipeline Beta",
+      "orgId": "org-abc-123",
+      "status": "success",
+      "createdAt": "2024-01-11T09:00:00.000Z",
+      "updatedAt": "2024-01-15T11:00:00.000Z",
+      "tags": ["beta"],
+      "owner": "bob@example.com",
+      "config": { "steps": [], "timeout": 1800 }
+    }
+  ],
+  "total": 3,
+  "page": 1,
+  "limit": 2,
+  "nextCursor": "cursor-abc123",
+  "hasMore": true
+}

@@ -1,0 +1,5 @@
+{
+  "code": "AUTH_INVALID_KEY",
+  "message": "The provided API key is invalid or has been revoked.",
+  "details": null
+}

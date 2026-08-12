@@ -1,0 +1,5 @@
+{
+  "code": "PIPELINE_NOT_FOUND",
+  "message": "Pipeline with id 'pipeline-nonexistent' was not found.",
+  "details": null
+}

@@ -1,0 +1,20 @@
+{
+  "data": [
+    {
+      "id": "pipeline-003",
+      "name": "Pipeline Gamma",
+      "orgId": "org-abc-123",
+      "status": "pending",
+      "createdAt": "2024-01-12T10:00:00.000Z",
+      "updatedAt": "2024-01-15T10:00:00.000Z",
+      "tags": ["gamma"],
+      "owner": "carol@example.com",
+      "config": { "steps": [], "timeout": 900 }
+    }
+  ],
+  "total": 3,
+  "page": 2,
+  "limit": 2,
+  "nextCursor": null,
+  "hasMore": false
+}

@@ -21,8 +21,8 @@ const config = {
     ],
   },
   testEnvironment: 'node',
-  testMatch: ['<rootDir>/src/__tests__/**/*.test.ts'],
-  collectCoverageFrom: ['src/**/*.ts', '!src/__tests__/**', '!src/index.ts'],
+  testMatch: ['<rootDir>/src/**/__tests__/**/*.test.ts'],
+  collectCoverageFrom: ['src/**/*.ts', '!src/**/__tests__/**', '!src/index.ts'],
   coverageDirectory: 'coverage',
   verbose: true,
 };

@@ -1,0 +1,30 @@
+{
+  "id": "pipeline-550e8400-e29b-41d4-a716-446655440000",
+  "name": "Salesforce Metadata Deployment",
+  "orgId": "org-abc-123",
+  "status": "success",
+  "createdAt": "2024-01-15T10:00:00.000Z",
+  "updatedAt": "2024-01-15T10:45:00.000Z",
+  "tags": ["salesforce", "production"],
+  "owner": "alice@example.com",
+  "config": {
+    "steps": [
+      {
+        "id": "step-001",
+        "name": "Source Tracking",
+        "type": "salesforce-source-tracking",
+        "order": 1,
+        "config": { "timeout": 300 }
+      },
+      {
+        "id": "step-002",
+        "name": "Metadata Deploy",
+        "type": "salesforce-deploy",
+        "order": 2,
+        "config": { "runTests": "RunLocalTests", "checkOnly": false }
+      }
+    ],
+    "timeout": 3600,
+    "retries": 1
+  }
+}

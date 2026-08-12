@@ -76,3 +76,20 @@ export {
   timeRangeSchema,
   uuidSchema,
 } from './validation/schemas.js';
+
+// ── Common utilities ──────────────────────────────────────────────────────────
+export { TokenCache } from './common/auth/TokenCache.js';
+export type { RetryOptions } from './common/http/retry.js';
+export { sleep, withRetry } from './common/http/retry.js';
+
+// ── Opsera integration ────────────────────────────────────────────────────────
+export type { AuthHeaders, AuthProvider, CredentialValidationResult, OAuthErrorResponse, OAuthTokenResponse, OrgInfo } from './integration/opsera/auth/types.js';
+export { AuthMode } from './integration/opsera/auth/types.js';
+export { ApiKeyAuthProvider } from './integration/opsera/auth/ApiKeyAuthProvider.js';
+export { OAuthAuthProvider } from './integration/opsera/auth/OAuthAuthProvider.js';
+export { OpseraAuthService } from './integration/opsera/auth/OpseraAuthService.js';
+
+export type { PaginatedResponse, Pipeline, PipelineConfig, PipelineListFilters, PipelineRun, PipelineStep, TriggerPipelineParams, ToolRegistryEntry, OpseraErrorBody } from './integration/opsera/client/types.js';
+export { PipelineStatus } from './integration/opsera/client/types.js';
+export { OpseraApiError, OpseraAuthError, isOpseraApiError, isOpseraAuthError } from './integration/opsera/client/OpseraApiError.js';
+export { OpseraApiClient } from './integration/opsera/client/OpseraApiClient.js';
