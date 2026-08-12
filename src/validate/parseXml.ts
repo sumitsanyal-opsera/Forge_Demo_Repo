@@ -1,4 +1,3 @@
-import * as fs from 'fs';
 import * as libxmljs from 'libxmljs2';
 
 export interface XmlError {
@@ -12,17 +11,9 @@ export interface XmlParseResult {
   errors: XmlError[];
 }
 
-export function parseXml(xmlPath: string): XmlParseResult {
-  let content: string;
+export function parseXml(xmlString: string): XmlParseResult {
   try {
-    content = fs.readFileSync(xmlPath, 'utf-8');
-  } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    return { valid: false, errors: [{ message: msg, line: 0, column: 0 }] };
-  }
-
-  try {
-    libxmljs.parseXml(content);
+    libxmljs.parseXml(xmlString);
     return { valid: true, errors: [] };
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
