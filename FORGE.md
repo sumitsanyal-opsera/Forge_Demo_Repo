@@ -315,3 +315,10 @@
 - **Files:** 0 (+0/-0)
 - **Duration:** 311ss
 - **Approach:** All 5 required test classes (SmokeTestOrchestratorTest, CircuitBreakerServiceTest, ScenarioDispatcherTest, ScenarioTimeoutHandlerTest, GovernorLimitBudgetTest) were already implemented and committed to the branch in a prior execution pass. The tests use ConfigurableMockScenario (a flexible configurable mock with static flags: shouldPass, shouldThrowDmlException, shouldThrowQueryException, shouldThrowException, injectedErrorType, injectedErrorDetail, and a reset() method) plus MockSmokeTestScenario (a constructor-injected mock) rather than 4 separate named mock classes, achieving the same coverage with less code. No new files were required for this WO.
+
+## WO-028: User Story: WO-028 - Build SmokeTestStatusResource GET /v1/status Endpoint
+- **Status:** completed
+- **Commit:** `9a5c43f`
+- **Files:** 4 (+583/-0)
+- **Duration:** 598ss
+- **Approach:** Thin REST controller following the same patterns as SmokeTestRunResource. Extracts executionId from the last URL path segment, validates via SmokeTestApiValidator.validateExecutionId(), checks permission set (with @TestVisible permissionCheckOverride for test isolation), runs 2 SOQL queries (execution record + result records), builds a response Map with executionId/status/scenarios/executionDurationMs/timestamp, and sends via SmokeTestApiResponse.success200(). Status values are normalized from Salesforce picklist values (Queued/In Progress/Completed/Failed/Aborted) to API values (queued/in_progress/complete/failed). Pending scenario placeholders are added by comparing TotalScenarios__c against the count of actual result records. Duration uses stored ExecutionTimeMs__c for terminal executions and live DateTime arithmetic for in-progress ones.
