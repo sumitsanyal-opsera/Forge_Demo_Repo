@@ -12,7 +12,7 @@
     </values>
     <values>
         <field>ScenarioClass__c</field>
-        <value xsi:type="xsd:string">PageLayoutRenderScenario</value>
+        <value xsi:type="xsd:string">FlexipageRenderScenario</value>
     </values>
     <values>
         <field>IsCritical__c</field>
