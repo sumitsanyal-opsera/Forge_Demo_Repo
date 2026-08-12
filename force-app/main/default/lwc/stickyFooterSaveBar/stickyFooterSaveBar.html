@@ -1,0 +1,38 @@
+<template>
+    <template if:true={hasChanges}>
+        <div class="slds-docked-form-footer save-bar"
+             role="status"
+             aria-live="polite"
+             aria-label="Unsaved changes — save or discard">
+            <span class="slds-text-body_small slds-text-color_weak slds-m-right_medium unsaved-label">
+                <lightning-icon icon-name="utility:warning" size="x-small"
+                    class="slds-m-right_x-small" aria-hidden="true">
+                </lightning-icon>
+                You have unsaved changes
+            </span>
+            <lightning-button
+                label="Discard Changes"
+                variant="neutral"
+                onclick={handleDiscard}
+                disabled={isSaving}
+                aria-label="Discard all unsaved settings changes">
+            </lightning-button>
+            <lightning-button
+                label="Save All Settings"
+                variant="brand"
+                onclick={handleSave}
+                disabled={isSaving}
+                class="slds-m-left_small"
+                aria-label="Save all settings changes">
+            </lightning-button>
+            <template if:true={isSaving}>
+                <div class="slds-spinner slds-spinner_x-small slds-spinner_brand slds-m-left_small"
+                     role="status" aria-label="Saving...">
+                    <span class="slds-assistive-text">Saving...</span>
+                    <div class="slds-spinner__dot-a"></div>
+                    <div class="slds-spinner__dot-b"></div>
+                </div>
+            </template>
+        </div>
+    </template>
+</template>

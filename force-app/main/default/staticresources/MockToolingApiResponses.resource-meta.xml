@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<StaticResource xmlns="http://soap.sforce.com/2006/04/metadata">
+    <cacheControl>Private</cacheControl>
+    <contentType>application/json</contentType>
+    <description>Mock Tooling API JSON response fixtures for MetadataIntegrityService unit tests. Contains success, missing-component, inactive-flow, and error response shapes for each supported component type.</description>
+</StaticResource>

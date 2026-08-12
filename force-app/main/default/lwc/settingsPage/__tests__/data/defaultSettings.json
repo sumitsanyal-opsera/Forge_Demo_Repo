@@ -1,0 +1,19 @@
+{
+  "SuiteTimeoutSec__c": 300,
+  "PerScenarioTimeoutSec__c": 30,
+  "GovernorBudgetCPUMs__c": 5000,
+  "GovernorBudgetSOQL__c": 50,
+  "GovernorBudgetDML__c": 50,
+  "CircuitBreakerThreshold__c": 3,
+  "SecurityScoreAbsoluteThreshold__c": 80,
+  "SecurityScoreRelativeThreshold__c": 5,
+  "SecurityHealthCheckEnabled__c": true,
+  "DefaultRollbackPolicy__c": "Recommend Only",
+  "DryRunMode__c": false,
+  "ShadowMode__c": false,
+  "AutoTriggerEnabled__c": true,
+  "DataRetentionDaysInternal__c": 90,
+  "DataRetentionDaysConfidential__c": 365,
+  "DataRetentionDaysSecurityScores__c": 365,
+  "DataRetentionDaysAuditLogs__c": 365
+}

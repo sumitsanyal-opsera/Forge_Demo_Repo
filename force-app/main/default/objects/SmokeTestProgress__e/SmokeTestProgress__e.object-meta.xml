@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Published by the SmokeTestOrchestrator after each scenario completes or changes phase. Subscribed to by the SmokeTestDashboard LWC via lightning/empApi for real-time progress updates. Enables the dashboard to display live scenario pass/fail counts and current execution phase without polling SmokeTestExecution__c records.</description>
+    <eventType>HighVolume</eventType>
+    <label>Smoke Test Progress</label>
+    <pluralLabel>Smoke Test Progresses</pluralLabel>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <publishBehavior>PublishImmediately</publishBehavior>
+</CustomObject>

@@ -1,0 +1,12 @@
+{
+    "Id": "a0Xxx0000000001AAA",
+    "PreDeploymentScore__c": 88,
+    "PostDeploymentScore__c": 90,
+    "ScoreDelta__c": 2,
+    "ThresholdStatus__c": "Pass",
+    "ThresholdMet__c": true,
+    "AbsoluteThreshold__c": 80,
+    "RelativeThreshold__c": 5,
+    "RiskCategories__c": null,
+    "CheckedAt__c": "2024-03-15T10:02:05.000Z"
+}

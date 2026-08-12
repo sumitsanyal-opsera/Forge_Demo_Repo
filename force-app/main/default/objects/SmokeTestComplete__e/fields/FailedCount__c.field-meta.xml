@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>FailedCount__c</fullName>
+    <description>Number of scenarios that failed in this execution run. Published by: SmokeTestOrchestrator. Consumed by: AlertRoutingService to determine if failure alerts should be dispatched; SmokeTestDashboard LWC for the failed count badge. A value greater than zero with OverallResult=Passed indicates all failures were non-Critical severity.</description>
+    <label>Failed Count</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

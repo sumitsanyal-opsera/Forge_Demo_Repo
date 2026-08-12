@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ScenarioStatus__c</fullName>
+    <description>Result status of the scenario referenced by ScenarioName__c. Published by: SmokeTestOrchestrator. Consumed by: SmokeTestDashboard LWC to color-code the scenario row (green=Passed, red=Failed, yellow=Running). Expected values: Running, Passed, Failed, Skipped (max 50 characters).</description>
+    <label>Scenario Status</label>
+    <length>50</length>
+    <type>Text</type>
+</CustomField>

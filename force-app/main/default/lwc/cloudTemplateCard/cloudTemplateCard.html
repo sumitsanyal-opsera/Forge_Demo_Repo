@@ -1,0 +1,34 @@
+<template>
+    <article class={cardClass}>
+        <div class="slds-card__header slds-grid slds-grid_vertical-align-center slds-p-around_small">
+            <div class="slds-col slds-no-flex slds-m-right_x-small">
+                <input
+                    type="checkbox"
+                    class="slds-checkbox_standalone"
+                    checked={isSelected}
+                    aria-label={templateName}
+                    onchange={handleCheckboxChange}
+                    data-id="template-checkbox" />
+            </div>
+            <div class="slds-col slds-no-flex slds-m-right_x-small">
+                <lightning-icon
+                    icon-name={icon}
+                    size="small"
+                    aria-hidden="true">
+                </lightning-icon>
+            </div>
+            <div class="slds-col">
+                <h3 class="slds-text-heading_small">{templateName}</h3>
+            </div>
+            <div class="slds-col slds-no-flex">
+                <span class="slds-badge slds-badge_lightest scenario-count-badge"
+                      aria-label={scenarioCountLabel}>
+                    {scenarioCountLabel}
+                </span>
+            </div>
+        </div>
+        <div class="slds-card__body slds-card__body_inner slds-p-horizontal_small slds-p-bottom_small">
+            <p class="slds-text-body_small slds-text-color_weak">{description}</p>
+        </div>
+    </article>
+</template>

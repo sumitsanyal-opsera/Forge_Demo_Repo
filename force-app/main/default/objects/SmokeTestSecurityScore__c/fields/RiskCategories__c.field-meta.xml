@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RiskCategories__c</fullName>
+    <description>Confidential: FLS restricted to SmokeTest_Admin. JSON-serialized list of security risk category names whose scores changed between the pre-deployment and post-deployment captures. Populated by SecurityScoreComparator.changedCategories.</description>
+    <externalId>false</externalId>
+    <label>Risk Categories</label>
+    <length>32000</length>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

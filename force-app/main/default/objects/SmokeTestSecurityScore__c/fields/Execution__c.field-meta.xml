@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Execution__c</fullName>
+    <description>Lookup to the smoke test execution this security score is associated with. Lookup (not Master-Detail) because security scores are Confidential and must not cascade-delete when Internal-tier Execution records are purged.</description>
+    <externalId>false</externalId>
+    <label>Execution</label>
+    <referenceTo>SmokeTestExecution__c</referenceTo>
+    <relationshipLabel>Security Health Scores</relationshipLabel>
+    <relationshipName>SecurityScores</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

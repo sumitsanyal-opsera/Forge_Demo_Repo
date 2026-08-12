@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>RecipientRole__c</fullName>
+    <description>Human-readable role name identifying who receives alerts from this route (e.g., Team Lead, Business Owner, QA Engineer, System Administrator). The alert routing service resolves this to actual user records or role hierarchies at runtime.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Recipient Role</label>
+    <length>255</length>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

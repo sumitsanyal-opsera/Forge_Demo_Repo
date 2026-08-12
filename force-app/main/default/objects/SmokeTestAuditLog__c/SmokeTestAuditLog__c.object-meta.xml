@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Data Classification: Confidential | Retention: 1 year minimum | Immutable: enforced by SmokeTestAuditLogTrigger (no UPDATE/DELETE) -->
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Immutable audit trail for all significant system actions: test executions, configuration changes, rollback decisions, and alert dispatches. Satisfies SOC 2, SOX, and HIPAA audit logging requirements. Records cannot be updated or deleted (enforced via SmokeTestAuditLogTrigger). Data Classification: Confidential. Retention: 1 year minimum.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableLicensing>false</enableLicensing>
+    <enableReports>true</enableReports>
+    <enableSearch>false</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <label>Audit Log</label>
+    <nameField>
+        <displayFormat>AUD-{000000}</displayFormat>
+        <label>Audit Log Number</label>
+        <trackHistory>false</trackHistory>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Audit Logs</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>Private</sharingModel>
+    <visibility>Public</visibility>
+    <indexes>
+        <fullName>Timestamp_Index</fullName>
+        <label>Timestamp Index</label>
+        <fields>
+            <name>Timestamp__c</name>
+            <sortDirection>DESC</sortDirection>
+        </fields>
+    </indexes>
+    <indexes>
+        <fullName>Action_Index</fullName>
+        <label>Action Index</label>
+        <fields>
+            <name>Action__c</name>
+            <sortDirection>ASC</sortDirection>
+        </fields>
+    </indexes>
+    <indexes>
+        <fullName>Actor_Index</fullName>
+        <label>Actor Index</label>
+        <fields>
+            <name>Actor__c</name>
+            <sortDirection>ASC</sortDirection>
+        </fields>
+    </indexes>
+</CustomObject>

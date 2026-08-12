@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ThresholdMet__c</fullName>
+    <description>Confidential: FLS restricted to SmokeTest_Admin. True when PostDeploymentScore__c meets or exceeds AbsoluteThreshold__c AND the score drop does not exceed RelativeThreshold__c. Set by SecurityHealthCheckService.</description>
+    <defaultValue>false</defaultValue>
+    <externalId>false</externalId>
+    <label>Threshold Met</label>
+    <trackTrending>false</trackTrending>
+    <type>Checkbox</type>
+</CustomField>

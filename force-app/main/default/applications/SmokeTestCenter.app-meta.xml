@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <defaultLandingPageKey>standard__home</defaultLandingPageKey>
+    <description>Salesforce Post-Deployment Smoke Testing — real-time dashboard for monitoring deployment health, security scores, and automated smoke test results.</description>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isServiceCloudConsole>false</isServiceCloudConsole>
+    <label>Smoke Test Center</label>
+    <navType>Standard</navType>
+    <uiType>Lightning</uiType>
+    <utilityBar></utilityBar>
+    <tabs>Home</tabs>
+    <tabs>Smoke_Test_Center</tabs>
+</CustomApplication>

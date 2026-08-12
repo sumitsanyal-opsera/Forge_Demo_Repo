@@ -1,0 +1,274 @@
+<template>
+    <!-- Error banner -->
+    <template if:true={hasError}>
+        <div class="slds-notify slds-notify_alert slds-alert_error slds-m-bottom_small" role="alert">
+            <span class="slds-assistive-text">Error</span>
+            <lightning-icon
+                icon-name="utility:error"
+                alternative-text="Error"
+                variant="inverse"
+                size="x-small"
+                class="slds-m-right_x-small">
+            </lightning-icon>
+            <span>{errorMessage}</span>
+            <button
+                class="slds-button slds-button_neutral slds-m-left_small"
+                onclick={handleRetry}>
+                Retry
+            </button>
+        </div>
+    </template>
+
+    <!-- Loading spinner -->
+    <template if:true={isLoading}>
+        <div class="slds-spinner_container slds-p-around_xx-large">
+            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading permissions...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Access denied -->
+    <template if:true={isAccessDenied}>
+        <div class="access-denied slds-p-around_large">
+            <div class="slds-text-align_center">
+                <lightning-icon
+                    icon-name="utility:lock"
+                    size="large"
+                    class="slds-m-bottom_medium">
+                </lightning-icon>
+                <h3 class="slds-text-heading_medium slds-m-bottom_small">Access Required</h3>
+                <p class="slds-text-body_regular">
+                    You need the <strong>SmokeTest_Dashboard_Viewer</strong> or
+                    <strong>SmokeTest_Admin</strong> permission set to access the Smoke Test Center.
+                    Contact your Salesforce Administrator.
+                </p>
+            </div>
+        </div>
+    </template>
+
+    <!-- Main app shell -->
+    <template if:true={hasAccess}>
+        <div class="app-shell slds-grid slds-has-flexi-truncate" role="main">
+            <!-- Sidebar -->
+            <div class="sidebar slds-col slds-size_2-of-12" role="complementary">
+                <div class="sidebar-brand slds-p-around_medium slds-text-align_center">
+                    <lightning-icon
+                        icon-name="utility:metrics"
+                        size="medium"
+                        class="slds-m-bottom_x-small">
+                    </lightning-icon>
+                    <p class="slds-text-heading_small">Smoke Test Center</p>
+                </div>
+
+                <nav class="slds-nav-vertical slds-nav-vertical_shade"
+                     aria-label="Smoke Test Center Navigation">
+
+                    <!-- Dashboard section -->
+                    <div class="slds-nav-vertical__section">
+                        <h2 id="nav-section-dashboard" class="slds-nav-vertical__title">Dashboard</h2>
+                        <ul aria-labelledby="nav-section-dashboard">
+                            <li class={navItemClass.overview}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="overview"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:home" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Overview
+                                </a>
+                            </li>
+                            <li class={navItemClass.executionDetail}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="executionDetail"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:list" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Execution Detail
+                                </a>
+                            </li>
+                            <li class={navItemClass.security}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="security"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:shield" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Security Health
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Configuration section -->
+                    <div class="slds-nav-vertical__section">
+                        <h2 id="nav-section-config" class="slds-nav-vertical__title">Configuration</h2>
+                        <ul aria-labelledby="nav-section-config">
+                            <li class={navItemClass.scenarios}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="scenarios"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:settings" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Test Scenarios
+                                </a>
+                            </li>
+                            <li class={navItemClass.cicd}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="cicd"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:connected_apps" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    CI/CD Integration
+                                </a>
+                            </li>
+                            <li class={navItemClass.alerts}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="alerts"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:notification" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Alert Routing
+                                </a>
+                            </li>
+                            <li class={navItemClass.settings}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="settings"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:setup" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Settings
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- History section -->
+                    <div class="slds-nav-vertical__section">
+                        <h2 id="nav-section-history" class="slds-nav-vertical__title">History</h2>
+                        <ul aria-labelledby="nav-section-history">
+                            <li class={navItemClass.history}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="history"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:clock" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Execution History
+                                </a>
+                            </li>
+                            <li class={navItemClass.auditLog}>
+                                <a class="slds-nav-vertical__action"
+                                   role="option"
+                                   data-page-id="auditLog"
+                                   onclick={handleNavClick}
+                                   tabindex="0">
+                                    <lightning-icon icon-name="utility:record" size="x-small"
+                                        class="slds-m-right_x-small">
+                                    </lightning-icon>
+                                    Audit Log
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+            </div>
+
+            <!-- Main content area -->
+            <div class="main-content slds-col slds-size_10-of-12 slds-p-around_medium"
+                 role="region"
+                 aria-label="Main content">
+
+                <!-- Content header: real-time progress indicator + manual refresh button -->
+                <div class="content-header slds-grid slds-grid_vertical-align-center slds-m-bottom_small">
+                    <div class="slds-col">
+                        <template if:true={progressData}>
+                            <span class="progress-indicator slds-badge slds-badge_lightest">
+                                {progressLabel}
+                            </span>
+                        </template>
+                    </div>
+                    <div class="slds-col slds-no-flex">
+                        <button
+                            class="slds-button slds-button_neutral"
+                            data-id="manual-refresh"
+                            onclick={handleManualRefresh}
+                            title="Refresh dashboard">
+                            <lightning-icon
+                                icon-name="utility:refresh"
+                                size="x-small"
+                                class="slds-m-right_xx-small">
+                            </lightning-icon>
+                            Refresh
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fallback warning: shown when empApi subscriptions fail after max retries -->
+                <template if:true={showFallbackWarning}>
+                    <div class="fallback-warning slds-notify slds-notify_alert slds-theme_info slds-m-bottom_small"
+                         role="status">
+                        <lightning-icon
+                            icon-name="utility:info"
+                            alternative-text="Information"
+                            size="x-small"
+                            class="slds-m-right_x-small">
+                        </lightning-icon>
+                        Real-time updates unavailable — using periodic refresh.
+                    </div>
+                </template>
+
+                <!-- First-time user onboarding — shown when no execution records exist -->
+                <template if:true={showOnboarding}>
+                    <c-onboarding-card is-admin={isAdmin}></c-onboarding-card>
+                </template>
+
+                <!-- Normal dashboard panels — shown by default and when executions exist -->
+                <template if:false={showOnboarding}>
+                    <!-- Test Scenarios configuration page (admin only) -->
+                    <template if:true={isScenariosPage}>
+                        <c-test-scenarios-page is-admin={isAdmin}></c-test-scenarios-page>
+                    </template>
+                    <!-- Settings configuration page (admin only) -->
+                    <template if:true={isSettingsPage}>
+                        <c-settings-page is-admin={isAdmin}></c-settings-page>
+                    </template>
+                    <!-- All other pages -->
+                    <template if:false={isScenariosPage}>
+                        <template if:false={isSettingsPage}>
+                            <template if:true={isAdmin}>
+                                <div class="admin-panels">
+                                    <slot name="admin-content"></slot>
+                                </div>
+                            </template>
+                            <slot></slot>
+                        </template>
+                    </template>
+                </template>
+            </div>
+        </div>
+    </template>
+</template>

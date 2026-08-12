@@ -1,0 +1,18 @@
+{
+    "orgName": "SmokeTestDev",
+    "edition": "Enterprise",
+    "features": [
+        "LightningExperience",
+        "API",
+        "PlatformEvents"
+    ],
+    "settings": {
+        "lightningExperienceSettings": {
+            "enableS1DesktopEnabled": true
+        },
+        "mobileSettings": {
+            "enableS1EncryptedStoragePref2": false
+        }
+    },
+    "description": "Scratch org for Salesforce Post-Deployment Smoke Testing development. Includes LightningExperience, API, and PlatformEvents features required for the SmokeTestCenter unlocked package."
+}

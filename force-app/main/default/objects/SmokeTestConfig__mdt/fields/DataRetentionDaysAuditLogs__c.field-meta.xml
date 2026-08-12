@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DataRetentionDaysAuditLogs__c</fullName>
+    <description>Number of days to retain SmokeTestAuditLog__c records. Minimum 365 days required per SOC 2 and ISO 27001 compliance requirements. Default: 365 days.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Data Retention - Audit Logs (days)</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

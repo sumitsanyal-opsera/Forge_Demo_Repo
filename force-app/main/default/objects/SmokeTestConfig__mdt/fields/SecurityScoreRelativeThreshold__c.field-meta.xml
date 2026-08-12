@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>SecurityScoreRelativeThreshold__c</fullName>
+    <description>Maximum acceptable point drop from pre-deployment baseline to post-deployment score. If the delta exceeds this value the execution is flagged as Security Risk. Default: 5.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Security Score Relative Threshold (points)</label>
+    <precision>3</precision>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

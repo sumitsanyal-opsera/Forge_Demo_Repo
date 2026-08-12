@@ -1,0 +1,47 @@
+.gauge-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1rem 0;
+}
+
+.gauge-svg {
+    overflow: visible;
+}
+
+.gauge-fg {
+    transition: stroke-dashoffset 0.5s ease;
+}
+
+.gauge-green {
+    stroke: #04844b;
+}
+
+.gauge-yellow {
+    stroke: #ffb75d;
+}
+
+.gauge-red {
+    stroke: #c23934;
+}
+
+.score-comparison .score-label {
+    font-weight: 600;
+    min-width: 9rem;
+}
+
+.delta-positive {
+    color: #04844b;
+}
+
+.delta-negative {
+    color: #c23934;
+}
+
+.threshold-met {
+    color: #04844b;
+}
+
+.threshold-not-met {
+    color: #c23934;
+}

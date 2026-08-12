@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Query__c</fullName>
+    <description>SOQL or Tooling API query to execute for this checklist item. For MetadataQuery type, this is a Tooling API query string. For SOQLValidation type, this is a SOQL query against standard objects. For CustomApex type, this field may contain a configuration JSON string passed to the executor class. Runtime validation of query syntax is handled by the MetadataIntegrityService.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Query</label>
+    <length>32000</length>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

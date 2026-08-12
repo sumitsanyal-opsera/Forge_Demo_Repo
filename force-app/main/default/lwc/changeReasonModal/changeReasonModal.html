@@ -1,0 +1,59 @@
+<template>
+    <section role="dialog"
+             tabindex="-1"
+             aria-modal="true"
+             aria-label={headerLabel}
+             class="slds-modal slds-fade-in-open"
+             onkeydown={handleKeyDown}>
+        <div class="slds-modal__container">
+            <header class="slds-modal__header">
+                <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse"
+                        title="Cancel"
+                        onclick={handleCancel}
+                        aria-label="Cancel change reason dialog">
+                    <lightning-icon icon-name="utility:close" size="small"
+                        alternative-text="Close">
+                    </lightning-icon>
+                </button>
+                <lightning-icon icon-name="utility:warning" size="small"
+                    class="slds-m-right_x-small" aria-hidden="true">
+                </lightning-icon>
+                <h2 class="slds-text-heading_medium">{headerLabel}</h2>
+            </header>
+
+            <div class="slds-modal__content slds-p-around_medium">
+                <p class="slds-text-body_regular slds-m-bottom_medium">{bodyText}</p>
+                <lightning-textarea
+                    label="Change Reason"
+                    value={reason}
+                    onchange={handleReasonChange}
+                    required
+                    aria-required="true"
+                    aria-describedby="change-reason-error"
+                    placeholder="Describe why you are making this change..."
+                    max-length="500">
+                </lightning-textarea>
+                <template if:true={hasError}>
+                    <p id="change-reason-error" class="field-error" role="alert">{errorMessage}</p>
+                </template>
+            </div>
+
+            <footer class="slds-modal__footer">
+                <lightning-button
+                    label="Cancel"
+                    variant="neutral"
+                    onclick={handleCancel}
+                    aria-label="Cancel and revert change">
+                </lightning-button>
+                <lightning-button
+                    label="Confirm Change"
+                    variant="brand"
+                    onclick={handleSave}
+                    class="slds-m-left_small"
+                    aria-label="Confirm change with provided reason">
+                </lightning-button>
+            </footer>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open" role="presentation"></div>
+</template>

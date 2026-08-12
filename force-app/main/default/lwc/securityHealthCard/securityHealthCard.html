@@ -1,0 +1,173 @@
+<template>
+    <!-- Permission gate: no markup rendered for non-admin users (AC-5) -->
+    <template if:true={isAdmin}>
+        <div class="slds-card security-health-card">
+            <div class="slds-card__header slds-grid">
+                <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                    <div class="slds-media__figure slds-line-height_reset">
+                        <lightning-icon icon-name="utility:shield" size="small"
+                            alternative-text="Security Health Score">
+                        </lightning-icon>
+                    </div>
+                    <div class="slds-media__body">
+                        <h2 class="slds-card__header-title">
+                            <span class="slds-text-heading_small">Security Health Score</span>
+                        </h2>
+                    </div>
+                </header>
+            </div>
+
+            <div class="slds-card__body slds-card__body_inner">
+
+                <!-- Error state -->
+                <template if:true={hasError}>
+                    <div class="slds-notify slds-notify_alert slds-alert_warning"
+                         role="alert"
+                         aria-live="assertive">
+                        <lightning-icon icon-name="utility:warning" size="x-small"
+                            variant="inverse" alternative-text="Warning"
+                            class="slds-m-right_x-small">
+                        </lightning-icon>
+                        <span>Security score unavailable.</span>
+                        <span class="slds-m-left_x-small slds-text-body_small">
+                            Check Tooling API access or re-deploy to refresh.
+                        </span>
+                    </div>
+                </template>
+
+                <!-- Loading state -->
+                <template if:true={isLoading}>
+                    <div class="slds-align_absolute-center slds-p-around_large">
+                        <lightning-spinner size="medium"
+                            alternative-text="Loading security score">
+                        </lightning-spinner>
+                    </div>
+                </template>
+
+                <!-- No data -->
+                <template if:true={hasNoData}>
+                    <p class="slds-text-body_regular slds-text-align_center slds-p-around_medium slds-text-color_weak">
+                        No security score data available. Run a smoke test to capture a score.
+                    </p>
+                </template>
+
+                <!-- Data available -->
+                <template if:true={hasData}>
+
+                    <!-- SVG Gauge Ring (AC-1, AC-6) -->
+                    <div class="gauge-container slds-text-align_center">
+                        <!-- Inline SVG required for LWC Shadow DOM; external files not supported -->
+                        <svg class="gauge-svg"
+                             viewBox="0 0 120 120"
+                             width="160"
+                             height="160"
+                             role="img"
+                             aria-label={gaugeAriaLabel}>
+                            <!-- Background track -->
+                            <circle class="gauge-track"
+                                    cx="60" cy="60" r="50"
+                                    fill="none"
+                                    stroke="#e0e0e0"
+                                    stroke-width="12">
+                            </circle>
+                            <!-- Score fill — rotated so fill starts at top -->
+                            <circle class={gaugeFgClass}
+                                    cx="60" cy="60" r="50"
+                                    fill="none"
+                                    stroke-width="12"
+                                    stroke-linecap="round"
+                                    transform="rotate(-90 60 60)"
+                                    stroke-dasharray={gaugeDasharray}
+                                    stroke-dashoffset={gaugeDashoffset}>
+                            </circle>
+                            <!-- Numeric score label -->
+                            <text x="60" y="64"
+                                  text-anchor="middle"
+                                  dominant-baseline="middle"
+                                  class="gauge-score-text"
+                                  font-size="22"
+                                  font-weight="bold"
+                                  fill="currentColor">
+                                {postScore}
+                            </text>
+                            <text x="60" y="82"
+                                  text-anchor="middle"
+                                  class="gauge-label-text"
+                                  font-size="9"
+                                  fill="#706e6b">
+                                out of 100
+                            </text>
+                        </svg>
+                        <!-- Visually hidden full description for screen readers (AC-6) -->
+                        <span class="slds-assistive-text">{gaugeAriaLabel}</span>
+                    </div>
+
+                    <!-- Score comparison section (AC-2, AC-3) -->
+                    <div class="score-comparison slds-m-top_medium">
+                        <dl class="slds-dl_horizontal">
+
+                            <!-- Pre-deployment score -->
+                            <template if:true={hasPreScore}>
+                                <dt class="slds-dl_horizontal__label score-label">Pre-Deployment:</dt>
+                                <dd class="slds-dl_horizontal__detail">{preScore}</dd>
+                            </template>
+                            <template if:false={hasPreScore}>
+                                <dt class="slds-dl_horizontal__label score-label">Pre-Deployment:</dt>
+                                <dd class="slds-dl_horizontal__detail slds-text-color_weak">
+                                    No baseline available
+                                </dd>
+                            </template>
+
+                            <!-- Post-deployment score -->
+                            <dt class="slds-dl_horizontal__label score-label">Post-Deployment:</dt>
+                            <dd class="slds-dl_horizontal__detail">{postScore}</dd>
+
+                            <!-- Delta with arrow icon (AC-3) -->
+                            <dt class="slds-dl_horizontal__label score-label">Delta:</dt>
+                            <dd class={deltaClass}>
+                                <template if:true={hasDelta}>
+                                    <lightning-icon icon-name={deltaIcon}
+                                                   size="xx-small"
+                                                   class="slds-m-right_xx-small">
+                                    </lightning-icon>
+                                </template>
+                                {deltaDisplay}
+                            </dd>
+
+                            <!-- Configured threshold -->
+                            <dt class="slds-dl_horizontal__label score-label">Threshold:</dt>
+                            <dd class="slds-dl_horizontal__detail">{threshold}</dd>
+
+                            <!-- Threshold status -->
+                            <dt class="slds-dl_horizontal__label score-label">Status:</dt>
+                            <dd class={thresholdStatusClass}>{thresholdStatusLabel}</dd>
+
+                        </dl>
+                    </div>
+
+                    <!-- Risk categories (AC-4) -->
+                    <div class="risk-categories slds-m-top_medium">
+                        <h3 class="slds-text-title_caps slds-m-bottom_x-small">
+                            Changed Risk Categories
+                        </h3>
+                        <template if:true={hasRiskCategories}>
+                            <ul class="slds-list_dotted">
+                                <template for:each={riskCategoriesList} for:item="category">
+                                    <li key={category} class="slds-item">{category}</li>
+                                </template>
+                            </ul>
+                        </template>
+                        <template if:false={hasRiskCategories}>
+                            <p class="slds-text-color_weak slds-text-body_small">
+                                No risk category changes detected
+                            </p>
+                        </template>
+                    </div>
+
+                </template>
+                <!-- end hasData -->
+
+            </div>
+        </div>
+    </template>
+</template>

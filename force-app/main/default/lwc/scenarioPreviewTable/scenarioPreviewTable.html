@@ -1,0 +1,117 @@
+<template>
+    <template if:true={isEmpty}>
+        <p class="slds-text-body_small slds-text-color_weak slds-p-around_medium">
+            No scenarios selected. Go back and select at least one cloud template.
+        </p>
+    </template>
+
+    <template if:false={isEmpty}>
+        <table class="slds-table slds-table_cell-buffer slds-table_bordered scenario-preview-table"
+               role="grid"
+               aria-label="Scenario preview">
+            <thead>
+                <tr class="slds-line-height_reset">
+                    <th scope="col" class="slds-text-title_caps" style="width:2rem">
+                        <span class="slds-truncate" title="#">#</span>
+                    </th>
+                    <th scope="col" class="slds-text-title_caps">
+                        <span class="slds-truncate" title="Scenario">Scenario</span>
+                    </th>
+                    <th scope="col" class="slds-text-title_caps">
+                        <span class="slds-truncate" title="Apex Class">Apex Class</span>
+                    </th>
+                    <th scope="col" class="slds-text-title_caps" style="width:7rem">
+                        <span class="slds-truncate" title="Timeout (s)">Timeout (s)</span>
+                    </th>
+                    <th scope="col" class="slds-text-title_caps" style="width:7rem">
+                        <span class="slds-truncate" title="CPU (ms)">CPU (ms)</span>
+                    </th>
+                    <th scope="col" class="slds-text-title_caps" style="width:6rem">
+                        <span class="slds-truncate" title="SOQL">SOQL</span>
+                    </th>
+                    <th scope="col" class="slds-text-title_caps" style="width:6rem">
+                        <span class="slds-truncate" title="DML">DML</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <template for:each={scenarioRows} for:item="row" for:index="idx">
+                    <tr key={row.rowKey} class="slds-hint-parent">
+                        <td data-label="#">
+                            <span class="slds-truncate">{row.executionOrder}</span>
+                        </td>
+                        <td data-label="Scenario">
+                            <div class="slds-media slds-media_center">
+                                <template if:true={row.isMissingClass}>
+                                    <lightning-icon
+                                        icon-name="utility:warning"
+                                        size="x-small"
+                                        variant="warning"
+                                        title={row.warningTitle}
+                                        class="slds-m-right_xx-small missing-class-warning">
+                                    </lightning-icon>
+                                </template>
+                                <span class="slds-truncate">{row.label}</span>
+                            </div>
+                        </td>
+                        <td data-label="Apex Class">
+                            <span class="slds-truncate">{row.apexClassName}</span>
+                        </td>
+                        <td data-label="Timeout (s)">
+                            <lightning-input
+                                type="number"
+                                label="Timeout"
+                                variant="label-hidden"
+                                value={row.timeout}
+                                min="1"
+                                max="60"
+                                data-index={idx}
+                                onchange={handleTimeoutChange}
+                                aria-label="Timeout in seconds for scenario">
+                            </lightning-input>
+                        </td>
+                        <td data-label="CPU (ms)">
+                            <lightning-input
+                                type="number"
+                                label="CPU Budget"
+                                variant="label-hidden"
+                                value={row.cpuBudget}
+                                min="1"
+                                max="10000"
+                                data-index={idx}
+                                onchange={handleCpuChange}
+                                aria-label="CPU budget in milliseconds">
+                            </lightning-input>
+                        </td>
+                        <td data-label="SOQL">
+                            <lightning-input
+                                type="number"
+                                label="SOQL Budget"
+                                variant="label-hidden"
+                                value={row.soqlBudget}
+                                min="1"
+                                max="200"
+                                data-index={idx}
+                                onchange={handleSoqlChange}
+                                aria-label="SOQL query budget">
+                            </lightning-input>
+                        </td>
+                        <td data-label="DML">
+                            <lightning-input
+                                type="number"
+                                label="DML Budget"
+                                variant="label-hidden"
+                                value={row.dmlBudget}
+                                min="1"
+                                max="150"
+                                data-index={idx}
+                                onchange={handleDmlChange}
+                                aria-label="DML statement budget">
+                            </lightning-input>
+                        </td>
+                    </tr>
+                </template>
+            </tbody>
+        </table>
+    </template>
+</template>

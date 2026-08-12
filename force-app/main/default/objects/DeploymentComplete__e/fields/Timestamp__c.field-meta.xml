@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Timestamp__c</fullName>
+    <description>UTC datetime when the deployment completed. Published by: deployment tooling. Consumed by: SmokeTestOrchestratorTrigger to set StartTime__c on SmokeTestExecution__c and to calculate deployment-to-test-start latency for SLA monitoring in future epics.</description>
+    <label>Timestamp</label>
+    <type>DateTime</type>
+</CustomField>

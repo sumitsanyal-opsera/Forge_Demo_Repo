@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AlertOnPass__c</fullName>
+    <description>When true, this alert route fires for passing smoke test executions in addition to failures. Useful for QA teams and DevOps pipelines that need confirmation notifications when deployments succeed. Defaults to false to minimize alert noise.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Alert On Pass</label>
+    <type>Checkbox</type>
+</CustomField>

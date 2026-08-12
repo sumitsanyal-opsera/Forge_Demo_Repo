@@ -1,0 +1,183 @@
+<template>
+    <!-- Loading state -->
+    <template if:true={isLoading}>
+        <div class="slds-spinner_container slds-p-around_large">
+            <div role="status" class="slds-spinner slds-spinner_medium slds-spinner_brand">
+                <span class="slds-assistive-text">Loading deployment history...</span>
+                <div class="slds-spinner__dot-a"></div>
+                <div class="slds-spinner__dot-b"></div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Error state -->
+    <template if:true={hasError}>
+        <div class="slds-notify slds-notify_alert slds-alert_error" role="alert">
+            <span class="slds-assistive-text">Error</span>
+            <lightning-icon icon-name="utility:error" size="x-small" variant="inverse"
+                alternative-text="Error" class="slds-m-right_x-small">
+            </lightning-icon>
+            <span>Unable to load deployment history —
+                <a role="button" tabindex="0" onclick={handleRetry}>retry</a>
+            </span>
+        </div>
+    </template>
+
+    <!-- Empty state -->
+    <template if:true={isEmpty}>
+        <div class="empty-state slds-p-around_large slds-text-align_center">
+            <lightning-icon icon-name="utility:chart" size="large" class="slds-m-bottom_small">
+            </lightning-icon>
+            <p class="slds-text-body_regular slds-m-top_small">No deployment history available</p>
+        </div>
+    </template>
+
+    <!-- Chart state -->
+    <template if:true={hasData}>
+        <div class="chart-card slds-card slds-p-around_small">
+            <!-- Chart header -->
+            <div class="slds-grid slds-grid_align-spread slds-m-bottom_x-small">
+                <h3 class="slds-text-heading_small">Pass Rate Trend</h3>
+                <button class="slds-button slds-button_neutral"
+                        onclick={toggleTable}
+                        aria-expanded={isTableVisible}
+                        aria-controls="trend-data-table">
+                    {tableToggleLabel}
+                </button>
+            </div>
+
+            <!-- Incomplete data note -->
+            <template if:true={hasIncompleteData}>
+                <p class="slds-text-body_small slds-text-color_weak slds-m-bottom_x-small">
+                    Note: {skippedCount} record(s) skipped due to missing scenario counts.
+                </p>
+            </template>
+
+            <!-- SVG Bar Chart -->
+            <div class="chart-wrapper" onmouseleave={handleChartLeave}>
+                <svg class="trend-svg"
+                     viewBox="0 0 620 290"
+                     role="img"
+                     aria-label="Pass rate trend over last 30 deployments"
+                     aria-describedby="trend-data-table"
+                     style="width:100%;height:auto;display:block;">
+
+                    <!-- WCAG pattern fills for color-independent encoding -->
+                    <defs>
+                        <!-- Diagonal stripes for warning (50-79%) -->
+                        <pattern id="pattern-warning" x="0" y="0" width="8" height="8"
+                                 patternUnits="userSpaceOnUse">
+                            <line x1="0" y1="8" x2="8" y2="0"
+                                  style="stroke:#5D4037;stroke-width:1.5;opacity:0.35;"/>
+                        </pattern>
+                        <!-- Crosshatch for error (&lt;50%) -->
+                        <pattern id="pattern-error" x="0" y="0" width="8" height="8"
+                                 patternUnits="userSpaceOnUse">
+                            <line x1="0" y1="4" x2="8" y2="4"
+                                  style="stroke:#B71C1C;stroke-width:1.5;opacity:0.4;"/>
+                            <line x1="4" y1="0" x2="4" y2="8"
+                                  style="stroke:#B71C1C;stroke-width:1.5;opacity:0.4;"/>
+                        </pattern>
+                    </defs>
+
+                    <!-- Y-axis gridlines and labels -->
+                    <template for:each={yGridlines} for:item="grid">
+                        <g lwc:key={grid.pct}>
+                            <line x1="44" y1={grid.y} x2="610" y2={grid.y}
+                                  style="stroke:#e0e0e0;stroke-width:1;"/>
+                            <text x="40" y={grid.labelY}
+                                  style="font-size:9px;fill:#666;text-anchor:end;">{grid.label}</text>
+                        </g>
+                    </template>
+
+                    <!-- Y-axis line -->
+                    <line x1="45" y1="10" x2="45" y2="250"
+                          style="stroke:#999;stroke-width:1;"/>
+
+                    <!-- X-axis line -->
+                    <line x1="45" y1="250" x2="610" y2="250"
+                          style="stroke:#999;stroke-width:1;"/>
+
+                    <!-- Bars -->
+                    <template for:each={bars} for:item="bar">
+                        <g lwc:key={bar.key}
+                           data-index={bar.index}
+                           onmouseenter={handleBarHover}
+                           class="bar-group">
+                            <!-- Accessible title for native SVG tooltip -->
+                            <title>{bar.tooltipText}</title>
+                            <!-- Solid color fill -->
+                            <rect x={bar.x} y={bar.y}
+                                  width={bar.width} height={bar.height}
+                                  rx="1" ry="1"
+                                  style={bar.barStyle}>
+                            </rect>
+                            <!-- Pattern overlay for WCAG color independence -->
+                            <template if:true={bar.hasPattern}>
+                                <rect x={bar.x} y={bar.y}
+                                      width={bar.width} height={bar.height}
+                                      rx="1" ry="1"
+                                      style={bar.patternStyle}>
+                                </rect>
+                            </template>
+                        </g>
+                    </template>
+
+                    <!-- X-axis date labels (every Nth bar to avoid overlap) -->
+                    <template for:each={xLabels} for:item="lbl">
+                        <text lwc:key={lbl.key}
+                              x={lbl.x} y="270"
+                              style="font-size:8px;fill:#666;text-anchor:middle;">{lbl.text}</text>
+                    </template>
+                </svg>
+
+                <!-- Hover tooltip -->
+                <template if:true={tooltip.visible}>
+                    <div class="chart-tooltip" style={tooltip.style} role="tooltip">
+                        <div class="slds-text-body_small">
+                            <strong>{tooltip.passRate}%</strong> pass rate
+                        </div>
+                        <div class="slds-text-body_small slds-text-color_weak">{tooltip.date}</div>
+                        <div class="slds-text-body_small">{tooltip.counts}</div>
+                    </div>
+                </template>
+            </div>
+
+            <!-- Accessible data table — always in DOM, visually hidden by default -->
+            <div id="trend-data-table"
+                 class={tableClass}
+                 aria-label="Deployment pass rate history data table"
+                 role="region">
+                <table class="slds-table slds-table_cell-buffer slds-table_bordered slds-table_col-bordered">
+                    <thead>
+                        <tr class="slds-line-height_reset">
+                            <th scope="col"><div class="slds-truncate">Deployment Date</div></th>
+                            <th scope="col"><div class="slds-truncate">Pass Rate</div></th>
+                            <th scope="col"><div class="slds-truncate">Passed</div></th>
+                            <th scope="col"><div class="slds-truncate">Failed</div></th>
+                            <th scope="col"><div class="slds-truncate">Timed Out</div></th>
+                            <th scope="col"><div class="slds-truncate">Total</div></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <template for:each={tableRows} for:item="row">
+                            <tr lwc:key={row.id} class="slds-hint-parent">
+                                <td>
+                                    <lightning-formatted-date-time
+                                        value={row.createdDate}
+                                        year="numeric" month="short" day="numeric">
+                                    </lightning-formatted-date-time>
+                                </td>
+                                <td>{row.passRateLabel}</td>
+                                <td>{row.passed}</td>
+                                <td>{row.failed}</td>
+                                <td>{row.timedOut}</td>
+                                <td>{row.total}</td>
+                            </tr>
+                        </template>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </template>
+</template>

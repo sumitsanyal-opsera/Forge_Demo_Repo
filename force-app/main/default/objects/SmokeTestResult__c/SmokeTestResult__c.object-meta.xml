@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Data Classification: Internal | Retention: 90 days | Purge: Database.emptyRecycleBin() via scheduled batch -->
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Per-scenario outcome record for a smoke test execution. Stores pass/fail status, governor limit metrics, and PII-masked error details. Master-Detail child of SmokeTestExecution__c. Data Classification: Internal. Retention: 90 days.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableLicensing>false</enableLicensing>
+    <enableReports>true</enableReports>
+    <enableSearch>false</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <label>Smoke Test Result</label>
+    <nameField>
+        <displayFormat>RES-{00000}</displayFormat>
+        <label>Result Number</label>
+        <trackHistory>false</trackHistory>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Smoke Test Results</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>ControlledByParent</sharingModel>
+    <visibility>Public</visibility>
+    <indexes>
+        <fullName>ScenarioName_Index</fullName>
+        <label>Scenario Name Index</label>
+        <fields>
+            <name>ScenarioName__c</name>
+            <sortDirection>ASC</sortDirection>
+        </fields>
+    </indexes>
+    <indexes>
+        <fullName>Status_Index</fullName>
+        <label>Status Index</label>
+        <fields>
+            <name>Status__c</name>
+            <sortDirection>ASC</sortDirection>
+        </fields>
+    </indexes>
+</CustomObject>

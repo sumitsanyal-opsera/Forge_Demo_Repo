@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CompletedCount__c</fullName>
+    <description>Running count of scenarios that have completed (regardless of pass/fail) at the time this progress event was published. Published by: SmokeTestOrchestrator. Consumed by: SmokeTestDashboard LWC to update the progress bar (CompletedCount / TotalCount).</description>
+    <label>Completed Count</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

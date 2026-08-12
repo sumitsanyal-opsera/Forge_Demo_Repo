@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>CheckedAt__c</fullName>
+    <description>Confidential: FLS restricted to SmokeTest_Admin. UTC timestamp when the post-deployment security health check was performed via the Tooling API.</description>
+    <externalId>false</externalId>
+    <label>Checked At</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>DateTime</type>
+</CustomField>

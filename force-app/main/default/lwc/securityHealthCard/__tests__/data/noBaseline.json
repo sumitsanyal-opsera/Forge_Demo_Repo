@@ -1,0 +1,12 @@
+{
+    "Id": "a0Xxx0000000003AAA",
+    "PreDeploymentScore__c": null,
+    "PostDeploymentScore__c": 75,
+    "ScoreDelta__c": null,
+    "ThresholdStatus__c": "Fail",
+    "ThresholdMet__c": false,
+    "AbsoluteThreshold__c": 80,
+    "RelativeThreshold__c": 5,
+    "RiskCategories__c": "Certificate and Key Management",
+    "CheckedAt__c": "2024-03-15T12:00:00.000Z"
+}

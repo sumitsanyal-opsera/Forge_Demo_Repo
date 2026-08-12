@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AutoTriggerEnabled__c</fullName>
+    <description>When true, the DeploymentComplete__e platform event trigger automatically starts a new smoke test suite on each deployment. When false, smoke tests must be triggered manually via the REST API or UI. Default: true.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Auto-Trigger on Deployment</label>
+    <type>Checkbox</type>
+    <defaultValue>true</defaultValue>
+</CustomField>

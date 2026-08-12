@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>InitiatedBy__c</fullName>
+    <description>Salesforce User who triggered this execution. Null for system-triggered executions (Platform Event, scheduled job). Lookup (not Master-Detail) to allow null.</description>
+    <externalId>false</externalId>
+    <label>Initiated By</label>
+    <referenceTo>User</referenceTo>
+    <relationshipLabel>Smoke Test Executions</relationshipLabel>
+    <relationshipName>SmokeTestExecutions</relationshipName>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Lookup</type>
+</CustomField>

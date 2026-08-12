@@ -1,0 +1,426 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- SmokeTest_Admin — Full access to all smoke test data tiers.
+     Data Classification boundary: grants access to both Internal and Confidential tiers.
+     SmokeTestAuditLog__c is READ-ONLY at the permission set level. The AuditLog immutability
+     trigger (SmokeTestAuditLogTrigger) provides secondary enforcement against edit/delete.
+     If new fields are added to any object in future WOs, this permission set must be updated.
+     Known Salesforce behavior: users with Modify All Data profile permission can bypass
+     object-level security regardless of permission set assignments. -->
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Full access to all smoke test data tiers including Confidential objects (SecurityScore, AuditLog). Grants Publish/Subscribe on all Platform Events. Intended for system administrators and security review personnel only.</description>
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>SmokeTest Admin</label>
+    <license>Salesforce</license>
+
+    <!-- ================================================================
+         Application Visibility
+         ================================================================ -->
+    <applicationVisibilities>
+        <application>SmokeTestCenter</application>
+        <visible>true</visible>
+    </applicationVisibilities>
+
+    <!-- ================================================================
+         Object Permissions — Internal Tier (full CRUD)
+         ================================================================ -->
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestExecution__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>true</allowDelete>
+        <allowEdit>true</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestResult__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <!-- ================================================================
+         Object Permissions — Confidential Tier
+         SecurityScore: Read/Create only (no Edit/Delete to preserve historical data)
+         AuditLog: Read only — trigger enforced immutability on update/delete;
+                   system code creates entries via without-sharing context
+         ================================================================ -->
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestSecurityScore__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestAuditLog__c</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <!-- ================================================================
+         Platform Event Permissions — Publish and Subscribe on all events
+         ================================================================ -->
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>DeploymentComplete__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestProgress__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestComplete__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <objectPermissions>
+        <allowCreate>true</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>SmokeTestSecurityComplete__e</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+
+    <!-- ================================================================
+         Field Permissions — SmokeTestExecution__c (readable and editable)
+         ================================================================ -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.CircuitBreakerTripped__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.DeploymentId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.EndTime__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.ExecutionTimeMs__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.FailedScenarios__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.InitiatedBy__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.OverallResult__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.PassedScenarios__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.RollbackPolicy__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.StartTime__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.TargetOrg__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.TotalScenarios__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.TriggerSource__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestExecution__c.WebhookCallbackUrl__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+
+    <!-- ================================================================
+         Field Permissions — SmokeTestResult__c (readable and editable)
+         ================================================================ -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.CPUTimeMs__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.DMLStatements__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.ErrorMessage__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.ErrorStackTrace__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.ExecutionOrder__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.ExecutionTimeMs__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.Execution__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.GovernorLimitExceeded__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.RoleProfile__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.SOQLQueries__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.ScenarioName__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.ScenarioType__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestResult__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+
+    <!-- ================================================================
+         Field Permissions — SmokeTestSecurityScore__c (readable and editable)
+         ScoreDelta__c is a formula field — readable only, cannot be edited.
+         ================================================================ -->
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.AbsoluteThreshold__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.CheckedAt__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.Execution__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.IntegrationUser__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.PostDeploymentScore__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.PreDeploymentScore__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.RawResponse__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.RelativeThreshold__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- ScoreDelta__c is a formula field: readable only, never editable -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestSecurityScore__c.ScoreDelta__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.ThresholdMet__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.ThresholdStatus__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>SmokeTestSecurityScore__c.RiskCategories__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+
+    <!-- ================================================================
+         Field Permissions — SmokeTestAuditLog__c (readable only — immutability enforced)
+         No fields are editable. System code creates entries via without-sharing context.
+         New fields added by WO-010 (AuditLogWriter service) are also included below.
+         ================================================================ -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.Action__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.Actor__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ChangeDetails__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.IPAddress__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ReferenceId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ResourceId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ResourceType__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.SessionId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.Timestamp__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <!-- WO-010 new fields -->
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ActorUserId__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ActionType__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.OldValue__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.NewValue__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.ChangeReason__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.Outcome__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>SmokeTestAuditLog__c.Execution__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+
+    <!-- ================================================================
+         Tab Visibility — deferred until tab definitions are created (future WO)
+         ================================================================ -->
+
+    <!-- ================================================================
+         Apex Class Access — deferred until REST resources are created (EPIC-02)
+         classAccesses for the following will be added when EPIC-02 is complete:
+           SmokeTestRunResource, SmokeTestStatusResource,
+           SmokeTestResultsResource, SmokeTestHealthResource
+         ================================================================ -->
+</PermissionSet>

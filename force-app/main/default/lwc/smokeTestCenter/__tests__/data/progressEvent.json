@@ -1,0 +1,12 @@
+{
+    "data": {
+        "payload": {
+            "ExecutionId__c": "a00000000000001AAA",
+            "CompletedScenarios__c": 3,
+            "TotalScenarios__c": 10,
+            "LatestScenarioName__c": "AccountCRUD",
+            "LatestResult__c": "Pass",
+            "ElapsedMs__c": 12500
+        }
+    }
+}

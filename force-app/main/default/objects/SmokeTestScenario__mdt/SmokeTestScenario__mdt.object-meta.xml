@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Registry of smoke test scenarios. Each record defines one executable scenario: the implementing Apex class, execution order, timeout, governor budgets, business process tag, and whether it is critical for rollback evaluation. Deployable via Metadata API. Accessed via SmokeTestScenario__mdt.getAll() without SOQL.</description>
+    <label>Smoke Test Scenario</label>
+    <pluralLabel>Smoke Test Scenarios</pluralLabel>
+    <visibility>Public</visibility>
+</CustomObject>

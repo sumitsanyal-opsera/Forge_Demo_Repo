@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>DataRetentionDaysInternal__c</fullName>
+    <description>Retention period in days for Internal-classification records (SmokeTestExecution__c, SmokeTestResult__c). Scheduled batch deletes records older than this value. Default: 90.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Data Retention — Internal (days)</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+    <unique>false</unique>
+</CustomField>

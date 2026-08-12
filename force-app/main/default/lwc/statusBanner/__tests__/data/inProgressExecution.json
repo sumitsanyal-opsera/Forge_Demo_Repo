@@ -1,0 +1,14 @@
+{
+    "Id": "a0Xxx0000000003AAA",
+    "Status__c": "In Progress",
+    "OverallResult__c": null,
+    "InitiatedBy__c": null,
+    "InitiatedBy__r": null,
+    "TriggerSource__c": "Platform Event",
+    "StartTime__c": "2024-03-15T11:00:00.000Z",
+    "EndTime__c": null,
+    "ExecutionTimeMs__c": null,
+    "TotalScenarios__c": 10,
+    "PassedScenarios__c": 3,
+    "FailedScenarios__c": 0
+}

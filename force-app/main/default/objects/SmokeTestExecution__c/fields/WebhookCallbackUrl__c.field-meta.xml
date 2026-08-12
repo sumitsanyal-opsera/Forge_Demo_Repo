@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>WebhookCallbackUrl__c</fullName>
+    <description>Optional HTTPS callback URL registered by the CI/CD pipeline to receive results upon completion. HMAC-SHA256 signed payload will be POSTed to this URL. Must be HTTPS.</description>
+    <externalId>false</externalId>
+    <label>Webhook Callback URL</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Url</type>
+</CustomField>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ErrorMessage__c</fullName>
+    <description>PII-MASKED error message from a failed or errored scenario. IMPORTANT: This field must only be populated by the ErrorSanitizer service after applying regex-based PII masking (email, phone, SSN patterns). Raw error messages containing PII must never be persisted directly.</description>
+    <externalId>false</externalId>
+    <label>Error Message</label>
+    <length>32000</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>LongTextArea</type>
+    <visibleLines>5</visibleLines>
+</CustomField>

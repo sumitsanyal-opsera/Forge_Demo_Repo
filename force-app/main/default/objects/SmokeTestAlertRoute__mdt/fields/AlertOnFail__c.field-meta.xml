@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>AlertOnFail__c</fullName>
+    <description>When true, this alert route fires when a smoke test execution fails or when any scenario within an execution fails. This is the primary trigger for most alert routes. Defaults to true.</description>
+    <externalId>false</externalId>
+    <fieldManageability>DeveloperControlled</fieldManageability>
+    <label>Alert On Fail</label>
+    <type>Checkbox</type>
+</CustomField>

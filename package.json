@@ -1,0 +1,30 @@
+{
+    "name": "salesforce-smoke-test-center",
+    "version": "0.1.0",
+    "description": "Salesforce Post-Deployment Smoke Testing — automated health checks after every deployment",
+    "private": true,
+    "scripts": {
+        "test:lwc": "lwc-jest --coverage",
+        "test:lwc:watch": "lwc-jest --watch",
+        "test:lwc:debug": "lwc-jest --debug",
+        "lint": "eslint **/{lwc,aura}/**/*.js",
+        "prettier": "prettier --write \"**/*.{cls,trigger,js,html,css,xml,json,md}\"",
+        "prettier:verify": "prettier --check \"**/*.{cls,trigger,js,html,css,xml,json,md}\""
+    },
+    "devDependencies": {
+        "@lwc/eslint-plugin-lwc": "^1.8.0",
+        "@salesforce/eslint-config-lwc": "^3.5.2",
+        "@salesforce/eslint-plugin-aura": "^2.1.0",
+        "@salesforce/eslint-plugin-lightning": "^1.0.0",
+        "@salesforce/sfdx-lwc-jest": "^3.1.0",
+        "@salesforce-ux/design-system": "^2.23.0",
+        "eslint": "^8.57.0",
+        "eslint-plugin-import": "^2.29.1",
+        "jest": "^29.7.0",
+        "prettier": "^3.2.5",
+        "prettier-plugin-apex": "^2.1.4"
+    },
+    "engines": {
+        "node": ">=18.0.0"
+    }
+}

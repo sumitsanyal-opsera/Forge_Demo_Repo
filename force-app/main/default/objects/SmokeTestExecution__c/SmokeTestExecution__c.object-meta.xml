@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Data Classification: Internal | Retention: 90 days | Purge: Database.emptyRecycleBin() via scheduled batch -->
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <allowInChatterGroups>false</allowInChatterGroups>
+    <compactLayoutAssignment>SYSTEM</compactLayoutAssignment>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Master record for each Salesforce post-deployment smoke test execution. Tracks overall lifecycle, timing, trigger source, and aggregate scenario results. Data Classification: Internal. Retention: 90 days.</description>
+    <enableActivities>false</enableActivities>
+    <enableBulkApi>true</enableBulkApi>
+    <enableFeeds>false</enableFeeds>
+    <enableHistory>false</enableHistory>
+    <enableLicensing>false</enableLicensing>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <enableSharing>true</enableSharing>
+    <enableStreamingApi>true</enableStreamingApi>
+    <label>Smoke Test Execution</label>
+    <nameField>
+        <displayFormat>EXEC-{0000}</displayFormat>
+        <label>Execution Number</label>
+        <trackHistory>false</trackHistory>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Smoke Test Executions</pluralLabel>
+    <searchLayouts/>
+    <sharingModel>Private</sharingModel>
+    <visibility>Public</visibility>
+    <indexes>
+        <fullName>Status_Index</fullName>
+        <label>Status Index</label>
+        <fields>
+            <name>Status__c</name>
+            <sortDirection>ASC</sortDirection>
+        </fields>
+    </indexes>
+    <indexes>
+        <fullName>StartTime_Index</fullName>
+        <label>Start Time Index</label>
+        <fields>
+            <name>StartTime__c</name>
+            <sortDirection>DESC</sortDirection>
+        </fields>
+    </indexes>
+</CustomObject>

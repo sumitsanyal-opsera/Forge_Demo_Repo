@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ExecutionTimeMs__c</fullName>
+    <description>Total wall-clock time in milliseconds from execution start to suite completion. Published by: SmokeTestOrchestrator. Consumed by: AlertRoutingService to include in notification content for SLA reporting; SmokeTestDashboard LWC to display the execution duration. Mirrors ExecutionTimeMs__c on SmokeTestExecution__c.</description>
+    <label>Execution Time (ms)</label>
+    <precision>18</precision>
+    <scale>0</scale>
+    <type>Number</type>
+</CustomField>

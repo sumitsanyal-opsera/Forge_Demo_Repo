@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ActualState__c</fullName>
+    <description>Human-readable description of the actual component state found in the org (e.g., Found and verified, Not found, Inactive). Populated by MetadataIntegrityService for ResultType__c = METADATA_INTEGRITY records.</description>
+    <externalId>false</externalId>
+    <label>Actual State</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

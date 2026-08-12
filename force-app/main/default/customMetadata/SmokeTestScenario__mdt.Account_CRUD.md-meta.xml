@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomMetadata xmlns="http://soap.sforce.com/2006/04/metadata" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+    <label>Account CRUD</label>
+    <protected>false</protected>
+    <values>
+        <field>IsEnabled__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>ExecutionOrder__c</field>
+        <value xsi:type="xsd:double">1</value>
+    </values>
+    <values>
+        <field>ScenarioClass__c</field>
+        <value xsi:type="xsd:string">AccountCrudScenario</value>
+    </values>
+    <values>
+        <field>IsCritical__c</field>
+        <value xsi:type="xsd:boolean">true</value>
+    </values>
+    <values>
+        <field>BusinessProcess__c</field>
+        <value xsi:type="xsd:string">Account Management</value>
+    </values>
+    <values>
+        <field>Description__c</field>
+        <value xsi:type="xsd:string">Validates Account record create, read, update, and delete operations. Critical scenario — Account object is foundational to all Sales Cloud workflows.</value>
+    </values>
+    <values>
+        <field>TimeoutOverrideSec__c</field>
+        <value xsi:null="true"/>
+    </values>
+    <values>
+        <field>RoleProfile__c</field>
+        <value xsi:null="true"/>
+    </values>
+    <values>
+        <field>GovernorBudgetOverrideCPU__c</field>
+        <value xsi:null="true"/>
+    </values>
+    <values>
+        <field>GovernorBudgetOverrideSOQL__c</field>
+        <value xsi:null="true"/>
+    </values>
+    <values>
+        <field>GovernorBudgetOverrideDML__c</field>
+        <value xsi:null="true"/>
+    </values>
+</CustomMetadata>
