@@ -19,6 +19,8 @@ import {
   errorMiddleware,
   registerProcessHandlers,
   disconnectDatabase,
+  createMetricsRouter,
+  createHttpMetricsMiddleware,
 } from '@opsera/shared';
 
 const SERVICE_NAME = 'detection-service';
@@ -30,12 +32,17 @@ const app = express();
 // ── Middleware ────────────────────────────────────────────────────────────────
 
 app.use(express.json());
+app.use(createHttpMetricsMiddleware());
 
 // ── Health check ──────────────────────────────────────────────────────────────
 
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: SERVICE_NAME });
 });
+
+// ── Metrics ───────────────────────────────────────────────────────────────────
+
+app.use('/metrics', createMetricsRouter());
 
 // ── Routes (added in subsequent WOs) ─────────────────────────────────────────
 

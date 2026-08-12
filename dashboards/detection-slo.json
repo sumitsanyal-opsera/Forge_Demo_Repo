@@ -1,0 +1,236 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "description": "Stuck pipeline detection SLO monitoring: MTTD compliance, false positive rates, detection coverage, and active pipeline monitoring.",
+  "editable": false,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 300 },
+              { "color": "red", "value": 600 }
+            ]
+          },
+          "unit": "s"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "id": 1,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "textMode": "auto"
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "histogram_quantile(0.95, sum by (le, org) (rate(detection_latency_seconds_bucket{org=~\"$org\"}[$__rate_interval])))",
+          "legendFormat": "P95 MTTD — {{org}}",
+          "refId": "A"
+        },
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "histogram_quantile(0.50, sum by (le, org) (rate(detection_latency_seconds_bucket{org=~\"$org\"}[$__rate_interval])))",
+          "legendFormat": "P50 MTTD — {{org}}",
+          "refId": "B"
+        }
+      ],
+      "title": "MTTD — Mean Time to Detection (target < 5 min)",
+      "type": "stat"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "percentage",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 5 },
+              { "color": "red", "value": 10 }
+            ]
+          },
+          "unit": "percentunit"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "id": 2,
+      "options": {
+        "minVizHeight": 75,
+        "minVizWidth": 75,
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "showThresholdLabels": true,
+        "showThresholdMarkers": true
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "false_positive_rate_1h{org=~\"$org\"}",
+          "legendFormat": "{{org}}",
+          "refId": "A"
+        }
+      ],
+      "title": "False Positive Rate — 1h Rolling (target < 5%)",
+      "type": "gauge"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "scheme" },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 10, "w": 24, "x": 0, "y": 8 },
+      "id": 3,
+      "options": {
+        "calculate": false,
+        "cellGap": 2,
+        "color": { "exponent": 0.5, "fill": "dark-orange", "mode": "scheme", "scheme": "Spectral", "steps": 64 },
+        "filterValues": { "le": 0 },
+        "yAxis": { "axisPlacement": "left", "bucketSize": "auto", "unit": "short" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (org) (increase(stuck_pipeline_detections_total{org=~\"$org\",pipeline=~\"$pipeline\"}[$__interval]))",
+          "legendFormat": "{{org}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Detection Coverage by Org",
+      "type": "heatmap"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "palette-classic" },
+          "unit": "reqps"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 18 },
+      "id": 4,
+      "options": {
+        "legend": { "calcs": ["mean", "max"], "displayMode": "table", "placement": "bottom" },
+        "tooltip": { "mode": "multi" }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (severity) (rate(stuck_pipeline_detections_total{org=~\"$org\",pipeline=~\"$pipeline\"}[$__rate_interval]))",
+          "legendFormat": "{{severity}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Stuck Pipeline Detections Rate by Severity",
+      "type": "timeseries"
+    },
+    {
+      "datasource": { "type": "prometheus", "uid": "${datasource}" },
+      "fieldConfig": {
+        "defaults": {
+          "color": { "mode": "thresholds" },
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "blue", "value": null }
+            ]
+          },
+          "unit": "short"
+        }
+      },
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 18 },
+      "id": 5,
+      "options": {
+        "colorMode": "background",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": { "calcs": ["lastNotNull"] }
+      },
+      "targets": [
+        {
+          "datasource": { "type": "prometheus", "uid": "${datasource}" },
+          "expr": "sum by (org) (active_monitored_pipelines{org=~\"$org\"})",
+          "legendFormat": "{{org}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Active Monitored Pipelines",
+      "type": "stat"
+    }
+  ],
+  "refresh": "30s",
+  "schemaVersion": 38,
+  "tags": ["opsera", "detection", "slo"],
+  "templating": {
+    "list": [
+      {
+        "current": {},
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "definition": "label_values(sf_api_calls_total, org)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "org",
+        "options": [],
+        "query": {
+          "query": "label_values(sf_api_calls_total, org)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": {},
+        "datasource": { "type": "prometheus", "uid": "${datasource}" },
+        "definition": "label_values(stuck_pipeline_detections_total, pipeline)",
+        "hide": 0,
+        "includeAll": true,
+        "multi": true,
+        "name": "pipeline",
+        "options": [],
+        "query": {
+          "query": "label_values(stuck_pipeline_detections_total, pipeline)",
+          "refId": "StandardVariableQuery"
+        },
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "current": { "selected": false, "text": "default", "value": "default" },
+        "hide": 0,
+        "includeAll": false,
+        "name": "datasource",
+        "options": [],
+        "query": "prometheus",
+        "refresh": 1,
+        "type": "datasource"
+      }
+    ]
+  },
+  "time": { "from": "now-1h", "to": "now" },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Detection SLO",
+  "uid": "opsera-detection-slo",
+  "version": 1
+}

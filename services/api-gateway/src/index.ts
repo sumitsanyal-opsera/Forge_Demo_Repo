@@ -20,6 +20,8 @@ import {
   errorMiddleware,
   registerProcessHandlers,
   disconnectDatabase,
+  createMetricsRouter,
+  createHttpMetricsMiddleware,
 } from '@opsera/shared';
 
 const SERVICE_NAME = 'api-gateway';
@@ -32,6 +34,7 @@ const app = express();
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true }));
+app.use(createHttpMetricsMiddleware());
 
 // Basic security headers (full set added in subsequent WOs via helmet or custom middleware)
 app.use((_req, res, next) => {
@@ -46,6 +49,10 @@ app.use((_req, res, next) => {
 app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: SERVICE_NAME });
 });
+
+// ── Metrics ───────────────────────────────────────────────────────────────────
+
+app.use('/metrics', createMetricsRouter());
 
 // ── Routes (added in subsequent WOs) ─────────────────────────────────────────
 

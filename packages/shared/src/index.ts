@@ -112,6 +112,28 @@ export { DEFAULT_ALLOWED_DOMAINS, UrlAllowList, isPrivateIp, sanitiseUrlForLog }
 export type { SsrfMiddlewareOptions } from './integration/salesforce/SsrfProtectionMiddleware.js';
 export { createSsrfMiddleware } from './integration/salesforce/SsrfProtectionMiddleware.js';
 
+// ── Prometheus metrics ────────────────────────────────────────────────────────
+export { getSharedRegistry, resetRegistryForTests } from './common/metrics/registry.js';
+
+export type { BusinessMetrics } from './common/metrics/business.metrics.js';
+export { createBusinessMetrics, getBusinessMetrics } from './common/metrics/business.metrics.js';
+
+export type { ApiMetrics } from './common/metrics/api.metrics.js';
+export { createApiMetrics, getApiMetrics } from './common/metrics/api.metrics.js';
+
+export type { IntegrationMetrics } from './common/metrics/integration.metrics.js';
+export { createIntegrationMetrics, getIntegrationMetrics } from './common/metrics/integration.metrics.js';
+
+export type { InfrastructureMetrics } from './common/metrics/infrastructure.metrics.js';
+export { createInfrastructureMetrics, getInfrastructureMetrics } from './common/metrics/infrastructure.metrics.js';
+
+export { checkCardinality, resetCardinalityStateForTests, getCardinalityCount } from './common/metrics/cardinality-guard.js';
+export type { CardinalityGuardOptions } from './common/metrics/cardinality-guard.js';
+
+export { normalizePath, isExcludedPath } from './common/metrics/path-normalizer.js';
+
+export { createMetricsRouter, createHttpMetricsMiddleware, createMetricsBundle } from './common/metrics/routes.js';
+
 // ── Salesforce authentication ─────────────────────────────────────────────────
 export type { JwtClaims, JwtBuilderConfig } from './integration/salesforce/auth/JwtBuilder.js';
 export { JwtBuilder } from './integration/salesforce/auth/JwtBuilder.js';
