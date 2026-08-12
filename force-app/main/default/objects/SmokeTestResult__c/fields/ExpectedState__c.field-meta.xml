@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>ExpectedState__c</fullName>
+    <description>Human-readable description of the expected component state (e.g., Exists in org, Active). Populated by MetadataIntegrityService for ResultType__c = METADATA_INTEGRITY records.</description>
+    <externalId>false</externalId>
+    <label>Expected State</label>
+    <length>255</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>
