@@ -4,6 +4,7 @@ import * as libxmljs from 'libxmljs2';
 import { validateMetadataXml, ValidationResult as BatchValidationResult } from './validator';
 import { validateXmlAgainstXsd } from './validateXml';
 import { formatResults as formatSingleResult } from './formatResults';
+import { formatResult } from './formatResult';
 import type { ValidationResult as SingleValidationResult } from './types';
 
 const BATCH_XSD_PATH = path.resolve(__dirname, '..', 'test', 'fixtures', 'schemas', 'metadata-61.0.xsd');
@@ -107,24 +108,71 @@ function validateDirectory(dirPath: string): void {
   }
 }
 
+function validateWithExplicitXsd(xmlPath: string, xsdPath: string): void {
+  let xmlContent: string;
+  try {
+    xmlContent = fs.readFileSync(xmlPath, 'utf-8');
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Error: Cannot read file ${xmlPath}: ${msg}\n`);
+    process.exit(1);
+  }
+
+  let xsdContent: string;
+  try {
+    xsdContent = fs.readFileSync(xsdPath, 'utf-8');
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    process.stderr.write(`Error: Cannot read file ${xsdPath}: ${msg}\n`);
+    process.exit(1);
+  }
+
+  const errors = validateXmlAgainstXsd(xmlContent, xsdContent);
+  if (errors.length === 0) {
+    console.log('Validation passed: no errors found');
+    process.exit(0);
+  }
+
+  for (const err of errors) {
+    console.log(formatResult(err, xmlPath));
+  }
+  process.exit(1);
+}
+
 function main(): void {
-  const targetPath = process.argv[2];
+  const xmlPath = process.argv[2];
+  const xsdPath = process.argv[3];
 
-  if (!targetPath) {
-    process.stderr.write('Usage: npx ts-node src/cli.ts <file.xml>\n');
+  if (!xmlPath) {
+    process.stderr.write('Usage: ts-node src/cli.ts <xml-file> <xsd-file>\n');
     process.exit(1);
   }
 
-  if (!fs.existsSync(targetPath)) {
-    process.stderr.write(`Error: File not found: ${targetPath}\n`);
+  if (xsdPath) {
+    // Two-arg mode: explicit XML + XSD paths
+    if (!fs.existsSync(xmlPath)) {
+      process.stderr.write(`Error: File not found: ${xmlPath}\n`);
+      process.exit(1);
+    }
+    if (!fs.existsSync(xsdPath)) {
+      process.stderr.write(`Error: File not found: ${xsdPath}\n`);
+      process.exit(1);
+    }
+    validateWithExplicitXsd(xmlPath, xsdPath);
+    return;
+  }
+
+  // Single-arg mode: file with bundled schema, or directory batch scan
+  if (!fs.existsSync(xmlPath)) {
+    process.stderr.write(`Error: File not found: ${xmlPath}\n`);
     process.exit(1);
   }
 
-  const stat = fs.statSync(targetPath);
+  const stat = fs.statSync(xmlPath);
   if (stat.isDirectory()) {
-    validateDirectory(targetPath);
+    validateDirectory(xmlPath);
   } else {
-    validateFile(targetPath);
+    validateFile(xmlPath);
   }
 }
 

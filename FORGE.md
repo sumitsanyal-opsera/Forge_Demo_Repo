@@ -70,3 +70,10 @@
 - **Files:** 4 (+110/-17)
 - **Duration:** 365ss
 - **Approach:** Created src/formatResults.ts with formatResults(result: ValidationResult): string that returns 'Validation passed: no errors found' for valid results or 'Line N: message' lines for errors, using the WO-091 ValidationResult type from src/types.ts. Modified src/cli.ts to support both single-file and directory arguments: when the argument is a regular file, the new validateFile() function reads the XML and bundled schemas/metadata.xsd, calls validateXmlAgainstXsd() from WO-092, maps errors to the WO-091 container type, calls formatSingleResult(), and exits with 0 (success) or 1 (failure); when the argument is a directory, the existing WO-087 batch-scan logic is preserved unchanged. Usage message updated to 'Usage: npx ts-node src/cli.ts <file.xml>' with exit code 1 (previously 2). Added 'validate': 'ts-node src/cli.ts' npm script. Created tests/unit/formatResults.test.ts with 4 Vitest tests covering the success message, multi-error output, single-error output, and the success-with-empty-errors case.
+
+## WO-072: User Story: WO-072 - CLI Runner to Display Validation Results
+- **Status:** completed
+- **Commit:** `ae8a513`
+- **Files:** 3 (+109/-8)
+- **Duration:** 190ss
+- **Approach:** Created src/formatResult.ts with a pure formatResult(result: ValidationResult, filePath: string): string function that produces '<filePath>:<line>:<column> [<phase>] <message>' and conditionally appends ' (rule: <xsdRule>)' when xsdRule is non-null. Extended src/cli.ts with a validateWithExplicitXsd(xmlPath, xsdPath) function and two-argument routing in main(): when both argv[2] and argv[3] are present, reads both files with try-catch error handling ('Error: Cannot read file <path>: <message>'), calls validateXmlAgainstXsd, prints 'Validation passed: no errors found' + exit(0) for empty results, or iterates errors via formatResult + exit(1) for non-empty results. Single-arg (bundled schema) and directory batch modes from prior WOs are preserved unchanged. Created tests/formatResult.test.ts with 3 Vitest tests.
