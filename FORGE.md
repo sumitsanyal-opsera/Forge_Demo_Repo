@@ -238,3 +238,10 @@
 - **Files:** 8 (+655/-0)
 - **Duration:** 404ss
 - **Approach:** Implemented a pure business-logic SecurityScoreComparator that evaluates pre/post SecurityHealthCheckResult objects against two configurable thresholds. Config is read zero-SOQL via SmokeTestConfig__mdt.getAll() using the existing SecurityScoreAbsoluteThreshold__c (default 80) and SecurityScoreRelativeThreshold__c (default 5) fields — reusing over creating duplicates per integration rules. Boundary semantics: post < threshold (strict less-than) for absolute fail; delta > maxDrop (strict greater-than) for delta fail. Category diff walks pre/post riskCategories lists and flags added, removed, or score-changed categories.
+
+## WO-039: User Story: WO-039 - Implement Security Check Graceful Degradation Handling
+- **Status:** completed
+- **Commit:** `6641204`
+- **Files:** 8 (+475/-36)
+- **Duration:** 583ss
+- **Approach:** Added three degradation paths to SecurityHealthCheckService: (1) HTTP 403 now returns 'View Setup and Configuration permission required for the integration user', (2) HTTP 500 returns 'Unable to retrieve security health score — Tooling API unavailable (HTTP 500)', (3) pre-flight check changed from ==0 to <5 with message 'API call limit approaching — security check skipped to preserve budget'. CalloutException is now caught separately from general Exception with a 'Network error connecting to Tooling API' message. SecurityHealthCheckCache.cls provides Platform Cache (local.SmokeTestCache, 60s TTL) with automatic static-map fallback for test contexts and unsupported org editions. SecurityCacheTTL__c CMT field configures the TTL. SecurityScoreComparator already handled ERROR/SKIPPED short-circuit from WO-038.

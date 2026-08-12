@@ -6,8 +6,10 @@
  *   - IHttpCallout nested interface: allows constructor injection of a mock HTTP
  *     handler in unit tests without requiring Test.setMock(); production code
  *     uses DefaultHttpCallout which delegates to new Http().send().
+ *   - SecurityHealthCheckCache: 60-second org-scoped cache prevents redundant
+ *     Tooling API queries during concurrent smoke test executions.
  *   - Pre-flight Limits.getApiCallsRemaining() guard: returns SKIPPED before
- *     consuming any callout budget if the org is at the API limit.
+ *     consuming any callout budget when fewer than 5 API calls remain.
  *   - All outcomes (PASS, FAIL, ERROR, SKIPPED) are logged to SmokeTestAuditLog__c
  *     via AuditLogWriter before returning to the caller.
  *   - JSON parsing uses JSON.deserializeUntyped() with null-safe field access so
@@ -36,13 +38,16 @@ public with sharing class SecurityHealthCheckService implements ISecurityHealthC
     // Constants
     // =========================================================================
 
-    private static final String TOOLING_API_QUERY_PATH =
+    private static final String  TOOLING_API_QUERY_PATH =
         '/services/data/v60.0/tooling/query/?q=SELECT+Id%2CScore%2CSecurityRiskCategory+FROM+SecurityHealthCheck';
 
-    private static final String RESOURCE_TYPE = 'SecurityHealthCheck';
-    private static final String RESOURCE_ID   = 'SecurityHealthCheck';
+    private static final String  RESOURCE_TYPE       = 'SecurityHealthCheck';
+    private static final String  RESOURCE_ID         = 'SecurityHealthCheck';
+    private static final String  CONFIG_RECORD        = 'Default';
+    private static final Integer DEFAULT_CACHE_TTL    = 60;
+    private static final Integer DEFAULT_MIN_API_CALLS = 5;
 
-    private static final String REMEDIATION_LINK =
+    private static final String  REMEDIATION_LINK =
         'https://help.salesforce.com/s/articleView?id=sf.security_health_check.htm';
 
     // =========================================================================
@@ -77,26 +82,51 @@ public with sharing class SecurityHealthCheckService implements ISecurityHealthC
     // =========================================================================
 
     public SecurityHealthCheckResult captureScore() {
+        // ── Cache check ──────────────────────────────────────────────────────
+        String orgId    = UserInfo.getOrganizationId();
+        Integer cacheTtl = DEFAULT_CACHE_TTL;
+
+        Map<String, SmokeTestConfig__mdt> allConfigs = SmokeTestConfig__mdt.getAll();
+        if (allConfigs != null && allConfigs.containsKey(CONFIG_RECORD)) {
+            SmokeTestConfig__mdt cfg = allConfigs.get(CONFIG_RECORD);
+            if (cfg.SecurityCacheTTL__c != null) {
+                cacheTtl = Integer.valueOf(cfg.SecurityCacheTTL__c);
+            }
+        }
+
+        SecurityHealthCheckResult cached = SecurityHealthCheckCache.get(orgId);
+        if (cached != null) {
+            return cached;
+        }
+
+        // ── Pre-flight API budget check ───────────────────────────────────────
         Integer callsRemaining = injectedApiCallsRemaining != null
             ? injectedApiCallsRemaining
             : Limits.getApiCallsRemaining();
 
-        if (callsRemaining == 0) {
+        if (callsRemaining < DEFAULT_MIN_API_CALLS) {
             SecurityHealthCheckResult skipped = SecurityHealthCheckResult.skipped(
-                'API call limit exhausted — Limits.getApiCallsRemaining() = 0');
+                'API call limit approaching — security check skipped to preserve budget');
             writeAuditLog(skipped);
             return skipped;
         }
 
+        // ── Tooling API callout ───────────────────────────────────────────────
         SecurityHealthCheckResult result;
         try {
             HttpRequest req = buildRequest();
             HttpResponse res = http.send(req);
             result = parseResponse(res);
+        } catch (CalloutException ce) {
+            result = SecurityHealthCheckResult.error(
+                'Network error connecting to Tooling API: ' + ce.getMessage());
         } catch (Exception e) {
             result = SecurityHealthCheckResult.error(
                 'Unexpected error during Tooling API callout: ' + e.getMessage());
         }
+
+        // ── Cache result (not SKIPPED — that path returns above) ─────────────
+        SecurityHealthCheckCache.put(orgId, result, cacheTtl);
 
         writeAuditLog(result);
         return result;
@@ -127,11 +157,11 @@ public with sharing class SecurityHealthCheckService implements ISecurityHealthC
         }
         if (statusCode == 403) {
             return SecurityHealthCheckResult.error(
-                'Insufficient permissions — View Setup and Configuration required');
+                'View Setup and Configuration permission required for the integration user');
         }
         if (statusCode == 500) {
             return SecurityHealthCheckResult.error(
-                'Tooling API server error — retry or contact Salesforce support');
+                'Unable to retrieve security health score — Tooling API unavailable (HTTP 500)');
         }
         if (statusCode != 200) {
             return SecurityHealthCheckResult.error(
@@ -212,7 +242,6 @@ public with sharing class SecurityHealthCheckService implements ISecurityHealthC
                 categories.add(cat);
             }
         } catch (Exception e) {
-            // Tolerate parse failures for individual categories
             System.debug(LoggingLevel.WARN,
                 'SecurityHealthCheckService: error parsing risk category — ' + e.getMessage());
         }

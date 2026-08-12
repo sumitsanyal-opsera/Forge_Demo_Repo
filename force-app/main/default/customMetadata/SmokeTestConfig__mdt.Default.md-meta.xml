@@ -90,4 +90,8 @@
         <field>EnableWebhookCallbacks__c</field>
         <value xsi:type="xsd:boolean">true</value>
     </values>
+    <values>
+        <field>SecurityCacheTTL__c</field>
+        <value xsi:type="xsd:double">60</value>
+    </values>
 </CustomMetadata>
