@@ -1,0 +1,26 @@
+{
+  "status": "healthy",
+  "connectors": {
+    "salesforce": {
+      "name": "salesforce",
+      "status": "healthy",
+      "authStatus": "authenticated",
+      "apiReachable": true,
+      "rateLimitRemaining": 85,
+      "lastSuccessAt": "2024-01-15T12:00:00.000Z",
+      "checkedAt": "2024-01-15T12:00:00.000Z",
+      "latencyMs": 142
+    },
+    "opsera": {
+      "name": "opsera",
+      "status": "healthy",
+      "authStatus": "authenticated",
+      "apiReachable": true,
+      "rateLimitRemaining": 92,
+      "lastSuccessAt": "2024-01-15T12:00:00.000Z",
+      "checkedAt": "2024-01-15T12:00:00.000Z",
+      "latencyMs": 87
+    }
+  },
+  "checkedAt": "2024-01-15T12:00:00.000Z"
+}

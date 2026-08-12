@@ -1,0 +1,8 @@
+{
+  "name": "salesforce",
+  "status": "unhealthy",
+  "authStatus": "unauthenticated",
+  "apiReachable": false,
+  "checkedAt": "2024-01-15T12:10:00.000Z",
+  "error": "Token acquisition failed: invalid_grant"
+}

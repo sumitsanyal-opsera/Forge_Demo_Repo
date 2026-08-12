@@ -93,3 +93,15 @@ export type { PaginatedResponse, Pipeline, PipelineConfig, PipelineListFilters, 
 export { PipelineStatus } from './integration/opsera/client/types.js';
 export { OpseraApiError, OpseraAuthError, isOpseraApiError, isOpseraAuthError } from './integration/opsera/client/OpseraApiError.js';
 export { OpseraApiClient } from './integration/opsera/client/OpseraApiClient.js';
+
+// ── Connector health monitoring ───────────────────────────────────────────────
+export type { AggregateHealth, ConnectorHealth, HealthCheck, StatusChangeEvent } from './integration/health/types.js';
+export { HealthStatus } from './integration/health/types.js';
+export { EventBus, globalHealthEventBus } from './integration/health/EventBus.js';
+export type { SalesforceConnectionConfig } from './integration/health/SalesforceHealthCheck.js';
+export { SalesforceHealthCheck } from './integration/health/SalesforceHealthCheck.js';
+export { OpseraHealthCheck } from './integration/health/OpseraHealthCheck.js';
+export { aggregateHealth, healthStatusToHttpCode } from './integration/health/HealthAggregator.js';
+export type { ConnectorStatusMonitorConfig } from './integration/health/ConnectorStatusMonitor.js';
+export { ConnectorStatusMonitor } from './integration/health/ConnectorStatusMonitor.js';
+export { createHealthRouter } from './integration/health/routes.js';
