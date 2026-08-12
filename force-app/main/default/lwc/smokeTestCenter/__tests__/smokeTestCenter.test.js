@@ -3,12 +3,14 @@ import { registerApexTestWireAdapter } from '@salesforce/sfdx-lwc-jest';
 import { NavigationMixin } from 'lightning/navigation';
 import SmokeTestCenter from 'c/smokeTestCenter';
 import checkUserPermissions from '@salesforce/apex/SmokeTestDashboardController.checkUserPermissions';
+import getLatestExecution from '@salesforce/apex/SmokeTestDashboardController.getLatestExecution';
 
 import mockAdminPermissions  from './data/adminPermissions.json';
 import mockViewerPermissions from './data/viewerPermissions.json';
 import mockNoPermissions     from './data/noPermissions.json';
 
 const checkUserPermissionsAdapter = registerApexTestWireAdapter(checkUserPermissions);
+const getLatestExecutionAdapter   = registerApexTestWireAdapter(getLatestExecution);
 
 const flushPromises = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -305,5 +307,88 @@ describe('navigation events', () => {
                 attributes: expect.objectContaining({ apiName: 'security' })
             })
         );
+    });
+});
+
+// =============================================================================
+// Onboarding card conditional rendering (AC-1, AC-5)
+// =============================================================================
+
+describe('onboarding card visibility', () => {
+    it('renders c-onboarding-card when getLatestExecution returns null', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        getLatestExecutionAdapter.emit(null);
+        await flushPromises();
+
+        const onboardingCard = element.shadowRoot.querySelector('c-onboarding-card');
+        expect(onboardingCard).not.toBeNull();
+    });
+
+    it('does not render c-onboarding-card when execution data exists', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        getLatestExecutionAdapter.emit({ Id: 'a001', Status__c: 'Completed', OverallResult__c: 'Pass' });
+        await flushPromises();
+
+        const onboardingCard = element.shadowRoot.querySelector('c-onboarding-card');
+        expect(onboardingCard).toBeNull();
+    });
+
+    it('does not render c-onboarding-card before execution wire resolves', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        // getLatestExecutionAdapter never emits — wire stays undefined
+        await flushPromises();
+
+        const onboardingCard = element.shadowRoot.querySelector('c-onboarding-card');
+        expect(onboardingCard).toBeNull();
+    });
+
+    it('passes isAdmin=true to onboarding card for admin user', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        getLatestExecutionAdapter.emit(null);
+        await flushPromises();
+
+        const onboardingCard = element.shadowRoot.querySelector('c-onboarding-card');
+        expect(onboardingCard).not.toBeNull();
+        expect(onboardingCard.isAdmin).toBe(true);
+    });
+
+    it('passes isAdmin=false to onboarding card for viewer user', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockViewerPermissions);
+        getLatestExecutionAdapter.emit(null);
+        await flushPromises();
+
+        const onboardingCard = element.shadowRoot.querySelector('c-onboarding-card');
+        expect(onboardingCard).not.toBeNull();
+        expect(onboardingCard.isAdmin).toBe(false);
+    });
+
+    it('shows dashboard panels (not onboarding) when execution data exists', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        getLatestExecutionAdapter.emit({ Id: 'a001', Status__c: 'Completed', OverallResult__c: 'Pass' });
+        await flushPromises();
+
+        // Dashboard slot should be accessible
+        const slot = element.shadowRoot.querySelector('slot');
+        expect(slot).not.toBeNull();
+    });
+
+    it('hides onboarding and shows dashboard after execution wire returns data', async () => {
+        const element = createComponent();
+        checkUserPermissionsAdapter.emit(mockAdminPermissions);
+        // First emit null (onboarding shows)
+        getLatestExecutionAdapter.emit(null);
+        await flushPromises();
+        expect(element.shadowRoot.querySelector('c-onboarding-card')).not.toBeNull();
+
+        // Then emit an execution record (onboarding hides)
+        getLatestExecutionAdapter.emit({ Id: 'a001', Status__c: 'Completed', OverallResult__c: 'Pass' });
+        await flushPromises();
+        expect(element.shadowRoot.querySelector('c-onboarding-card')).toBeNull();
     });
 });

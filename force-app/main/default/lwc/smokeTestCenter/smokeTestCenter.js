@@ -1,6 +1,7 @@
 import { LightningElement, wire, track } from 'lwc';
 import { NavigationMixin } from 'lightning/navigation';
 import checkUserPermissions from '@salesforce/apex/SmokeTestDashboardController.checkUserPermissions';
+import getLatestExecution from '@salesforce/apex/SmokeTestDashboardController.getLatestExecution';
 
 const PAGE_IDS = [
     'overview', 'executionDetail', 'security',
@@ -16,6 +17,18 @@ export default class SmokeTestCenter extends NavigationMixin(LightningElement) {
     _wiredPermissionResult;
     permissionData;
     permissionError;
+
+    // undefined = not yet loaded; null = loaded, no records; object = has records
+    _executionData = undefined;
+
+    @wire(getLatestExecution)
+    wiredLatestExecution({ data, error }) {
+        if (data !== undefined) {
+            this._executionData = data;  // null = no records, SObject = has records
+        } else if (error) {
+            this._executionData = error; // treat error as "has data" so onboarding is not shown
+        }
+    }
 
     @wire(checkUserPermissions)
     wiredPermissions(result) {
@@ -55,6 +68,11 @@ export default class SmokeTestCenter extends NavigationMixin(LightningElement) {
 
     get isAdmin() {
         return !!(this.permissionData && this.permissionData.isAdmin);
+    }
+
+    // Show onboarding only when we have access AND execution wire resolved to null (no records)
+    get showOnboarding() {
+        return this.hasAccess && this._executionData === null;
     }
 
     get navItemClass() {

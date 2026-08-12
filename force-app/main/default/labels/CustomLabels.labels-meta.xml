@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomLabels xmlns="http://soap.sforce.com/2006/04/metadata">
+    <labels>
+        <fullName>Onboarding_WelcomeHeading</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Onboarding card welcome heading</shortDescription>
+        <value>Welcome to Smoke Test Center</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_Step1</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Onboarding step 1 instruction</shortDescription>
+        <value>Configure your test scenarios for each Salesforce cloud</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_Step2</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Onboarding step 2 instruction</shortDescription>
+        <value>Set pass/fail thresholds and alert routing rules</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_Step3</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Onboarding step 3 instruction</shortDescription>
+        <value>Run your first smoke test and review results on this dashboard</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_ActionButton</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Onboarding card primary action button label</shortDescription>
+        <value>Configure Scenarios</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_AdminRequired</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Message shown to non-admin users on configure button</shortDescription>
+        <value>Contact your Salesforce Administrator to configure scenarios</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_SalesCloudName</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Sales Cloud template card name</shortDescription>
+        <value>Sales Cloud</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_SalesCloudDesc</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Sales Cloud template card description</shortDescription>
+        <value>Account creation, Contact management, Opportunity pipeline, and Lead conversion scenarios</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_ServiceCloudName</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Service Cloud template card name</shortDescription>
+        <value>Service Cloud</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_ServiceCloudDesc</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Service Cloud template card description</shortDescription>
+        <value>Case creation, Entitlement validation, Escalation rules, and Knowledge article scenarios</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_ExperienceCloudName</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Experience Cloud template card name</shortDescription>
+        <value>Experience Cloud</value>
+    </labels>
+    <labels>
+        <fullName>Onboarding_ExperienceCloudDesc</fullName>
+        <categories>onboarding</categories>
+        <language>en_US</language>
+        <protected>false</protected>
+        <shortDescription>Experience Cloud template card description</shortDescription>
+        <value>Community login, Self-service portal access, and Delegated administration scenarios</value>
+    </labels>
+</CustomLabels>

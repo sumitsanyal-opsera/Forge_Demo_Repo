@@ -189,12 +189,21 @@
             <div class="main-content slds-col slds-size_10-of-12 slds-p-around_medium"
                  role="region"
                  aria-label="Main content">
-                <template if:true={isAdmin}>
-                    <div class="admin-panels">
-                        <slot name="admin-content"></slot>
-                    </div>
+
+                <!-- First-time user onboarding — shown when no execution records exist -->
+                <template if:true={showOnboarding}>
+                    <c-onboarding-card is-admin={isAdmin}></c-onboarding-card>
                 </template>
-                <slot></slot>
+
+                <!-- Normal dashboard panels — shown by default and when executions exist -->
+                <template if:false={showOnboarding}>
+                    <template if:true={isAdmin}>
+                        <div class="admin-panels">
+                            <slot name="admin-content"></slot>
+                        </div>
+                    </template>
+                    <slot></slot>
+                </template>
             </div>
         </div>
     </template>

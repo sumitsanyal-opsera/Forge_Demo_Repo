@@ -1,0 +1,79 @@
+<template>
+    <div class="slds-card slds-p-around_large onboarding-card">
+
+        <!-- Welcome illustration -->
+        <div class="slds-text-align_center slds-m-bottom_large">
+            <template if:false={imageLoadError}>
+                <img
+                    src={sampleDashboardUrl}
+                    alt="Sample populated Smoke Test Center dashboard"
+                    class="sample-screenshot slds-m-bottom_medium"
+                    onerror={handleImageError} />
+            </template>
+            <template if:true={imageLoadError}>
+                <div class="slds-illustration slds-illustration_small slds-m-bottom_medium image-fallback" aria-hidden="true">
+                    <lightning-icon icon-name="utility:metrics" size="large" variant="brand"></lightning-icon>
+                </div>
+            </template>
+
+            <h1 class="slds-text-heading_large slds-m-bottom_x-small">{label.welcomeHeading}</h1>
+            <p class="slds-text-body_regular slds-text-color_weak">
+                Get your first smoke test running in minutes.
+            </p>
+        </div>
+
+        <!-- 3-step setup instructions -->
+        <div class="slds-m-bottom_large">
+            <h2 class="slds-text-heading_small slds-m-bottom_small">Get started in 3 steps</h2>
+            <ol class="slds-list_ordered setup-steps">
+                <template for:each={steps} for:item="step">
+                    <li key={step.key} class="slds-item setup-step slds-p-vertical_x-small">
+                        <span class="slds-badge slds-badge_lightest slds-m-right_x-small step-number">{step.number}</span>
+                        {step.text}
+                    </li>
+                </template>
+            </ol>
+        </div>
+
+        <!-- Cloud template cards -->
+        <div class="slds-m-bottom_large">
+            <h2 class="slds-text-heading_small slds-m-bottom_small">Recommended scenario templates</h2>
+            <div class="slds-grid slds-gutters slds-wrap">
+                <template for:each={cloudTemplates} for:item="cloud">
+                    <div key={cloud.key} class="slds-col slds-size_1-of-1 slds-medium-size_1-of-3 slds-m-bottom_small">
+                        <article class="slds-card slds-card_boundary cloud-template-card">
+                            <div class="slds-card__header slds-grid slds-grid_vertical-align-center slds-p-around_small">
+                                <lightning-icon
+                                    icon-name={cloud.icon}
+                                    size="small"
+                                    class="slds-m-right_x-small">
+                                </lightning-icon>
+                                <h3 class="slds-text-heading_small">{cloud.name}</h3>
+                            </div>
+                            <div class="slds-card__body slds-card__body_inner">
+                                <p class="slds-text-body_small">{cloud.description}</p>
+                            </div>
+                        </article>
+                    </div>
+                </template>
+            </div>
+        </div>
+
+        <!-- Primary action -->
+        <div class="slds-text-align_center">
+            <button
+                class="slds-button slds-button_brand configure-btn"
+                onclick={handleConfigure}
+                disabled={configButtonDisabled}
+                title={configButtonTitle}>
+                {label.actionButton}
+            </button>
+            <template if:true={configButtonDisabled}>
+                <p class="slds-text-body_small slds-m-top_x-small slds-text-color_weak admin-required-message">
+                    {label.adminRequired}
+                </p>
+            </template>
+        </div>
+
+    </div>
+</template>
