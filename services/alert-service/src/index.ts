@@ -40,6 +40,15 @@ app.get('/health', (_req, res) => {
   res.json({ status: 'ok', service: SERVICE_NAME });
 });
 
+// Kubernetes / docker-compose probe endpoints
+app.get('/api/v1/health/live', (_req, res) => {
+  res.json({ status: 'ok', probe: 'liveness', service: SERVICE_NAME });
+});
+
+app.get('/api/v1/health/ready', (_req, res) => {
+  res.json({ status: 'ok', probe: 'readiness', service: SERVICE_NAME });
+});
+
 // ── Metrics ───────────────────────────────────────────────────────────────────
 
 app.use('/metrics', createMetricsRouter());

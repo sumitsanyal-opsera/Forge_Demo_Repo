@@ -1,6 +1,21 @@
 version: '3.9'
 
+# ── Shared network ─────────────────────────────────────────────────────────────
+networks:
+  opsera-net:
+    driver: bridge
+
+# ── Volumes ───────────────────────────────────────────────────────────────────
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
 services:
+
+  # ── Infrastructure ───────────────────────────────────────────────────────────
+
   postgres:
     image: postgres:16-alpine
     platform: linux/amd64  # explicit for Apple Silicon (ARM64) compatibility
@@ -14,12 +29,19 @@ services:
       - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    networks:
+      - opsera-net
     healthcheck:
       test: ['CMD-SHELL', 'pg_isready -U postgres -d opsera_stuck_pipeline']
       interval: 10s
       timeout: 5s
       retries: 5
       start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
 
   redis:
     image: redis:7-alpine
@@ -30,6 +52,8 @@ services:
       - '6379:6379'
     volumes:
       - redis_data:/data
+    networks:
+      - opsera-net
     command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     healthcheck:
       test: ['CMD', 'redis-cli', 'ping']
@@ -37,9 +61,172 @@ services:
       timeout: 5s
       retries: 5
       start_period: 10s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
 
-volumes:
-  postgres_data:
-    driver: local
-  redis_data:
-    driver: local
+  # ── Application services ──────────────────────────────────────────────────────
+  # Build context is always the repository root so each Dockerfile can access
+  # packages/shared and the service-specific src in one build context.
+  #
+  # Troubleshooting:
+  #   - Service exits on startup → check DATABASE_URL and REDIS_URL are reachable
+  #   - Health check failing → wait for start_period (30s) before diagnosing
+  #   - Port conflict → change the left side of the port mapping (e.g. 13001:3001)
+  #   - Distroless has no shell — use `docker logs <container>` for diagnostics
+
+  detection-service:
+    build:
+      context: .
+      dockerfile: services/detection-service/Dockerfile
+    image: opsera/detection-service:local
+    container_name: opsera_detection
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/opsera_stuck_pipeline?connection_limit=10
+      REDIS_URL: redis://redis:6379
+      DETECTION_SERVICE_PORT: '3002'
+    ports:
+      - '3002:3002'
+    networks:
+      - opsera-net
+    healthcheck:
+      test:
+        - '/nodejs/bin/node'
+        - '-e'
+        - "require('http').get('http://localhost:3002/api/v1/health/live',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  baseline-service:
+    build:
+      context: .
+      dockerfile: services/baseline-service/Dockerfile
+    image: opsera/baseline-service:local
+    container_name: opsera_baseline
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/opsera_stuck_pipeline?connection_limit=10
+      REDIS_URL: redis://redis:6379
+      BASELINE_SERVICE_PORT: '3001'
+    ports:
+      - '3001:3001'
+    networks:
+      - opsera-net
+    healthcheck:
+      test:
+        - '/nodejs/bin/node'
+        - '-e'
+        - "require('http').get('http://localhost:3001/api/v1/health/live',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  alert-service:
+    build:
+      context: .
+      dockerfile: services/alert-service/Dockerfile
+    image: opsera/alert-service:local
+    container_name: opsera_alert
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/opsera_stuck_pipeline?connection_limit=5
+      REDIS_URL: redis://redis:6379
+      ALERT_SERVICE_PORT: '3003'
+      # Email delivery — stub values for local dev; replace with real SMTP for integration testing
+      SMTP_HOST: mailpit
+      SMTP_PORT: '1025'
+      SMTP_USER: ''
+      SMTP_PASS: ''
+      SMTP_FROM: 'Opsera Alerts <noreply@localhost>'
+    ports:
+      - '3003:3003'
+    networks:
+      - opsera-net
+    healthcheck:
+      test:
+        - '/nodejs/bin/node'
+        - '-e'
+        - "require('http').get('http://localhost:3003/api/v1/health/live',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M
+
+  dashboard-service:
+    build:
+      context: .
+      dockerfile: services/dashboard-service/Dockerfile
+    image: opsera/dashboard-service:local
+    container_name: opsera_dashboard
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: development
+      LOG_LEVEL: info
+      DATABASE_URL: postgresql://postgres:password@postgres:5432/opsera_stuck_pipeline?connection_limit=10
+      REDIS_URL: redis://redis:6379
+      DASHBOARD_SERVICE_PORT: '3004'
+    ports:
+      - '3004:3004'
+    networks:
+      - opsera-net
+    healthcheck:
+      test:
+        - '/nodejs/bin/node'
+        - '-e'
+        - "require('http').get('http://localhost:3004/api/v1/health/live',r=>process.exit(r.statusCode===200?0:1)).on('error',()=>process.exit(1))"
+      interval: 15s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    deploy:
+      resources:
+        limits:
+          cpus: '0.5'
+          memory: 256M

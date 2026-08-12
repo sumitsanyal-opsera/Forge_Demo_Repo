@@ -3,7 +3,9 @@
 // Example: postgresql://user:pass@localhost:5432/opsera_stuck_pipeline?connection_limit=20
 
 generator client {
-  provider = "prisma-client-js"
+  provider      = "prisma-client-js"
+  // native: local dev (Mac/Linux); debian-openssl-3.0.x: gcr.io/distroless/nodejs20-debian12 runtime
+  binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
 datasource db {
